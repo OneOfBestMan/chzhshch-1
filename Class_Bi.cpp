@@ -20,3 +20,9 @@ Class_Bi::Class_Bi(void)
 Class_Bi::~Class_Bi(void)
 {
 }
+
+
+void Class_Bi::accept(int bar)
+{
+
+}

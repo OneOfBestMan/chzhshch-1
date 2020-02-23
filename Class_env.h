@@ -8,6 +8,9 @@
 
 */
 
+#ifndef CLASS_ENV_H
+#define CLASS_ENV_H
+
 class Class_env
 {
 public:
@@ -39,3 +42,5 @@ private:
 
 	int totalBar;
 };
+
+#endif

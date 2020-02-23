@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef CLASS_KXIAN_H
+#define CLASS_KXIAN_H
+
 class Class_KXian
 {
 public:
@@ -11,3 +14,5 @@ public:
 private:
 	int pos;
 };
+
+#endif
