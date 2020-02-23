@@ -62,6 +62,10 @@ public:
 
 	baseItemType*  getStart() const{return Start;}
 	baseItemType*  getEnd() const {return End;}
+
+	Class_KXian* getStartRec() { return getStart()->getStartRec(); }
+	Class_KXian* getEndRec() { return getEnd()->getEndRec(); }
+
 	Direction getDirection() const {return d;}
 
 };

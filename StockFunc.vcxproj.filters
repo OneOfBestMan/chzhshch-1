@@ -110,6 +110,12 @@
     <ClInclude Include="StockFunc.h">
       <Filter>Header Files\API</Filter>
     </ClInclude>
+    <ClInclude Include="IComparable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplayable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

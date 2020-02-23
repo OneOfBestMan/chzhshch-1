@@ -173,6 +173,8 @@
     <ClInclude Include="FenXianDuan.h" />
     <ClInclude Include="FenXianDuan_Common.h" />
     <ClInclude Include="FoxFunc.h" />
+    <ClInclude Include="IComparable.h" />
+    <ClInclude Include="IDisplayable.h" />
     <ClInclude Include="include_api.h" />
     <ClInclude Include="slist.h" />
     <ClInclude Include="StdAfx.h" />
