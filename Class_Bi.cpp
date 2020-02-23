@@ -193,7 +193,11 @@ void Class_LeiBi::FenBi_Step1()
 			high = start->getHigh();
 			low = start->getLow();
 		}
-	}while (p != end);
+	}while (p != end - 1);
+	// 将剩余的K线做成1个类笔
+	if (start != end -  1)
+		intermidiate->push_back(ContainerType::value_type(&(*start), &(*p), high, low, d, KXianCnt));
+
 
 	/* 对intermidiate中的各个类笔，做处理，检查下列情形：即 这3个类笔，各自KXianCnt都是2， 并且 第1、第3 类笔 同向或包含， 将这3个类笔，合并成为1个类笔，总笔数是4
 
