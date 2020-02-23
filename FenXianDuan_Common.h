@@ -208,7 +208,16 @@
 				biLatter = CharacVecStack.back().end + 1;
 				if (biLatter < end - 2)
 				{
-					CharacVecStack.pop_back();
+					if (getDirection(*biFormer, *biLatter) == d)
+					{
+						CharacVecStack.pop_back();
+					}
+					else if ((*biFormer) >>  (*biLatter))
+					{
+						biFormer = biLatter;
+						biLatter += 2;
+					}
+
 					continue;
 				}
 				else
