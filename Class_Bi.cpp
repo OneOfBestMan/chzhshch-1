@@ -58,7 +58,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	intermediate = new ContainerType();;
+	intermediate = new ContainerType();
 
 	Class_env *env = Class_env::getInstance();
 
@@ -413,7 +413,13 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 		current++;
 	}
 
-	// TODO: 根据 analyzeStack 中的各个 顶、底分型， 生成 笔列表
+	// 根据 analyzeStack 中的各个 顶、底分型， 生成 笔列表
+
+	container = new ContainerType();
+	container->reserve(analyzeStack.size());
+
+	
+
 
 #undef IS_TOP
 #undef IS_BOT
