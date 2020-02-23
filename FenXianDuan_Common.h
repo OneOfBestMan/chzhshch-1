@@ -26,9 +26,10 @@
 		baseItemType possiblePrevXianDuanChracVec = *current;
 		while (current < end - 2)
 		{
-			if (possiblePrevXianDuanChracVec >> *(current + 2))
+			baseItemType& suspect = *(current + 2);
+			if (possiblePrevXianDuanChracVec >> suspect)
 			{
-				possiblePrevXianDuanChracVec.merge(*(current+2), -hints);
+				possiblePrevXianDuanChracVec.merge(suspect, -hints);
 				current += 2;
 				continue;
 			}
@@ -42,10 +43,11 @@
 		baseItemType lastBi = possiblePrevXianDuanChracVec;
 		while (current < end - 2)
 		{
-			d = getDirection(lastBi, *(current + 2));
-			if (d == hints || (lastBi << *(current + 2)))
+			baseItemType &suspect = *(current + 2);
+			d = getDirection(lastBi, suspect);
+			if (d == hints || (lastBi << suspect))
 			{
-				lastBi = *(current + 2);
+				lastBi = suspect;
 				current += 2;
 				continue;
 			}
@@ -137,8 +139,33 @@
 		}
 	}
 
+	static void NormalizeV2(baseItemIterator start, baseItemIterator end)
+	{
+		/* 这个函数，处理各个相邻线段，连接点处，最低值、最高值 不相等的情况；出现这种情况的原因，是因为，线段的最低值、最高值出现在线段中间某根K线，而不是出现在连接点处 */
+		baseItemIterator curr = start;
+
+		while (curr != end - 1)
+		{
+			baseItemType &former = *curr;
+			baseItemType &latter = *(curr + 1);
+
+
+			if (former.getDirection() == ASCENDING)
+			{
+				latter.High = former.High = max(former.getHigh(), latter.getHigh());
+			}
+			else
+			{
+				latter.Low = former.Low = min(former.getLow(), latter.getLow());
+			}
+			curr++;
+		}
+	}
+
 	static ContainerType* startFenXianDuan(baseItemIterator start, baseItemIterator end)
 	{
+		NormalizeV2(start, end);
+
 		baseItemType_Container* backupBeforeNormalize = (baseItemType_Container*)NULL;
 		ContainerType* resultSet = (ContainerType*)NULL;
 
@@ -213,7 +240,10 @@
 				biFormer = CharacVecStack.back().start - 1;
 				biLatter = CharacVecStack.back().end + 1;
 				
-				/*if (((*biFormer) == (*oldBiFormer)) && ((*biLatter) == (*oldBiLatter)))
+				
+				/*
+				// 这段代码是用来调试死循环的。 
+				if (((*biFormer) == (*oldBiFormer)) && ((*biLatter) == (*oldBiLatter)))
 				{
 					count++;
 				}
@@ -224,12 +254,19 @@
 					oldBiLatter = biLatter;
 				}
 
+				if (count == 4)
+					printf("break me here\n");
+
 				if (count == 5)
-					break;*/
+					break;
+				*/
 
 				if (biLatter < end - 2)
 				{
-					if (getDirection(*biFormer, *biLatter) == d)
+					assert(getDirection(*biFormer, *biLatter) == d);
+					CharacVecStack.pop_back();
+
+					/*if (getDirection(*biFormer, *biLatter) == d)
 					{
 						CharacVecStack.pop_back();
 					}
@@ -241,7 +278,7 @@
 					{
 						biFormer = biLatter;
 						biLatter += 2;
-					}
+					}*/
 
 					continue;
 				}

@@ -20,6 +20,7 @@ public:
 		ItemIterator curr = Bi_Or_XianDuan::container->begin();
 		ItemIterator end = Bi_Or_XianDuan::container->end();
 
+
 		ItemType item = *curr;
 
 		Class_KXian *veryStart = item.getStartRec();

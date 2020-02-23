@@ -24,8 +24,8 @@ Class_env::Class_env(CALCINFO *p)
 		p->m_pCalcParam[1].m_nParamStart < 0  ||
 		p->m_pCalcParam[2].m_nParamStart < 0  || 
 		p->m_pCalcParam[3].m_nParamStart < 0  ||
-		p->m_pCalcParam[4].m_nParamStart >= 0 ||
-		p->m_pCalcParam[5].m_nParamStart >= 0 )
+		p->m_pCalcParam[4].m_nParamStart > 0 ||
+		p->m_pCalcParam[5].m_nParamStart > 0 )
 		throw invalid_argument("输入 数组参数不正确");
 
 	startParm = p->m_pCalcParam[0].m_pfParam;
@@ -86,8 +86,8 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		filename<<"c:\\" << env->stockName << env->barKind << ".txt";
 
 		ofstream file(filename.str().c_str());
-		preDump<Class_XianDuan<2>>(map);
-		DumpV2<Class_XianDuan<2>>(map, file);
+		preDump<Class_XianDuan<7>>(map);
+		DumpV2<Class_XianDuan<7>>(map, file);
 #endif
 	}
 
