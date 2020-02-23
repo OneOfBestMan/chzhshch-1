@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Class_env.h"
+#include "FenXianDuan.h"
 
 #include <stdexcept>
 using namespace std;
@@ -7,6 +8,7 @@ using namespace std;
 #include "Class_XianDuan.h"
 
 
+#if 0
 template <>
 void preDump<typename Class_KXian>(dumpHelperMap &helperMap)
 {
@@ -66,8 +68,11 @@ void preDump<typename Class_Bi<vector<Class_KXian> >>(dumpHelperMap &helperMap)
 	}
 }
 
+#endif
+
+#if 0
 template<>
-void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release = false)
+void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release)
 {
 	typedef Class_XianDuan<1> XianDuanClass;
 
@@ -95,7 +100,7 @@ void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release = false)
 		XianDuanClass::baseItems = NULL;
 	}
 }
-
+#endif
 
 
 Class_env* Class_env::env = NULL;
@@ -147,12 +152,12 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		// 释放之前的分析结果
 		if (env)
 		{
-			HuaFenXianDuan<Class_XianDuan<7>>(true);
+			FenXianDuan<Class_XianDuan<7>>(true);
 			delete env;
 		}
 
 		env = newEnv;
-		HuaFenXianDuan<Class_XianDuan<7>>();
+		FenXianDuan<Class_XianDuan<7>>(false);
 	}
 
     return env;

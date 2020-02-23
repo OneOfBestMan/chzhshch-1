@@ -48,6 +48,8 @@ public:
 	typedef Class_KXian baseItemType;
 	typedef vector<Class_KXian> baseItemType_Container;
 
+	typedef preDumpTemplate<Class_Bi>  preDumpClass;
+
 	typedef struct {
 		baseItemType* start;
 		baseItemType* end;

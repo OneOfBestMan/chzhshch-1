@@ -10,6 +10,16 @@ K线   用于刻画分型的顶点、线段的高低点、中枢的高低点、中枢的第三买卖点
 
 */
 
+
+template<>
+void preDump<typename Class_KXian> (dumpHelperMap &helperMap)
+{
+	Class_KXian::preDumpClass::doWork(helperMap);
+}
+
+
+
+
 Direction operator-(const Direction& d)
 {
 	switch (d)

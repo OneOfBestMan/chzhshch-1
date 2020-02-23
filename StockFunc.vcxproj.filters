@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{4afe9fd9-a9c3-4f86-a7c5-d9e2094eecd1}</UniqueIdentifier>
+      <UniqueIdentifier>{519f46a2-8331-4565-bf24-b641ae25969d}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{132903df-5468-44b0-86d0-1da2e5d5ebb2}</UniqueIdentifier>
+      <UniqueIdentifier>{e1182ca9-8f1c-4c71-bcf3-43c7fb836274}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{6df0610e-8d64-45c8-ae40-876a945bbf60}</UniqueIdentifier>
+      <UniqueIdentifier>{017a8ac1-37f0-4de7-9a26-99d9ea1b11d2}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -66,6 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class_ZhongShu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FenXianDuan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h">

@@ -5,7 +5,12 @@
 
 #include <assert.h>
 #include <vector>
+
+
 using namespace std;
+
+
+#include "Debug.h"
 
 
 typedef enum Direction
@@ -22,6 +27,8 @@ class Class_KXian
 public:
 
 	typedef vector<Class_KXian> ContainerType;
+
+	typedef preDumpTemplate<Class_KXian>  preDumpClass;
 
 	typedef struct
 	{
@@ -86,6 +93,34 @@ public:
 private:
 	valueType bar;
 };
+
+
+
+template<>
+class preDumpTemplate<typename Class_KXian>
+{
+public:
+	static void doWork(dumpHelperMap &helperMap)
+	{
+		char tempSpace[20]; // 类似这样的串：(####.##, ####.##)
+		if (Class_KXian::container == NULL) return;
+
+		Class_KXian::ContainerType::iterator p = Class_KXian::container->begin();
+		Class_KXian::ContainerType::iterator end   = Class_KXian::container->end();
+		while (p != end)
+		{
+			Class_KXian::ContainerType::value_type &item = *p;
+			sprintf(tempSpace, "(%4.2f, %4.2f)", item.getLow(), item.getHigh());
+			int content = strlen(tempSpace);
+			helperMap[&item] = mappedInfo(content, content + 1);
+			p++;
+		}
+	}
+};
+
+template<>
+void preDump<typename Class_KXian> (dumpHelperMap &helperMap);
+
 
 
 #endif

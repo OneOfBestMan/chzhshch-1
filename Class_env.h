@@ -17,6 +17,8 @@ using namespace std;
 
 */
 
+#if 0
+
 typedef struct mappedInfo{
 	int content; 
 	int total; 
@@ -61,7 +63,7 @@ void preDump(dumpHelperMap &helperMap)
 }
 
 template<class XianDuanClass>
-void DumpOut()
+void Dump()
 {
 	/* 大致思路是：
 	（1）从高级线段、到低级线段，逐层打印； 在打印高层线段时，其包含的低层线段，也被打印出来；
@@ -72,11 +74,19 @@ void DumpOut()
 
 
 	dumpHelperMap helperMap;
+
 	preDump<XianDuanClass>(helperMap);
 
-	
-}
+	Dump<XianDuanClass::baseItemType>(); // 先打印 子 线段
 
+	XianDuanClass::ContainerType::iterator begin = XianDuanClass::container->begin();
+	XianDuanClass::ContainerType::iterator end = XianDuanClass::container->end();
+
+}
+#endif
+
+
+#if 0
 
 template<class XianDuanClass>
 void HuaFenXianDuan(bool release = false)
@@ -111,7 +121,7 @@ void HuaFenXianDuan(bool release = false)
 template<>
 void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release);
 
-
+#endif
 
 class Class_env
 {

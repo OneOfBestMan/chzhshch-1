@@ -323,6 +323,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Debug.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FenXianDuan.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>

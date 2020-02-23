@@ -165,6 +165,8 @@
     <ClInclude Include="Class_KXian.h" />
     <ClInclude Include="Class_XianDuan.h" />
     <ClInclude Include="Class_ZhongShu.h" />
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="FenXianDuan.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />
   </ItemGroup>
