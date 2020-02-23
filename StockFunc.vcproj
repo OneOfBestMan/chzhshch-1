@@ -347,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\slist.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>

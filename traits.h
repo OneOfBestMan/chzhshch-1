@@ -122,7 +122,13 @@ public:
 
 	bool intersect(const Item &latter)
 	{
-		return (this->getHigh() >= latter.getLow()) || (this->getLow() < = latter.getHigh());
+		float high1 = getHigh();
+		float high2 = latter.getHigh();
+
+		float low1 = getLow();
+		float low2 = latter.getLow();
+
+		return (high1 >= high2 && high2 >= low1 || high1 <= high2 && high1 >= low2);
 	}
 };
 
@@ -159,6 +165,7 @@ public:
 	/* 用于比较中枢时间前后 */
 	virtual veryLowXianDuanType* getEnd() = 0;
 	virtual veryLowXianDuanType* getStart() = 0;
+	virtual bool intersect(const IZhongShu &latter) = 0;
 };
 
 
@@ -215,8 +222,7 @@ public:
 	float High, Low;  // High和Low表示中枢波动的高低点
 	veryBaseXianDuanType *Start;
 	veryBaseXianDuanType *End;
-
-	//Direction d;
+	Direction d; // 中枢的方向，与所在线段方向相反：即，在向下的线段中，中枢方向是向上的。
 
 
 	/*
@@ -276,7 +282,7 @@ public:
 
 
 	
-	/*Direction getDirection() const {return d;} */
+	Direction getDirection() const {return d;} 
 
 	Class_KXian* getStartRec()
 	{
@@ -365,13 +371,18 @@ public:
 			assert(0);
 		}
 		return *this;
-	}
-
-	bool intersect(const Item &latter)
-	{
-		return (this->getHigh() >= latter.getLow()) || (this->getLow() < = latter.getHigh());
 	}*/
 
+	bool intersect(const IZhongShu &latter)
+	{
+		float high1 = getHigh();
+		float high2 = latter.getHigh();
+
+		float low1 = getLow();
+		float low2 = latter.getLow();
+
+		return (high1 >= high2 && high2 >= low1 || high1 <= high2 && high1 >= low2);
+	}
 };
 
 

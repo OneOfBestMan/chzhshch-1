@@ -4,6 +4,209 @@
 
 #include "Class_ZhongShu.h"
 
+#include "slist.h"
+
+class MultiLevelZhongShuView // 多级别中枢联立视图，用于中枢扩展的分析
+{
+private:
+	static const int MAX_LEVEL = 7; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
+
+	struct ElemOfView
+	{
+		IZhongShu *elem;
+		List_Entry level_link[MAX_LEVEL]; 
+		List_Entry time_link;
+		ElemOfView(IZhongShu* cs) {elem = cs; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; }
+		ElemOfView() {elem = NULL; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL;  }
+	};
+
+	List_Entry time_list;
+	List_Entry level_list[MAX_LEVEL];
+
+	int total; // time_list队列所含的元素个数
+	int levelTotal[MAX_LEVEL]; // 个级别队列所含的元素个数
+
+
+public:
+	int max_level;
+	int min_level;
+	// int forward; // 增量式（随着添加中枢，随着merge）、还是待添加所有的中枢之后，再作merge。 如果是增量式，那么同级别中枢列表使用栈，否则，应该使用对列。
+
+	MultiLevelZhongShuView(/*bool mergeForward = true*/)
+	{
+		max_level = -1; 
+		min_level = MAX_LEVEL + 1; 
+
+		initializeList(&time_list);
+
+		for (int i = 0; i < MAX_LEVEL; i++)
+			initializeList(&level_list[i]);
+
+		/*forward = mergeForward;*/ 
+	}
+
+	~MultiLevelZhongShuView() 
+	{
+		if (total > 0)
+		{
+			while (!isEmpty(&time_list))
+			{
+				List_Entry *item = remove(time_list.next);
+				delete item;
+				total--;
+			}
+			assert(total == 0);
+		}
+	}
+
+	void Add_Elem(IZhongShu *zs)
+	{
+		int level = zs->getGrade();
+		assert(level < MAX_LEVEL);
+
+		max_level = max(level, max_level);
+		min_level = min(level, min_level);
+
+		ElemOfView *elem = new ElemOfView(zs);
+		append(&time_list, &elem->time_link);
+		total++;
+
+		for (int i = min_level; i <= level; i++)
+		{
+			append(&level_list[i], &elem->level_link[i]);
+			levelTotal[i]++;
+		}
+	}
+
+	void RemoveElem(ElemOfView *eov)
+	{
+		int level = eov->elem->getGrade();
+
+		int possibleMaxLevel = -1;
+
+		for (int i = min_level; i <= level; i++)
+		{
+			assert(!isEmpty(&level_list[i]) && levelTotal[i] > 0);
+
+			// 从 level list队列中删除eov
+			eov->level_link[i].prev->next = eov->level_link[i].next;
+			eov->level_link[i].next->prev = eov->level_link[i].prev;
+			levelTotal[i]--;
+
+			if (min_level == i && isEmpty(&level_list[i]))
+			{
+				assert(levelTotal[i] == 0);
+				min_level++;
+			}
+
+			if (levelTotal[i] > 0)
+				possibleMaxLevel = i;
+		}
+
+		if (min_level > max_level)
+		{
+			// level_list 全变空了
+			assert(total == 1);
+			min_level = MAX_LEVEL + 1;
+			max_level = -1;
+		}else
+		{
+			if (max_level == level && isEmpty(&level_list[max_level]))
+			{
+				// 如果eov是 max_level队列的最后一个元素，则需要更新max_level到 低级别非空队列
+				max_level = possibleMaxLevel;
+			}
+
+			if (min_level == level + 1)
+			{
+				// 如果eov是 min_level队列的最后一个元素，则扫描高级别非空队列，更新min_level
+				while (isEmpty(&level_list[min_level]))
+					min_level++;
+			}
+		}
+
+		eov->time_link.prev->next = eov->time_link.next;
+		eov->time_link.next->prev = eov->time_link.prev;
+		total--;
+
+		if (!total) 
+			assert(isEmpty(&time_list));
+	}
+
+	void merge(IZhongShu *zs)
+	{
+		bool changed = false;
+		int level = zs->getGrade();
+
+		/* 
+		对于中枢0到中枢1，中枢1到中枢2，需要特殊的处理，而不能采用高级别中枢扩展的方式（3个中枢并排有重叠）。归其原因，是由于，构成中枢的最小级别线段，即：线段1，
+		是衡量中枢的大小的最基本单位，比如，3个级别1线段构成中枢1,9个级别1线段构成中枢2,27个级别1线段构成中枢3，以此类推。但是，在中枢级别变大后，就按照3个同级别中枢，并排
+		存在重叠关系（intersect），构成高级别中枢来处理了，而不再去数低级别线段数量。原因在于，（连接）这些（构成高级别中枢的）次级别中枢之间的线段，不一定是和这些
+		次级别中枢同级别的线段（譬如，可以是直接跳空涨停，也就是一个级别1的线段），因此，就不再考虑这些中枢之间的线段的数量；与此相反，对于低级别中枢来说，比如，中枢级别0
+		到中枢级别1、中枢级别1到中枢级别2，这些中枢之间的连接线，就是级别1的线段，因此，不得不需要将它们的数量关系考虑在内。举例来说：
+		
+	   （1）两个intersect的中枢0（3个1分钟线段），就可以构成1个中枢1，
+
+                            /\
+                           /  \
+                  /\      /    3
+                 /  2    /      \
+          /\    2'   \  /        \
+         /  1  /      \/
+ 		/    \/
+       /
+		
+		1、2、3是中枢0， 1和2构成中枢1，只需要2个中枢0具有intersect关系就可以构成中枢1了，而不需要像高级别中枢需要3个低级别中枢的并排才能构成。究其原因，
+		是因为，把2'也算作构成中枢0的那一笔了。
+
+		此外，中枢1到中枢2，也需要特殊处理，比如下例：
+
+                                         TP
+                                         /\
+                                        /  \      /\
+                                       /    \    5  \
+                            /\        4'     \  /    \
+                           /  \      /        \/      \
+                  /\      3'   3    /                  \
+                 /  2    /      \  /                    \
+          /\    2'   \  /        \/                      \
+         /  1  /      \/                                  \
+ 		/    \/
+       /
+
+	   这个图可以归结为如下的pattern: 一个TP由两个级别2线段构成；左侧级别2线段，包含1个级别1中枢（1+2'+2）、1个级别0中枢(3)；右侧级别2线段，包含1个级别0中枢（5）；右侧级别2线段，
+	   跌到了左侧级别1中枢的价格区间； 这时候，可以把级别1中枢+级别0中枢+级别0中枢，看做级别2中枢；
+       */
+
+		do
+		{
+			changed = false;
+
+			// 三个中枢 并排，有重叠;
+			if (levelTotal[level] >= 3)
+			{
+				// assert(level_stacks[level].top->elem == zs);
+				IZhongShu *last = list_entry(level_list[level].prev, ElemOfView, level_link[level])->elem;
+				IZhongShu *prev = list_entry(level_list[level].prev->prev, ElemOfView, level_link[level])->elem;
+				IZhongShu *prev_prev = list_entry(level_list[level].prev->prev->prev, ElemOfView, level_link[level])->elem;
+
+				if (zs->getGrade() == prev->getGrade() && prev->getGrade() == prev_prev->getGrade() &&
+					zs->intersect(*prev_prev) && prev->intersect(*prev_prev) && zs->intersect(*prev))
+				{
+					// 三个中枢 并排重叠 形成更大的中枢
+					changed = true;
+
+				}	
+			}
+		}while (changed);
+	}
+
+};
+
+
+
+
+
 template <class XianDuanClass>
 class AnalyzeZhongShu_Template
 {
@@ -15,7 +218,7 @@ public:
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 
 /*
-  对于向上的线段说， TurningPoint(TP)是指 这样的点： TP1、TP2
+  对于向上的线段说，转折点TurningPoint(TP)是指 这样的点： TP1、TP2
 
                TP2       /
                 /\      /
@@ -41,6 +244,8 @@ TP1_1  TP1_2/
 
 	static void handleTurningPoint(ItemIterator &curr)
 	{
+		MultiLevelZhongShuView view;
+
 		baseItemType* TP1_1 = (*curr).getStart();
 		baseItemType* TP1_2 = TP1_1 + 1;
 		baseItemType* end = (*curr).getEnd();
@@ -50,11 +255,11 @@ TP1_1  TP1_2/
 			if (!TP1_1->zsList && !TP1_2->zsList)
 			{
 				IZhongShu *zs = createZhongShu(TP1_2);
-				(*curr).addZhongShu(zs);
-				zs = createZhongShu(zs, TP1_2);
-			}
+				view.Add_Elem(zs);
+				TP1_1 = TP1_1 + 2;
+				TP1_2 = TP1_2 + 2;
+			} 
 		}
-
 	}
 
 	static void handleTurningPoint(baseItemType *start, baseItemType *end)
@@ -70,7 +275,7 @@ TP1_1  TP1_2/
 		}*/
 	}
 /*
-  对于向上的线段说， Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
+  对于向上的线段说， 并列Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
 
                            /\
                           /  \      /
