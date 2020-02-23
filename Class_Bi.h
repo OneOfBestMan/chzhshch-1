@@ -86,6 +86,8 @@ public:
 
 	static const int MIN_BI_KXIAN = 5; // 一笔 至少包含 5根 无包含关系的K线；
 
+	Class_XianDuan<1>* getBaseXianDuanStart() {return NULL;}
+	Class_XianDuan<1>* getBaseXianDuanEnd() {return NULL;}
 private:
 
 		/*

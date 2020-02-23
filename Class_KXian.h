@@ -39,6 +39,10 @@ public:
 	friend ostream& operator<< (ostream&, Class_KXian &);
 
 	static void initialize(bool release = false);
+
+	Class_XianDuan<1>* getBaseXianDuanStart() {return NULL;}
+	Class_XianDuan<1>* getBaseXianDuanEnd() {return NULL;}
+
 private:
 	float Start;
 	float End;

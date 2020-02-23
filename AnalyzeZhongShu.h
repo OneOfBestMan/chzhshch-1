@@ -6,103 +6,93 @@
 
 #include "slist.h"
 
+/*
+  对于向上的线段说，转折点TurningPoint(TP)是指 这样的点： TP1、TP2
 
-
-/*class IRules
-{
-	bool canChange
-}
+               TP2       /
+                /\      /
+     TP1       /  \    end
+      /\      /    \  /
+     /  \    /      \/
+TP1_1  TP1_2/
+   /      \/
+  /
+ 
+ 对于向下的线段，TurningPoint是指 这样的点：TP1、TP2
+  \
+   \        /\
+ TP1_1  TP1_2 \
+	 \    /    \        /\
+	  \  /      \      /  \
+	   \/        \    /    \
+      TP1         \  /      end
+                   \/        \
+                  TP2         \
+                               \
 */
 
-class MultiLevelZhongShuView;
+/*
+  对于向上的线段说， 并列Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
 
-template <class XianDuanClass>
-class AnalyzeZhongShu_Template_V2
-{
-public:
-	typedef typename XianDuanClass::baseItemType_Container::iterator baseItemIterator;
-	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
-	typedef typename XianDuanClass::baseItemType baseItemType;
-	typedef typename XianDuanClass::ContainerType ContainerType;
-	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
+                           /\
+                          /  \      /
+                         /   JP5   /
+                /\     JP4     \  /
+               /  \    /        \/
+      /\     JP2  JP3 /
+     /  \    /      \/
+   JP0  JP1 /
+   /      \/
+  /
 
-	/*static void handleTurningPoint(ItemIterator &curr)
-	{
-	}*/
+  对于向下的线段说， Juxtaposition是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
 
-	static void handleTurningPoint(MultiLevelZhongShuView &view, baseItemType *start, baseItemType *end)
-	{
-	}
+  \
+   \      /\
+   JP0  JP1 \          
+	 \  /    \        /\
+      \/    JP2     JP3 \
+               \    /    \          /
+                \  /      \        /
+                 \/       JP4    JP5
+                            \    /
+                             \  /
+                              \/
 
-	static void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *start, XianDuanClass *end)
-	{
-	}
+  对于下列的线段(如果父亲线段方向是向上的)，Juxtaposition是指： JP0/JP1/JP2/JP3/JP4/JP5
+   
+                                 /\
+                                /  \
+                               /    \
+                /\            /      \
+     /\        /  \          /        \
+    /  \      /    \        /          \
+  JP0  JP1  JP2    JP3    JP4          JP5
+  /      \  /        \    /              \
+          \/          \  /                \
+                       \/
 
-	static void handleLast(MultiLevelZhongShuView &view, baseItemType *last)
-	{
-	}
-	static void handleLast(MultiLevelZhongShuView &view, XianDuanClass *last)
-	{
-	}
+ 对于下列的线段(如果父亲线段方向是向下的)，Juxtaposition是指： JP0/JP1/JP2/JP3
+   
+                                 /\
+                                /  \
+                               /    \
+                /\            /      \
+     /\        /  \          /        \
+    /  \      /    \        /          \
+   /  JP0   JP1    JP2    JP3           \
+  /      \  /        \    /              \
+          \/          \  /                \
+                       \/
 
-	/*static void handleJuxtaposition(ItemIterator &curr)
-	{
-	}
-
-	static void handleJuxtaposition(MultiLevelZhongShuView &view, baseItemType *start, baseItemType *end)
-	{
-	}*/
-
-	static void doWork(XianDuanClass &item)
-	{
-		MultiLevelZhongShuView view;
-
-		baseItemType* TP1_1 = item.getStart();
-		baseItemType* TP1_2 = TP1_1 + 1;
-		baseItemType* end = item.getEnd();
-
-		while (TP1_1 < end)
-		{
-			AnalyzeZhongShu_Template_V2<baseItemType>::doWork(*TP1_1);
-
-			if (TP1_2 < end)
-			{
-				AnalyzeZhongShu_Template_V2<baseItemType>::doWork(*TP1_2);
-				handleTurningPoint(view, TP1_1, TP1_2);
-			}
-			else
-				handleLast(view, TP1_1); // 该线段中的最后那个次级别线段
-
-
-			TP1_1 = TP1_1 + 2;
-			TP1_2 = TP1_2 + 2;
-		}
-
-		item.zsList = view.getResult();
-	}
-};
-
-
-template <>
-class AnalyzeZhongShu_Template_V2<Class_XianDuan<1>>
-{
-public:
-	static void handleTurningPoint(MultiLevelZhongShuView &view, Class_XianDuan<1> *start, Class_XianDuan<1> *end)
-	{
-	}
-
-	static void handleLast(MultiLevelZhongShuView &view, Class_XianDuan<1> *last)
-	{
-	}
-	static void doWork(Class_XianDuan<1> &item)
-	{
-	}
-
-};
+*/
 
 
 class MultiLevelZhongShuView // 多级别中枢联立视图，用于中枢扩展的分析
 {
+template <typename XianDuanClass> friend void handleTurningPoint(MultiLevelZhongShuView &, typename XianDuanClass*, typename XianDuanClass*);
+template <typename XianDuanClass> friend void handleLast(MultiLevelZhongShuView &, typename XianDuanClass*);
+
 private:
 	static const int MAX_LEVEL = 7; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
 
@@ -232,13 +222,13 @@ public:
 		}
 	}
 
-#if 0
-	void merge()
+
+	void merge(Itraits *TP1_2)
 	{
 
 	}
 
-
+#if 0
 
 	void merge(IZhongShu *zs)
 	{
@@ -311,8 +301,6 @@ public:
 #endif
 
 
-	template <typename XianDuanClass> friend void AnalyzeZhongShu_Template_V2<XianDuanClass>::handleTurningPoint(MultiLevelZhongShuView &, typename XianDuanClass::baseItemType*, typename XianDuanClass::baseItemType*);
-	template <typename XianDuanClass> friend void AnalyzeZhongShu_Template_V2<XianDuanClass>::handleLast(MultiLevelZhongShuView &, typename XianDuanClass::baseItemType*);
 
 };
 
@@ -330,30 +318,7 @@ public:
 	typedef typename XianDuanClass::ContainerType ContainerType;
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 
-/*
-  对于向上的线段说，转折点TurningPoint(TP)是指 这样的点： TP1、TP2
 
-               TP2       /
-                /\      /
-     TP1       /  \    end
-      /\      /    \  /
-     /  \    /      \/
-TP1_1  TP1_2/
-   /      \/
-  /
- 
- 对于向下的线段，TurningPoint是指 这样的点：TP1、TP2
-  \
-   \        /\
- TP1_1  TP1_2 \
-	 \    /    \        /\
-	  \  /      \      /  \
-	   \/        \    /    \
-      TP1         \  /      end
-                   \/        \
-                  TP2         \
-                               \
-*/
 
 	static void handleTurningPoint(ItemIterator &curr)
 	{
@@ -389,61 +354,7 @@ TP1_1  TP1_2/
 			}
 		}*/
 	}
-/*
-  对于向上的线段说， 并列Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
 
-                           /\
-                          /  \      /
-                         /   JP5   /
-                /\     JP4     \  /
-               /  \    /        \/
-      /\     JP2  JP3 /
-     /  \    /      \/
-   JP0  JP1 /
-   /      \/
-  /
-
-  对于向下的线段说， Juxtaposition是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
-
-  \
-   \      /\
-   JP0  JP1 \          
-	 \  /    \        /\
-      \/    JP2     JP3 \
-               \    /    \          /
-                \  /      \        /
-                 \/       JP4    JP5
-                            \    /
-                             \  /
-                              \/
-
-  对于下列的线段(如果父亲线段方向是向上的)，Juxtaposition是指： JP0/JP1/JP2/JP3/JP4/JP5
-   
-                                 /\
-                                /  \
-                               /    \
-                /\            /      \
-     /\        /  \          /        \
-    /  \      /    \        /          \
-  JP0  JP1  JP2    JP3    JP4          JP5
-  /      \  /        \    /              \
-          \/          \  /                \
-                       \/
-
- 对于下列的线段(如果父亲线段方向是向下的)，Juxtaposition是指： JP0/JP1/JP2/JP3
-   
-                                 /\
-                                /  \
-                               /    \
-                /\            /      \
-     /\        /  \          /        \
-    /  \      /    \        /          \
-   /  JP0   JP1    JP2    JP3           \
-  /      \  /        \    /              \
-          \/          \  /                \
-                       \/
-
-*/
 	static void handleJuxtaposition(ItemIterator &curr)
 	{
 	}
@@ -500,10 +411,111 @@ void AnalyzeZhongShu_PostOrder<Class_XianDuan<1>>()
 
 
 template <class XianDuanClass>
+void handleLast(MultiLevelZhongShuView &view, XianDuanClass *last)
+{
+}
+
+
+template <class XianDuanClass>
+void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, XianDuanClass *TP1_2)
+{
+	if (!TP1_1->zsList && !TP1_2->zsList)
+	{
+		//assert(TP1_1->GRADE == 1);
+		IZhongShu *zs = createZhongShu(TP1_2);
+		view.Add_Elem(zs);
+	}
+	else
+	{
+		for (int i = 0; i < TP1_1->zsList->size(); i++)
+			view.Add_Elem(TP1_1->zsList->at(i));
+		for (int i = 0; i < TP1_2->zsList->size(); i++)
+			view.Add_Elem(TP1_2->zsList->at(i));
+
+		view.merge(TP1_2);
+	}
+}
+
+template <class XianDuanClass>
+void doWork(XianDuanClass &item)
+{
+	typedef typename XianDuanClass::baseItemType baseItemType;
+
+	MultiLevelZhongShuView view;
+	
+	baseItemType* TP1_1 = item.getStart();
+	baseItemType* TP1_2 = TP1_1 + 1;
+	baseItemType* end = item.getEnd();
+
+	while (TP1_1 <= end)
+	{
+		doWork(*TP1_1);
+		if (TP1_2 <= end)
+		{
+			doWork(*TP1_2);
+			handleTurningPoint(view, TP1_1, TP1_2);
+		}
+		else
+			handleLast(view, TP1_1); // 该线段中的最后那个次级别线段
+
+		TP1_1 = TP1_1 + 2;
+		TP1_2 = TP1_2 + 2;
+	}
+	item.zsList = view.getResult();
+}
+
+template<>
+void doWork(Class_XianDuan<1>  &item)
+{
+}
+
+template <class XianDuanClass>
+void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView *view)
+{
+	typedef typename XianDuanClass::baseItemType baseItemType;
+	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
+
+
+	if (startFrom)
+	{
+		ItemIterator end =  XianDuanClass::container->end();
+		XianDuanClass *remainingEnd = &(*(end - 1));
+		while (startFrom <= remainingEnd)
+		{
+			XianDuanClass& TP1_1 = *startFrom;
+			doWork(TP1_1);
+
+			if (startFrom + 1 <= remainingEnd)
+			{
+				XianDuanClass &TP1_2 = *(startFrom + 1);
+				doWork(TP1_2);
+
+				handleTurningPoint(*view, &TP1_1, &TP1_2);
+				startFrom += 2;
+			}
+			else
+			{
+				handleLast(*view, &TP1_1);
+				startFrom++;
+			}
+		}
+		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
+		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
+	}
+}
+
+template <>
+void AnalyzeZhongShu_Remaining<Class_XianDuan<1>>(Class_XianDuan<1> *startFrom, MultiLevelZhongShuView *view)
+{
+}
+
+
+template <class XianDuanClass>
 void AnalyzeZhongShu_PostOrder_V2()
 {
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
+
 
 	if (XianDuanClass::container)
 	{
@@ -516,52 +528,32 @@ void AnalyzeZhongShu_PostOrder_V2()
 		while (curr < end)
 		{
 			XianDuanClass& TP1_1 = *curr;
-			AnalyzeZhongShu_Template_V2<XianDuanClass>::doWork(TP1_1);
+			doWork(TP1_1);
 			
 			if (curr + 1 < end)
 			{
 				XianDuanClass &TP1_2 = *(curr + 1);
-				AnalyzeZhongShu_Template_V2<XianDuanClass>::doWork(TP1_2);
+				doWork(TP1_2);
 
-				AnalyzeZhongShu_Template_V2<XianDuanClass>::handleTurningPoint(view, &TP1_1, &TP1_2);
+				handleTurningPoint(view, &TP1_1, &TP1_2);
 				curr += 2;
 			}
 			else
 			{
-				AnalyzeZhongShu_Template_V2<XianDuanClass>::handleLast(view, &TP1_1);
+				handleLast(view, &TP1_1);
 				curr++;
 			}
 		}
 
 		// 会有一些低级别线段， 它们还没有被归纳到 高级别线段，因此需要处理这些线段
 		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
-		baseItemType *baseItemEnd = &(*(XianDuanClass::baseItems->end() - 1));
-		while (remaining <= baseItemEnd)
-		{
-			baseItemType& TP1_1 = *remaining;
-			AnalyzeZhongShu_Template_V2<baseItemType>::doWork(TP1_1);
-
-			if (remaining + 1 < baseItemEnd)
-			{
-				baseItemType &TP1_2 = *(remaining + 1);
-				AnalyzeZhongShu_Template_V2<baseItemType>::doWork(TP1_2);
-
-				AnalyzeZhongShu_Template_V2<baseItemType>::handleTurningPoint(view, &TP1_1, &TP1_2);
-				remaining += 2;
-			}
-			else
-			{
-				AnalyzeZhongShu_Template_V2<baseItemType>::handleLast(view, &TP1_1);
-				remaining++;
-			}
-		}
+		AnalyzeZhongShu_Remaining<baseItemType>(remaining, &view);
 	}
 	else
 	{
 		AnalyzeZhongShu_PostOrder_V2<baseItemType>();
 	}
 }
-
 
 template <>
 void AnalyzeZhongShu_PostOrder_V2<Class_XianDuan<1>>()

@@ -44,9 +44,9 @@ public:
 
 	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
 
-
-
-
+	/* 这两个接口，是给中枢服务的，中枢最小的构成单位 */
+	Class_XianDuan<1>* getBaseXianDuanStart() {return getStart()->getBaseXianDuanStart();}
+	Class_XianDuan<1>* getBaseXianDuanEnd() {return getEnd()->getBaseXianDuanEnd();}
 	
 	friend ostream& operator<<(ostream& file, Class_XianDuan& objXianDuan) 
 	{

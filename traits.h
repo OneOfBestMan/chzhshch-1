@@ -22,8 +22,27 @@ class Class_KXian;
 template<int grade> class Class_XianDuan;
 class IZhongShu;
 
+
+class Itraits
+{
+	/* 设立这个接口的目的，是因为，MultiLevelZhongShuView.merge需要一个 线段作为参数，来辅助判断，是否形成了更大级别的中枢；参数的类型
+	可能是Class_XianDuan<1>  Class_XianDuan<2> Class_XianDuan<3>等等。如果没有Itraits接口，那么，这也就意味着MultiLevelZhongShuView的成员函数
+	是个模板函数，即，MultiLevelZhongShuView变成是个模板类。 但是，我不希望看到MultiLevelZhongShuView成为模板类。 所以，需要将各个 线段模板类，
+	抽取出一个共同的接口，形成Itraits。
+     */
+public:
+	virtual float getHigh() const = 0;
+	virtual float getLow() const = 0;
+	virtual Direction getDirection() const = 0;
+
+	/* 这两个接口，是给中枢服务的，中枢最小的构成单位是级别1线段 */
+	virtual Class_XianDuan<1>* getBaseXianDuanStart() = 0;
+	virtual Class_XianDuan<1>* getBaseXianDuanEnd() = 0;
+};
+
+
 template<class baseItemType, class Item>
-class traits
+class traits : public Itraits
 { 
 public:
 	typedef vector<Item> ContainerType;
@@ -47,10 +66,6 @@ public:
 
 	Class_KXian* getStartRec() { return Start->getStartRec(); }
 	Class_KXian* getEndRec() { return End->getEndRec(); }
-
-	/* 这两个接口，是给中枢服务的，中枢最小的构成单位 */
-	Class_XianDuan<1>* getBaseXianDuanStart() {return getStart()->getBaseXianDuanStart();}
-	Class_XianDuan<1>* getBaseXianDuanEnd() {return getEnd()->getBaseXianDuanEnd();}
 
 	vector<IZhongShu*> *zsList; //该线段所包含的 中枢列表
 	void addZhongShu(IZhongShu* zs)
