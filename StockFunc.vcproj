@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Class_Driver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Class_env.cpp"
 				>
 			</File>
@@ -286,7 +290,15 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\Base.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Class_Bi.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_Driver.h"
 				>
 			</File>
 			<File

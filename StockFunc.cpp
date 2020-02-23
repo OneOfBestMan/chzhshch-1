@@ -5,6 +5,8 @@
 #include "StockFunc.h"
 #include "stdio.h"
 #include "vector"
+#include "base.h"
+
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -60,6 +62,18 @@ __declspec(dllexport) int WINAPI MYMACLOSE(CALCINFO* pData)
 
 	return -1;
 }
+
+/*
+ 缠中说禅 分笔、分线段、确定中枢
+ 调用方法:
+   "STOCKFUNC@CHZHSHCH(HIGH,LOW,START,END)
+*/
+__declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
+{
+	Class_env* env = Class_env::getInstance(pData);
+
+}
+
 
 //计算均价,2个参数,参数1为待求均线的数据,参数2表示计算周期
 //调用方法:

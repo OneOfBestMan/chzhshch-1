@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Class_Bi.cpp" />
+    <ClCompile Include="Class_Driver.cpp" />
     <ClCompile Include="Class_env.cpp" />
     <ClCompile Include="Class_FenXing.cpp" />
     <ClCompile Include="Class_KXian.cpp" />
@@ -155,7 +156,9 @@
     <ClCompile Include="StockFunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base.h" />
     <ClInclude Include="Class_Bi.h" />
+    <ClInclude Include="Class_Driver.h" />
     <ClInclude Include="Class_env.h" />
     <ClInclude Include="Class_FenXing.h" />
     <ClInclude Include="Class_KXian.h" />

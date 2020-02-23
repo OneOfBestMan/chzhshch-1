@@ -2,20 +2,23 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{8a1295ab-cc62-4058-8833-3ed6892ae4e6}</UniqueIdentifier>
+      <UniqueIdentifier>{cb5a9e02-c729-44e9-9f27-f8249deac28f}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{a8e5b1c8-bb6b-403b-a8c6-bea19e247d24}</UniqueIdentifier>
+      <UniqueIdentifier>{42fd8d81-e3de-490f-bfca-0305e2110b9f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{f57421d2-0d0d-44f0-88b6-7d5c87aa7816}</UniqueIdentifier>
+      <UniqueIdentifier>{72596dcd-d508-40be-898f-9579c048175c}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Class_Bi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class_Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Class_env.cpp">
@@ -41,7 +44,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Class_Bi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class_Driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class_env.h">
