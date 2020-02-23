@@ -28,6 +28,7 @@ public:
 
 	typedef preDumpTemplate<Class_XianDuan>  preDumpClass;
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
+	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
 
 	//static void printMe() {printf("This is %d\n", GRADE); Class_XianDuan<grade-1>::printMe();}
@@ -91,6 +92,7 @@ public:
 
 	typedef preDumpTemplate<Class_XianDuan>  preDumpClass;
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
+	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
 
 	static const int GRADE = 1;

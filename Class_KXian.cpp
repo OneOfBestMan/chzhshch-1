@@ -23,6 +23,12 @@ void Dump<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file)
 	Class_KXian::DumpClass::doWork(helperMap, file);
 }
 
+template<>
+void DumpV2<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file)
+{
+	return;
+}
+
 
 
 

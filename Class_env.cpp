@@ -72,7 +72,7 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 			dumpHelperMap map;
 			ofstream file("c:\\log.txt");
 			preDump<Class_XianDuan<7>>(map);
-			Dump<Class_XianDuan<7>>(map, file);
+			DumpV2<Class_XianDuan<7>>(map, file);
 		}
 
 

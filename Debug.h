@@ -111,4 +111,84 @@ void Dump(dumpHelperMap &helperMap, ostream &file)  // pre Order
 	Dump<XianDuan_or_Bi_or_KXian::baseItemType>(helperMap, file);
 }
 
+
+
+template<class XianDuanClass >
+class DumpTemplateV2
+{
+public:
+
+	static void printChildren(typename XianDuanClass::baseItemType *start, typename XianDuanClass::baseItemType *end, ostream &stream, dumpHelperMap &helperMap)
+	{
+		XianDuanClass::baseItemType *p = start;
+		while (p != end)
+		{
+			XianDuanClass::baseItemType item = *p;
+
+			int total = helperMap[p].total;
+
+			stringstream strstream;
+			strstream << item;
+
+			int left = (total - 1 - strstream.str().length()) / 2 + strstream.str().length();
+			int right = total - 1 - left;
+
+			stream << '|';
+			stream.width(left);
+			stream << strstream.str();
+			for (int i = 0; i < right; i++)
+				stream << ' ';
+
+			p++;
+		}
+		stream << '$' << "\n\n";
+	}
+
+
+	static void doWork(dumpHelperMap &helperMap, ostream &stream)
+	{
+		if (XianDuanClass::container == NULL) return;
+
+		XianDuanClass::ContainerType::iterator p = XianDuanClass::container->begin();
+		XianDuanClass::ContainerType::iterator end   = XianDuanClass::container->end();
+		
+		while (p != end)
+		{
+			XianDuanClass::ContainerType::value_type &item = *p;
+
+			int total = helperMap[&item].total;
+			
+			stringstream strstream;
+			strstream << item;
+
+			int left = (total - 1 - strstream.str().length()) / 2 + strstream.str().length();
+			int right = total - 1 - left;
+
+			stream << '|';
+			stream.width(left);
+			stream << strstream.str();
+			for (int i = 0; i < right; i++)
+				stream << ' ';
+
+			stream << '$' << '\n';
+			printChildren(item.getStart(), item.getEnd(), stream, helperMap);
+
+			p++;
+		}
+		stream << "####" << '\n';
+	}
+};
+
+
+
+template<class XianDuan_or_Bi_or_KXian>
+void DumpV2(dumpHelperMap &helperMap, ostream &file)  // pre Order
+{
+	XianDuan_or_Bi_or_KXian::DumpClassV2::doWork(helperMap, file);
+
+	DumpV2<XianDuan_or_Bi_or_KXian::baseItemType>(helperMap, file);
+}
+
+
+
 #endif

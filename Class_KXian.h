@@ -128,10 +128,15 @@ public:
 	}
 };
 
+
+
 template<>
 void preDump<typename Class_KXian> (dumpHelperMap &helperMap);
 
 template<>
 void Dump<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file) ;
+
+template<>
+void DumpV2<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file) ;
 
 #endif
