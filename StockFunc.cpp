@@ -8,9 +8,9 @@
 #include "base.h"
 
 
-BOOL APIENTRY DllMain( HANDLE hModule, 
+BOOL WINAPI DllMain( HINSTANCE hModule, 
                        DWORD  ul_reason_for_call, 
-                       LPVOID lpReserved
+                       PVOID lpReserved
 					 )
 {
     switch (ul_reason_for_call)
@@ -18,7 +18,19 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 		case DLL_PROCESS_ATTACH:
 		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:
+			break;
 		case DLL_PROCESS_DETACH:
+			if (Class_env::getInstance())
+			{
+				for (int i = 0; i < Class_ZhongShu::MAX_LEVEL; i++)
+				{
+					int size = Class_ZhongShu::zsList[i].size();
+					Class_ZhongShu::zsList[i].clear();
+				}
+				FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(true);
+				delete Class_env::getInstance();
+				Class_env::env = NULL;
+			}
 			break;
     }
     return TRUE;
