@@ -7,14 +7,8 @@ using namespace std;
 
 #include "slist.h"
 
-typedef enum Direction
-{
-	UNKNOWN = -1, // 对于K线，是没有方向的；
-	ASCENDING =1,
-	DESCENDING = 2,
-	ENCLOSING = 3,
-	OVERLAPPING = ENCLOSING, // 这个只适用于中枢
-}  Direction;
+#include "IComparable.h"
+#include "IDisplayable.h"
 
 Direction operator-(const Direction& d);
 
@@ -40,18 +34,13 @@ public:
 	virtual Class_XianDuan<1>* getBaseXianDuanStart() = 0;
 	virtual Class_XianDuan<1>* getBaseXianDuanEnd() = 0;
 
+
 	List_Entry* zsList; //该线段所包含的 中枢列表，是View的time link;
-	/*void addZhongShu(Class_ZhongShu* zs)
-	{
-		if (!zsList)
-			zsList = new vector<Class_ZhongShu*>;
-		zsList->push_back(zs);
-	}*/
 };
 
 
 template<class baseItemType, class Item>
-class traits : public Class_XianDuanBase
+class traits : public Class_XianDuanBase, public IComparable, public IDisplayable
 { 
 public:
 	typedef vector<Item> ContainerType;
@@ -68,85 +57,13 @@ public:
 
 	float getHigh() const {return High;}
 	float getLow() const {return Low;}
+	void setHigh(float h) {High = h;}
+	void setLow(float l) {Low = l;}
+
 	baseItemType*  getStart() const{return Start;}
 	baseItemType*  getEnd() const {return End;}
 	Direction getDirection() const {return d;}
 
-	Class_KXian* getStartRec() { return Start->getStartRec(); }
-	Class_KXian* getEndRec() { return End->getEndRec(); }
-
-
-
-	bool operator<(const Item &latter) const
-	{
-		/* 前者 与 后者 构成上升形态 */
-		return (getHigh() < latter.getHigh()  && getLow() < latter.getLow());
-	}
-
-	bool operator>(const Item &latter) const
-	{
-		/* 前者 与 后者 构成下跌形态 */
-		return (getHigh() > latter.getHigh()  && getLow() > latter.getLow());
-	}
-
-	static Direction getDirection(const Item &former, const Item &latter)
-	{
-		if (former < latter)
-			return ASCENDING;
-		else if (former > latter)
-			return DESCENDING;
-		else
-			return ENCLOSING;
-	}
-
-	bool operator>> (const Item &latter) const
-	{
-		/* 前包后 */
-		return getHigh() >= latter.getHigh()  && getLow() <= latter.getLow();
-	}
-
-	bool operator<< (const Item &latter) const
-	{
-		/* 后包前 */
-		return getHigh() <= latter.getHigh()  && getLow() >= latter.getLow();
-	}
-	
-	bool operator==(const Item &latter) const
-	{
-		/* 包含 */
-		return  (*this >> latter) || (*this << latter);
-	}
-
-	traits&  merge(const Item &latter, Direction d) // 合并两条具有包含关系的K线
-	{
-		assert(*this == latter);
-
-		switch (d)
-		{
-		case ASCENDING:
-			this->High = max(this->getHigh(), latter.getHigh());
-			this->Low = max(this->getLow(), latter.getLow());
-			break;
-		case DESCENDING:
-			this->High = min(this->getHigh(), latter.getHigh());
-			this->Low = min(this->getLow(), latter.getLow());
-			break;
-		default:
-			assert(0);
-		}
-		return *this;
-	}
-
-	bool intersect(const Item &latter)
-	{
-		float high1 = getHigh();
-		float high2 = latter.getHigh();
-
-		float low1 = getLow();
-		float low2 = latter.getLow();
-
-		return (high1 >= high2 && high2 >= low1 || high1 <= high2 && high1 >= low2);
-	}
 };
 
 #if 0

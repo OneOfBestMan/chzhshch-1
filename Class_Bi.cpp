@@ -241,7 +241,7 @@ void Class_LeiBi::FenBi_Step1()
 		
 		Direction df = (*former).getDirection();
 		
-		if (df == getDirection(*former, *latter))
+		if (df == IComparable::getDirection(*former, *latter))
 		{
 			float high = max((*former).getHigh(), (*latter).getHigh());
 			float low = min((*former).getLow(), (*latter).getLow());
@@ -326,7 +326,7 @@ bool Class_Bi::bckwdSearch(ContainerType::reverse_iterator from, Class_LeiBi *cm
 	while (former < end)
 	{
 		Direction d = (*latter).getDirection();
-		if (d == getDirection(*former, *latter))
+		if (d == IComparable::getDirection(*former, *latter))
 		{
 			result = former;
 			break;
@@ -423,7 +423,7 @@ void Class_Bi::FenBi_Step2()
 
 		*/
 			Direction d = (*current).getDirection();
-			Direction dBi = leiBi::getDirection(*current, *(current + 2));
+			Direction dBi = IComparable::getDirection(*current, *(current + 2));
 			if (d == dBi)
 			{
 				container->push_back(ContainerType::value_type(&(*current), &(*(current+2))));

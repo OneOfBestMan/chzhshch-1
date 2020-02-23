@@ -71,11 +71,12 @@ void Class_KXian::initialize(bool release)
 	}
 }
 
-Class_KXian::Class_KXian(float kStart, float kEnd, float kBot, float kHigh) : traits((void*)0xdeaddead, (void*)0xdeaddead , kHigh, kBot)
+Class_KXian::Class_KXian(float kStart, float kEnd, float kBot, float kHigh)
 {
 	Start = kStart;
 	End = kEnd;
-
+	High = kHigh;
+	Low = kBot;
 }
 
 Class_KXian::~Class_KXian(void)

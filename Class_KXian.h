@@ -16,9 +16,10 @@ using namespace std;
 #include "traits.h"
 
 
-class Class_KXian: public traits<void, Class_KXian>
+class Class_KXian: public IComparable, public IDisplayable
 {
 public:
+	typedef vector<Class_KXian> ContainerType;
 
 	typedef preDumpTemplate<Class_KXian>  preDumpClass;
 	typedef DumpTemplate<Class_KXian> DumpClass;
@@ -43,9 +44,14 @@ public:
 	Class_XianDuan<1>* getBaseXianDuanStart() {return NULL;}
 	Class_XianDuan<1>* getBaseXianDuanEnd() {return NULL;}
 
+
+	float getHigh() const {return High;}
+	float getLow() const {return Low;}
+	void setHigh(float h) {High = h;}
+	void setLow(float l) {Low = l;}
+
 private:
-	float Start;
-	float End;
+	float Start, End, High, Low;
 };
 
 

@@ -9,12 +9,6 @@
 
 	typedef vector<CharacterVec> analyzeStack;
 
-	static Direction getDirection(baseItemType &former, baseItemType &latter)
-	{
-		return baseItemType::getDirection(former, latter);
-	}
-
-
 	static baseItemIterator FXD_Merge(Direction hints, const baseItemIterator & start, const baseItemIterator & end, baseItemIterator &prevCharacVecEnd)
 	{
 		assert(hints != ENCLOSING);
@@ -44,7 +38,7 @@
 		while (current < end - 2)
 		{
 			baseItemType &suspect = *(current + 2);
-			d = getDirection(lastBi, suspect);
+			d = IComparable::getDirection(lastBi, suspect);
 			if (d == hints || (lastBi << suspect))
 			{
 				lastBi = suspect;
@@ -174,7 +168,7 @@
 		Direction d = ENCLOSING;
 		while (end - biFormer > 2)
 		{
-			d = getDirection(*biFormer, *(biFormer + 2));
+			d = IComparable::getDirection(*biFormer, *(biFormer + 2));
 			Direction dXian = (*biFormer).getDirection();
 			if (d == ENCLOSING || d == -dXian) // d == -dXian  是为了规避normalize
 			{
@@ -211,7 +205,7 @@
 		do 
 		{
 			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
-			while  (biFormer < end - 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter) || (*biFormer >> *biLatter)) )
+			while  (biFormer < end - 2 &&  (IComparable::getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter) || (*biFormer >> *biLatter)) )
 			{
 				CharacVecStack.push_back(CharacterVec(biFormer + 1, biLatter - 1));
 				biFormer = biLatter;
@@ -268,7 +262,7 @@
 
 				if (biLatter >= end)  break;
 
-				if (getDirection(*biFormer, *biLatter) == d || (*biFormer >> *biLatter))
+				if (IComparable::getDirection(*biFormer, *biLatter) == d || (*biFormer >> *biLatter))
 				{
 					/*
                     情形1： biFormer 与 biLatter之间的方向， 与 原线段方向相同
