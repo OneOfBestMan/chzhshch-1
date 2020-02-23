@@ -222,9 +222,11 @@
 	DRAWSL(ZHONGSHU_7_TIME == 1, ZHONGSHU_7_HIGH, (RefX(ZHONGSHU_7_HIGH,ZHONGSHU_7_DURATION) - ZHONGSHU_7_HIGH)/ZHONGSHU_7_DURATION, ZHONGSHU_7_DURATION,0),LineThick1,COLOR0000FF;
 
 	/////// 死1-1: 黄金线下穿生命线；死1-2: 黄金线下穿M34；死2: 黄金线下穿控盘线；死3: M34线下穿控盘线
+	/////// 金1-1: 黄金线上穿生命线；金1-2: 黄金线上穿M34；金2: 黄金线上穿控盘线；金3: M34线上穿控盘线
 	/////// 离场的步骤： 30分死1警示 --- 反弹 --- 30分死2离场需要减仓的60% -- 反弹 --- 30分死3离场需要减仓的40% --- 60分钟死2则必须放弃全部减仓。
 	/////// 进场的步骤： 30分金1警示 --- 下跌 --- 30分金2进场需要进仓的60% -- 下跌 --- 30分金3进场需要进仓的40% --- 60分钟金2则可以全仓进入。
 	/////// 60分金3不犹豫；30分死3不奢望，60分死2要清仓
+	/////// 下跌中，如果手中筹码被套，那么在出现30分金2之前，只可以做T，做T注意 不可以用太重的仓位，以免T不成功被埋；当出现30分金2后，才可以买入并持有，未出现30分金2 只许T，不许持有增加仓位；
 	三:MA(CLOSE,M3),COLORFFFFFF;
 	七:MA(CLOSE,M7),COLORC0C0C0;
 	黄:MA(CLOSE,M13),POINTDOT,LINETHICK3,COLORYELLOW;
@@ -238,17 +240,19 @@
 
 
  //  KT中，专家系统（显示红色、绿色箭头）
-MA3:=MA(CLOSE,M3);
-MA7:=MA(CLOSE,M7);
 黄金线:=MA(CLOSE,M13);
 生命线:=MA(CLOSE,M21);
 MA34:=MA(CLOSE,M34);
 控盘线:=MA(CLOSE,M55);
 
-EnterShort:CROSS(黄金线,控盘线);
-EnterLong:CROSS(MA34,控盘线) And 黄金线>控盘线 And REF(控盘线,30)/控盘线<=1.02 And 黄金线/REF(黄金线,20)>1.02;
-ExitShort:CROSS(控盘线,黄金线);
-ExitLong:CROSS(控盘线,MA34);
+//多头买入：金3
+EnterLong:CROSS(MA34,控盘线);
+//多头卖出：死2
+ExitLong:CROSS(控盘线,黄金线);
+//空头卖出：死3
+EnterShort:CROSS(控盘线,MA34);
+//空头买入：金2
+ExitShort:CROSS(黄金线,控盘线);
 
 
 // 水平、垂直翻转180度，逆向看图
