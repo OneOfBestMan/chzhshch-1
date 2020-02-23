@@ -115,49 +115,47 @@ Class_env::~Class_env(void)
 	delete stockName;
 }
 
-
+/*
 float Class_env::getKHigh(int pos)
 {
-	/*if (pos >= firstHighParm && pos < totalBar)
+	if (pos >= firstHighParm && pos < totalBar)
 		return highParm[pos];
 	else
-		throw invalid_argument("下标越界");*/
+		throw invalid_argument("下标越界");
 	return 0;
 }
 
 
 float Class_env::getKLow(int pos)
 {
-	/*if (pos >= firstLowParm && pos < totalBar)
+	if (pos >= firstLowParm && pos < totalBar)
 		return lowParm[pos];
 	else
-		throw invalid_argument("下标越界");*/
+		throw invalid_argument("下标越界");
 	return 0;
 }
 
 
 float Class_env::getKStart(int pos)
 {
-	/*
 	if (pos >= firstStartParm && pos < totalBar)
 		return startParm[pos];
 	else
-		throw invalid_argument("下标越界");*/
+		throw invalid_argument("下标越界");
 	return 0;
 }
 
 float Class_env::getKEnd(int pos)
 {
-	/*
 	if (pos >= firstEndParm && pos < totalBar)
 		return endParm[pos];
 	else
-		throw invalid_argument("下标越界");*/
+		throw invalid_argument("下标越界");
 	return 0;
 }
+*/
 
-
-
+#if 0
 bool Class_env::rangeContain(float k1B, float k1T, float k2B, float k2T)
 {
     /*
@@ -190,3 +188,4 @@ void Class_env::updateMergedRange(int direction, int bar, float &mergedBot, floa
 
 	}
 }
+#endif
