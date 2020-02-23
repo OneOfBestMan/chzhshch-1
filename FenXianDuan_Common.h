@@ -263,7 +263,7 @@
 
 				if (biLatter < end - 2)
 				{
-					assert(getDirection(*biFormer, *biLatter) == d);
+					assert(getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter));
 					CharacVecStack.pop_back();
 
 					/*if (getDirection(*biFormer, *biLatter) == d)
