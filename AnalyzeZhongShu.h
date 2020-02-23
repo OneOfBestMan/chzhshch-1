@@ -2,7 +2,7 @@
 #define ANALYZEZHONGSHU_H
 
 
-
+#include "Class_ZhongShu.h"
 
 template <class XianDuanClass>
 class AnalyzeZhongShu_Template
@@ -49,14 +49,16 @@ TP1_1  TP1_2/
 		{
 			if (!TP1_1->zsList && !TP1_2->zsList)
 			{
-				//(*curr).addZhongShu(new Class_ZhongShu<0>
+				IZhongShu *zs = createZhongShu(TP1_2);
+				(*curr).addZhongShu(zs);
+				zs = createZhongShu(zs, TP1_2);
 			}
 		}
 
 	}
 
 	static void handleTurningPoint(baseItemType *start, baseItemType *end)
-	{
+	{/*
 		baseItemType *TP1_1 = start;
 		baseItemType *TP1_2 = start + 1;
 		while (TP1_1 < end)
@@ -65,8 +67,7 @@ TP1_1  TP1_2/
 			{
 
 			}
-		}
-
+		}*/
 	}
 /*
   对于向上的线段说， Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5

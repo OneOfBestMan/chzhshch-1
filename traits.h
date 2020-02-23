@@ -53,11 +53,11 @@ public:
 	Class_XianDuan<1>* getBaseXianDuanEnd() {return getEnd()->getBaseXianDuanEnd();}
 
 	vector<IZhongShu*> *zsList; //该线段所包含的 中枢列表
-	bool addZhongShu(IZhongShu* zs)
+	void addZhongShu(IZhongShu* zs)
 	{
 		if (!zsList)
 			zsList = new vector<IZhongShu*>;
-		zsList.push_back(zs);
+		zsList->push_back(zs);
 	}
 
 	bool operator<(const Item &latter) const
@@ -138,22 +138,22 @@ public:
 	virtual int getGrade() = 0;
 
 	/* 时间上 */
-	virtual bool preceed(const IZhongShu &item) const = 0;
-	virtual bool follow(const IZhongShu &item) const = 0;
+	virtual bool preceed( IZhongShu &item)  = 0;
+	virtual bool follow( IZhongShu &item)  = 0;
 	/* 空间上，构成上升形态 */
-	virtual bool operator<(const IZhongShu &item) const = 0;
+	virtual bool operator<( IZhongShu &item)  = 0;
 	/* 空间上，构成下跌形态 */
-	virtual bool operator>(const IZhongShu &item) const = 0;
-	virtual bool operator==(const IZhongShu &latter) const = 0;
+	virtual bool operator>( IZhongShu &item)  = 0;
+	virtual bool operator==( IZhongShu &latter)  = 0;
 
-	virtual bool operator>> (const IZhongShu &latter) const = 0;
-	virtual bool operator<< (const IZhongShu &latter) const = 0;
+	virtual bool operator>> ( IZhongShu &latter)  = 0;
+	virtual bool operator<< ( IZhongShu &latter)  = 0;
 
 	virtual float getHigh() const = 0;
-	virtual float getLow() const = 0;
+	virtual float getLow()  const = 0;
 	
 	/* 用于输出中枢的时候使用 */
-	virtual Class_KXian* getStartRec() = 0;
+	virtual Class_KXian* getStartRec()  = 0;
 	virtual Class_KXian* getEndRec() = 0;
 
 	/* 用于比较中枢时间前后 */
@@ -275,53 +275,10 @@ public:
 	float getLow() const {return Low;}
 
 
-	veryBaseXianDuanType*  getStart() const
-	{
-		if (Start) return Start;
-
-		switch (content.type)
-		{
-		case 1:
-			Start = content.c1.first->getStart();
-			break;
-		case 2:
-			Start = content.c2.first->getStart();
-			break;
-		case 3:
-			Start = content.c3.start->getBaseXianDuanStart();
-			break;
-		default:
-			assert(0);
-		}
-
-		return Start;
-	}
-	
-	veryBaseXianDuanType*  getEnd() const
-	{
-		if (End) return End;
-
-		switch (content.type)
-		{
-		case 1:
-			End = content.c1.first->getEnd();
-			break;
-		case 2:
-			End = content.c2.first->getEnd();
-			break;
-		case 3:
-			End = content.c3.start->getBaseXianDuanEnd();
-			break;
-		default:
-			assert(0);
-		}
-
-		return End;
-	}
 	
 	/*Direction getDirection() const {return d;} */
 
-	Class_KXian* getStartRec() const
+	Class_KXian* getStartRec()
 	{
 		if (getStart())
 			return Start->getStartRec();
@@ -329,7 +286,7 @@ public:
 			return NULL;
 	}
 
-	Class_KXian* getEndRec() const
+	Class_KXian* getEndRec()
 	{
 		if (getEnd())
 			return End->getEndRec();
@@ -338,29 +295,29 @@ public:
 	}
 
 
-	bool preceed(const IZhongShu &latter)
+	bool preceed(IZhongShu &latter)
 	{
 		return getEndRec() > latter.getStartRec();
 	}
 
-	bool follow(const IZhongShu &former) 
+	bool follow(IZhongShu &former) 
 	{
-		return latter.getEndRec() > getStartRec();
+		return former.getEndRec() > getStartRec();
 	}
 
-	bool operator<(const IZhongShu &latter)
+	bool operator<(IZhongShu &latter)
 	{
 		/* 前者 与 后者 构成上升形态 */
 		return preceed(latter)  &&  getHigh() < latter.getLow();
 	}
 
-	bool operator>(const IZhongShu &latter)
+	bool operator>(IZhongShu &latter)
 	{
 		/* 前者 与 后者 构成下跌形态 */
 		return preceed(latter)  && getLow() > latter.getHigh();
 	}
 
-	static Direction getDirection(const IZhongShu &former, const IZhongShu &latter)
+	static Direction getDirection(IZhongShu &former, IZhongShu &latter)
 	{
 		assert(former.preceed(latter));
 
@@ -372,19 +329,19 @@ public:
 			return OVERLAPPING;
 	}
 
-	bool operator>> (const IZhongShu &latter)
+	bool operator>> (IZhongShu &latter)
 	{
 		/* 前者 高于 后者，但是有重叠 */
 		return preceed(latter) && getHigh() > latter.getHigh()  && getLow() < latter.getHigh();
 	}
 
-	bool operator<< (const IZhongShu &latter)
+	bool operator<< (IZhongShu &latter)
 	{
 		/* 前者 低于 后者， 但是有重叠 */
 		return preceed(latter) && getHigh() > latter.getLow()  && getHigh() < latter.getHigh();
 	}
 	
-	bool operator==(const IZhongShu &latter)
+	bool operator==(IZhongShu &latter)
 	{
 		/* 包含 */
 		return  (*this >> latter) || (*this << latter);
