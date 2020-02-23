@@ -26,5 +26,8 @@ List_Entry* remove(List_Entry *item)
 
 bool isEmpty(PList_Head list)
 {
-	return list->next == list->prev;
+	return list->next == list;
 }
+
+
+int debugCounter = 0;

@@ -99,6 +99,9 @@ private:
 	veryBaseXianDuanType *End;
 	Direction d; // 中枢的方向，与所在线段方向相反：即，在向下的线段中，中枢方向是向上的。
 
+	/* 第三买、卖点： 次级别走势回拉（三卖）或回跌（三买），不触及中枢区间，则该次级别走势的终点是第三买卖点； 并且要求，该次级别的起点，应该高于中枢波动高点（三买）或低于中枢波动低点（三卖） */
+	Class_ZhongShu* thirdPoint; // 对于中枢级别0（线段级别1），这个域是无效的，对于中枢级别0，第三买卖点，就是它自己；对于其它高级别中枢，thirdPoint是一个低级别中枢，比如：级别3中枢的第三买卖点，是个级别2中枢；
+
 	/*
 
 	关于中枢级别， 一点思考：
@@ -145,17 +148,99 @@ private:
 	} content;
 
 
+	void initializeCommon()
+	{
+		thirdPoint = NULL;
+
+		switch(content.type)
+		{
+
+		case 1:
+			coreRange = content.c1.first->getCoreRange();
+			coreRange = coreRange && content.c1.mid->getCoreRange() && content.c1.last->getCoreRange();
+			floatRange = content.c1.first->getFloatRange();
+			floatRange = floatRange && content.c1.mid->getFloatRange() && content.c1.last->getFloatRange();
+			break;
+		case 2:
+			{
+				coreRange = content.c2.first->getCoreRange();
+				floatRange = content.c2.first->getFloatRange();
+				veryBaseXianDuanType* curr = content.c2.first->getEnd() + 1;
+				veryBaseXianDuanType* last = content.c2.XianDuan->getBaseXianDuanEnd();
+
+				ValueRange temp;
+				while (curr <= last)
+				{
+					temp = temp || ValueRange(curr->getLow(), curr->getHigh());
+					curr++;
+				}
+				coreRange = coreRange && temp;
+				floatRange = floatRange || temp;
+			}
+			break;
+		case 3:
+			{
+				veryBaseXianDuanType* curr = content.c3.start->getBaseXianDuanStart();
+				veryBaseXianDuanType* end = content.c3.last->getBaseXianDuanStart();
+				while (curr <= end)
+				{
+					coreRange && ValueRange(curr->getLow(), curr->getHigh());
+					floatRange || ValueRange(curr->getLow(), curr->getHigh());
+					curr++;
+				}
+
+			}
+			break;
+		case 4:
+			coreRange = ValueRange(content.c4.xianDuan->getLow(), content.c4.xianDuan->getHigh());
+			floatRange = coreRange;
+			break;
+		case 5:
+			coreRange = content.c5.former->getCoreRange();
+			coreRange = coreRange && content.c5.latter->getCoreRange();
+			floatRange = content.c5.former->getFloatRange();
+			floatRange = floatRange && content.c5.latter->getFloatRange();
+			break;
+		default:
+			assert(0);
+		}
+	}
 
 	
-	Class_ZhongShu(subZhongShuType *f, subZhongShuType *m, subZhongShuType *l, int grad)  {grade = grad; content.type = 1; content.c1.first = f; content.c1.mid = m; content.c1.last = l;}
+	Class_ZhongShu(subZhongShuType *f, subZhongShuType *m, subZhongShuType *l, int grad) 
+	{
+		grade = grad;
+		content.type = 1; content.c1.first = f; content.c1.mid = m; content.c1.last = l;
+		initializeCommon();
+	}
 
-	Class_ZhongShu(subZhongShuType *f, Class_XianDuanBase *x, int grad) {grade = grad; content.type = 2; content.c2.first = f; content.c2.XianDuan = x;}
+	Class_ZhongShu(subZhongShuType *f, Class_XianDuanBase *x, int grad) 
+	{
+		grade = grad; 
+		content.type = 2; content.c2.first = f; content.c2.XianDuan = x;
+		initializeCommon();
+	}
 
-	Class_ZhongShu(Class_XianDuanBase *s, Class_XianDuanBase *l, int grad) { assert(l-s >= 8); grade = grad; content.type = 3; content.c3.start =s; content.c3.last = l;}
+	Class_ZhongShu(Class_XianDuanBase *s, Class_XianDuanBase *l, int grad) 
+	{ 
+		assert(l-s >= 8);
+		grade = grad; content.type = 3; content.c3.start =s; content.c3.last = l;
+		initializeCommon();
+	}
 
-	Class_ZhongShu(Class_XianDuanBase *x, int grad) { assert(x->zsList == NULL); grade = grad; content.type = 4; content.c4.xianDuan = x;}
+	Class_ZhongShu(Class_XianDuanBase *x, int grad) 
+	{ 
+		assert(x->zsList == NULL); 
+		grade = grad; content.type = 4; content.c4.xianDuan = x;
+		initializeCommon();
+	}
 
-	Class_ZhongShu(subZhongShuType *f, subZhongShuType *l, int grad) {grade = grad; content.type = 5; content.c5.former = f; content.c5.latter = l;}
+	Class_ZhongShu(subZhongShuType *f, subZhongShuType *l, int grad) 
+	{
+		grade = grad; 
+		content.type = 5; content.c5.former = f; content.c5.latter = l;
+		initializeCommon();
+	}
 
 public:	
 

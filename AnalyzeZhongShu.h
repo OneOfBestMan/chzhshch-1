@@ -154,6 +154,8 @@ private:
 			append(&level_list[i], &elem->level_link[i]);
 			levelTotal[i]++;
 		}
+
+
 	}
 
 	void RemoveElem(ElemOfView *eov)
@@ -259,7 +261,8 @@ public:
 			while (!isEmpty(&time_list))
 			{
 				List_Entry *item = remove(time_list.next);
-				delete item;
+				ElemOfView *elem = list_entry(item, ElemOfView, time_link);
+				delete elem;
 				total--;
 			}
 			assert(total == 0);
@@ -689,24 +692,31 @@ void handleLast(MultiLevelZhongShuView &view, XianDuanClass *last)
 	while (curr != NULL)
 	{
 		ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+		curr = curr->next;// 必须在加入view之前，获得下一个元素指针，否则，time_link会被修改
 		view.Add_Elem(elem);
-		curr = curr->next;
 	}
+	last->zsList = NULL;
 }
 
+extern int debugCounter;
 
 template <class XianDuanClass>
 void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, XianDuanClass *TP1_2)
 {
 	typedef MultiLevelZhongShuView::ElemOfView ElemOfView;
 
+	debugCounter++;
+	if (debugCounter == 2734)
+		printf("break me here");
+
 	List_Entry *curr = TP1_1->zsList;
 	while (curr != NULL)
 	{
 		ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+		curr = curr->next; // 必须在加入view之前，获得下一个元素指针，否则，time_link会被修改
 		view.Add_Elem(elem);
-		curr = curr->next;
 	}
+	TP1_1->zsList = NULL;
 
 	curr = TP1_2->zsList;
 	if (!curr)
@@ -720,9 +730,10 @@ void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, Xian
 		while (curr != NULL)
 		{
 			ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+			curr = curr->next; // 必须在加入view之前，获得下一个元素指针，否则，time_link会被修改
 			view.Add_Elem(elem);
-			curr = curr->next;
 		}
+		TP1_2->zsList = NULL;
 	}
 }
 
