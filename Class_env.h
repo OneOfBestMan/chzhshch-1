@@ -1,15 +1,17 @@
 #pragma once
 
-#include "StockFunc.h"
 
+#ifndef CLASS_ENV_H
+#define CLASS_ENV_H
+
+#include "StockFunc.h"
 
 /*
  封装一些全局变量  读取K线的高、低点的方法
 
 */
 
-#ifndef CLASS_ENV_H
-#define CLASS_ENV_H
+
 
 class Class_env
 {
@@ -22,6 +24,7 @@ public:
 	float getKLow(int pos);
 	float getKStart(int pos);
 	float getKEnd(int pos);
+	int   getTotal() {return totalBar;}
 private:
 
 
