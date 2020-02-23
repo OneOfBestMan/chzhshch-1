@@ -29,7 +29,7 @@
 			baseItemType& suspect = *(current + 2);
 			if (possiblePrevXianDuanChracVec >> suspect)
 			{
-				possiblePrevXianDuanChracVec.merge(suspect, -hints);
+				possiblePrevXianDuanChracVec = suspect;
 				current += 2;
 				continue;
 			}
@@ -200,10 +200,13 @@
 
 		baseItemIterator biLatter = biFormer + 2;
 
+#ifdef DEBUG
+		// 这段代码是用来调试死循环的。 
 		int debugCnt = 0;
 		baseItemIterator oldBiFormer = biFormer;
 		baseItemIterator oldBiLatter = biLatter;
 		int count = 0;
+#endif
 
 		do 
 		{
@@ -225,7 +228,9 @@
 						resultSet = new ContainerType();
 					}
 					resultSet->push_back(XianDuanClass(biStart, biLatter, d));
+#ifdef DEBUG
 					debugCnt++;
+#endif
 				}
 			}
 
@@ -241,7 +246,7 @@
 				biLatter = CharacVecStack.back().end + 1;
 				
 				
-				/*
+#ifdef DEBUG
 				// 这段代码是用来调试死循环的。 
 				if (((*biFormer) == (*oldBiFormer)) && ((*biLatter) == (*oldBiLatter)))
 				{
@@ -259,42 +264,105 @@
 
 				if (count == 5)
 					break;
-				*/
+#endif
 
-				if (biLatter < end - 2)
+				if (biLatter >= end)  break;
+
+				if (getDirection(*biFormer, *biLatter) == d)
 				{
-					assert(getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter));
-					CharacVecStack.pop_back();
-
 					/*
-					// 这段代码在进行了 NormalizeV2之后，应该就不会再有用处了。
-					if (getDirection(*biFormer, *biLatter) == d)
+                    情形1： biFormer 与 biLatter之间的方向， 与 原线段方向相同
+
+                                                    /
+                               /\                  /
+                              /  \          /\  biLatter
+                       /\ biFormer\        /  \  /
+                      /  \  /      \      /    \/
+                     /    \/        \    /
+                    /                \  /        
+                                      \/
+                   |<  原线段 >|<-  特征向量 ->|<- 原线段延续 ->|
+				                   
+					*/
+					if (biLatter < end - 2)
 					{
 						CharacVecStack.pop_back();
+						continue;
 					}
-					else if ((*biFormer) >>  (*biLatter))
+					else
 					{
-						biFormer = biLatter;
-						biLatter += 2;
-					} else
-					{
-						biFormer = biLatter;
-						biLatter += 2;
-					}*/
+						/* baseItem快到最后了 */
+						if (!resultSet)
+						{
+							resultSet = new ContainerType();
+						}
+						resultSet->push_back(XianDuanClass(biStart, biFormer, d));
+#ifdef DEBUG
+						debugCnt++;
+#endif
+						break;
+					}
 
-					continue;
-				}
-				else
+				} else
 				{
-					/* baseItem快到最后了 */
+					/*
+                    情形2： biFormer 与 biLatter之间的方向， 与 原线段方向相反
+
+                               /\                          /
+                              /  \                  /\    /
+                       /\ biFormer\        /\      /  \  /
+                      /  \  /      \      /  \ biLatter\/
+                     /    \/        \    /    \  /
+                    /                \  /      \/
+                                      \/
+                   |<  原线段 >|<-  特征向量 ->|<- 新线段 ->|
+                               |   形成新线段  |
+
+                   情形3： biFormer 被 biLatter 包含
+
+                                                      /\
+                               /\                    /  \      /
+                              /  \                  /    \    /
+                       /\ biFormer\        /\   biLatter  \  /
+                      /  \  /      \      /  \    /        \/
+                     /    \/        \    /    \  /
+                    /                \  /      \/
+                                      \/
+                   |<  原线段 >|<-  特征向量 ->|<- 新线段 ->|
+                                   形成新线段
+
+					*/
+
+					// 将特征向量 作为 一个新的线段
 					if (!resultSet)
 					{
 						resultSet = new ContainerType();
 					}
+					// 原线段
 					resultSet->push_back(XianDuanClass(biStart, biFormer, d));
-					debugCnt++;
-					break;
+					// 特征向量形成新线段
+					resultSet->push_back(XianDuanClass(biFormer + 1, biLatter - 1, -d));
+					// 新线段
+					CharacVecStack.clear();
+					biFormer = biStart = biLatter;
+
+					/* 新的线段，开始的部分，可能有一组互相包含的线段 */
+					baseItemType temp = *biFormer;
+					while (biFormer < end - 2)
+					{
+						if (temp >> *(biFormer + 2))
+						{
+							temp = *(biFormer + 2);
+							biFormer += 2;
+							continue;
+						}
+						else
+							break;
+					}
+					if (biFormer < end - 2)
+						biLatter = biFormer + 2;
 				}
+
 			} else
 			{
 				/* 原线段被破坏，将该线段添加到container中 */
@@ -306,10 +374,11 @@
 
 				int debugEdgeCnt = biFormer - biStart + 1;
 
+#ifdef DEBUG
 				debugCnt++;
-
-				/*if (debugCnt == 67)
-					printf("break me here\n");*/
+				if (debugCnt == 67)
+					printf("break me here\n");
+#endif
 
 				/* 新线段需要 翻转方向 */
 				d = -d;
@@ -324,7 +393,7 @@
 				{
 					if (temp >> *(biFormer + 2))
 					{
-						temp.merge(*(biFormer + 2), -d);
+						temp = *(biFormer + 2);
 						biFormer += 2;
 						continue;
 					}
