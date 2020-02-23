@@ -172,6 +172,10 @@
 		baseItemIterator biLatter = biFormer + 2;
 
 		int debugCnt = 0;
+		baseItemIterator oldBiFormer = biFormer;
+		baseItemIterator oldBiLatter = biLatter;
+		int count = 0;
+
 		do 
 		{
 			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
@@ -206,6 +210,21 @@
 				/* 原线段延续*/
 				biFormer = CharacVecStack.back().start - 1;
 				biLatter = CharacVecStack.back().end + 1;
+				
+				/*if (((*biFormer) == (*oldBiFormer)) && ((*biLatter) == (*oldBiLatter)))
+				{
+					count++;
+				}
+				else
+				{
+					count = 0;
+					oldBiFormer = biFormer;
+					oldBiLatter = biLatter;
+				}
+
+				if (count == 5)
+					break;*/
+
 				if (biLatter < end - 2)
 				{
 					if (getDirection(*biFormer, *biLatter) == d)
@@ -213,6 +232,10 @@
 						CharacVecStack.pop_back();
 					}
 					else if ((*biFormer) >>  (*biLatter))
+					{
+						biFormer = biLatter;
+						biLatter += 2;
+					} else
 					{
 						biFormer = biLatter;
 						biLatter += 2;
@@ -243,6 +266,9 @@
 				int debugEdgeCnt = biFormer - biStart + 1;
 
 				debugCnt++;
+
+				/*if (debugCnt == 67)
+					printf("break me here\n");*/
 
 				/* 新线段需要 翻转方向 */
 				d = -d;
