@@ -10,14 +10,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi()
 {
 	if (base_Container == NULL)
 	{
-	// 创建 K线 vector
-		Class_env *env = Class_env::getInstance();
-		int total = env->getTotal();
-		base_Container = new baseItem_Container(total);
-		for (int i = 0; i < total; i++)
-		{
-			(*base_Container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
-		}
+		// 创建 K线 vector
+		Class_KXian::initialize();
+		base_Container = Class_KXian::container;
 	}
 
 	if (base_Container && !container)
@@ -46,7 +41,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 	for (int i = 0; i < total; i++)
 	{
-
+		
 	}
 
 }

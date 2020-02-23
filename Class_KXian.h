@@ -30,6 +30,8 @@ public:
 	float getEnd();
 	float getHigh();
 	float getLow();
+
+	static void initialize();
 private:
 	valueType bar;
 };
