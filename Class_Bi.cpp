@@ -16,7 +16,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi()
 		base_Container = new baseItem_Container(total);
 		for (int i = 0; i < total; i++)
 		{
-			((Class_KXian)(*base_Container)[i]) = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
+			(*base_Container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
 		}
 	}
 

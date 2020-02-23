@@ -60,14 +60,6 @@ Class_env::Class_env(CALCINFO *p)
 	firstEndParm = p->m_pCalcParam[3].m_nParamStart;
 
 	totalBar = p->m_nNumData;
-
-
-    /* 初始化 各个线段类型 */
-	AllocConsole();
-	freopen("CONOUT$", "w", stdout);
-
-	HuaFenXianDuan<Class_XianDuan<7>>();
-	
 	
 }
 

@@ -190,5 +190,12 @@ __declspec(dllexport) int WINAPI MYBBI(CALCINFO* pData)
 __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
 {
 	Class_env* env = Class_env::getInstance(pData);
+
+    /* 初始化 各个线段类型 */
+	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
+
+	HuaFenXianDuan<Class_XianDuan<7>>();
+
 	return 0; //TODO: 这个返回值，不应该是0，而应该是result数组的个数
 }
