@@ -70,7 +70,12 @@ Class_env::Class_env(CALCINFO *p)
 	firstEndParm = p->m_pCalcParam[3].m_nParamStart;
 
 	totalBar = p->m_nNumData;
-	
+
+	if (p->m_strStkLabel)
+	{
+		stockName = new char[strlen(p->m_strStkLabel) + 1];
+		stockName = strcpy(stockName, p->m_strStkLabel);
+	}
 }
 
 Class_env* Class_env::getInstance(CALCINFO *p)
@@ -107,6 +112,7 @@ Class_env* Class_env::getInstance()
 
 Class_env::~Class_env(void)
 {
+	delete stockName;
 }
 
 

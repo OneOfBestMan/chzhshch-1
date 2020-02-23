@@ -78,11 +78,11 @@ public:
 
 	int totalBar;
 
-	int stockName;
+	char* stockName;
 
 	bool operator==(const Class_env &secondEnv) const 
 	{
-		return (stockName == secondEnv.stockName &&
+		return (!strcmp(stockName, secondEnv.stockName) &&
 			totalBar  == secondEnv.totalBar);
 	}
 
