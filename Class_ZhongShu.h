@@ -12,7 +12,7 @@
 
 
 template <int grade>
-class Class_ZhongShu: protected traits_ZhongShu<typename Class_ZhongShu<grade-1>, typename Class_XianDuan<grade>, typename Class_XianDuan<1>, typename Class_ZhongShu<grade>>
+class Class_ZhongShu: protected traits_ZhongShu<typename Class_ZhongShu<grade-1>, typename Class_XianDuan<grade>, typename Class_ZhongShu<grade>>
 {
 public:
 

@@ -46,6 +46,8 @@ public:
 
 
 
+
+	
 	friend ostream& operator<<(ostream& file, Class_XianDuan& objXianDuan) 
 	{
 		typedef Class_XianDuan<grade> XianDuanClass;
@@ -93,6 +95,8 @@ public:
 
 	friend ostream& operator<<(ostream&, Class_XianDuan&);
 
+	Class_XianDuan<1>* getBaseXianDuanStart() {return this;}
+	Class_XianDuan<1>* getBaseXianDuanEnd() {return this;}
 private:
 
 

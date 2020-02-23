@@ -19,6 +19,7 @@ Direction operator-(const Direction& d);
 
 
 class Class_KXian;
+template<int grade> class Class_XianDuan;
 
 template<class baseItemType, class Item>
 class traits
@@ -44,6 +45,10 @@ public:
 
 	Class_KXian* getStartRec() { return Start->getStartRec(); }
 	Class_KXian* getEndRec() { return End->getEndRec(); }
+
+	/* 这两个接口，是给中枢服务的，中枢最小的构成单位 */
+	Class_XianDuan<1>* getBaseXianDuanStart() {return getStart()->getBaseXianDuanStart();}
+	Class_XianDuan<1>* getBaseXianDuanEnd() {return getEnd()->getBaseXianDuanEnd();}
 
 	bool operator<(const Item &latter) const
 	{
@@ -112,12 +117,14 @@ public:
 };
 
 
-
 /* 设立这个接口，是因为线段，可能包含若干个不同级别的中枢，这些中枢需要放置到一个列表中，因此，这个列表是个异质的列表，因此，需要维护虚类的指针，以便处理这些异质的中枢。 */
-template<class veryLowXianDuanType>
+
 class IZhongShu
 {
 public:
+
+	typedef Class_XianDuan<1> veryLowXianDuanType;
+
 	virtual int getGrade() = 0;
 
 	/* 时间上 */
@@ -135,17 +142,19 @@ public:
 	virtual float getHigh() const = 0;
 	virtual float getLow() const = 0;
 	
+	/* 用于输出中枢的时候使用 */
 	virtual Class_KXian* getStartRec() = 0;
 	virtual Class_KXian* getEndRec() = 0;
 
+	/* 用于比较中枢时间前后 */
 	virtual veryLowXianDuanType* getEnd() = 0;
 	virtual veryLowXianDuanType* getStart() = 0;
 };
 
 
 
-template<class subZhongShuType, class XianDuanType, class veryLowXianDuanType, class ZhongShuType>
-class traits_ZhongShu: public IZhongShu<veryLowXianDuanType>
+template<class subZhongShuType, class XianDuanType, class ZhongShuType>
+class traits_ZhongShu: public IZhongShu
 { 
 public:
 	typedef vector<ZhongShuType> ContainerType;
@@ -153,7 +162,7 @@ public:
 
 	typedef typename XianDuanType::baseItemType subXianDuanType;
 
-	typedef veryLowXianDuanType veryBaseXianDuanType;
+	typedef Class_XianDuan<1> veryBaseXianDuanType;
 
 /*
                             此处高点一定要高于High
@@ -230,18 +239,73 @@ public:
 
 	traits_ZhongShu(subXianDuanType *s, subXianDuanType *l) { assert(l-s >= 8); content.type = 3; content.c3.start =s; content.c3.last = l;}
 
+	traits_ZhongShu() {}
 
 	float getHigh() const {return High;}
 	float getLow() const {return Low;}
 
 
-	veryBaseXianDuanType*  getStart() const{return Start;}
-	veryBaseXianDuanType*  getEnd() const {return End;}
+	veryBaseXianDuanType*  getStart() const
+	{
+		if (Start) return Start;
+
+		switch (content.type)
+		{
+		case 1:
+			Start = content.c1.first->getStart();
+			break;
+		case 2:
+			Start = content.c2.first->getStart();
+			break;
+		case 3:
+			Start = content.c3.start->getBaseXianDuanStart();
+			break;
+		default:
+			assert(0);
+		}
+
+		return Start;
+	}
+	
+	veryBaseXianDuanType*  getEnd() const
+	{
+		if (End) return End;
+
+		switch (content.type)
+		{
+		case 1:
+			End = content.c1.first->getEnd();
+			break;
+		case 2:
+			End = content.c2.first->getEnd();
+			break;
+		case 3:
+			End = content.c3.start->getBaseXianDuanEnd();
+			break;
+		default:
+			assert(0);
+		}
+
+		return End;
+	}
 	
 	/*Direction getDirection() const {return d;} */
 
-	Class_KXian* getStartRec() { return Start->getStartRec(); }
-	Class_KXian* getEndRec() { return End->getEndRec(); }
+	Class_KXian* getStartRec() 
+	{
+		if (getStart())
+			return Start->getStartRec();
+		else
+			return NULL;
+	}
+
+	Class_KXian* getEndRec()
+	{
+		if (getEnd())
+			return End->getEndRec();
+		else
+			return NULL;
+	}
 
 
 	bool preceed(const IZhongShu &latter) const

@@ -9,43 +9,48 @@ class AnalyzeZhongShu_Template
 {
 public:
 	typedef typename XianDuanClass::baseItemType_Container::iterator baseItemIterator;
+	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType ContainerType;
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 
 
-	void handleTurningPoint()
+	static void handleTurningPoint(baseItemType *start, baseItemType *end)
 	{
 /*
-
   对于向上的线段说， TurningPoint(TP)是指 这样的点： TP1、TP2
 
                TP2       /
                 /\      /
-     TP1       /  \    /
+     TP1       /  \    end
       /\      /    \  /
      /  \    /      \/
-    /    \  /
+TP1_1  TP1_2/
    /      \/
   /
  
  对于向下的线段，TurningPoint是指 这样的点：TP1、TP2
   \
    \        /\
-    \      /  \
+ TP1_1  TP1_2 \
 	 \    /    \        /\
 	  \  /      \      /  \
 	   \/        \    /    \
-      TP1         \  /      \
+      TP1         \  /      end
                    \/        \
                   TP2         \
                                \
 */
-
+		baseItemType *TP1_1 = start;
+		baseItemType *TP1_2 = start + 1;
+		while (TP1_1 < end)
+		{
+			//if (TP1_1->
+		}
 
 	}
 
-	void handleJuxtaposition()
+	static void handleJuxtaposition(baseItemType *start, baseItemType *end)
 	{
 /*
   对于向上的线段说， Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
@@ -105,24 +110,50 @@ public:
 
 	}
 
-	void doWork() 
+	static void doWork() 
 	{
-		handleTurningPoint();
-		handleJuxtaposition();
+		if (XianDuanClass::container == NULL)  return;
+
+		ItemIterator curr = XianDuanClass::container->begin();
+		ItemIterator end = XianDuanClass::container->end();
+		baseItemType* veryEnd = &(*(XianDuanClass::baseItems->end() - 1));
+
+		while (curr < end)
+		{
+			baseItemType *first = (*curr).getStart();
+			baseItemType *last = (*curr).getEnd();
+
+			handleTurningPoint(first, last);
+			handleJuxtaposition(first, last);
+
+			curr++;
+		}
+		
+		// baseItem队列中，可能会有一些剩余的项目，没有归入高一级别的线段，依然需要分析它们所包含中枢。 可行的方法，也许是，创建一个临时的父亲线段来包含这些剩余的子线段？
+		baseItemType *remaining = (*(end-1)).getEnd() + 1;
+		if (remaining < veryEnd)
+		{
+			// XianDuanClass temp = new XianDuanClass(baseItemIterator(remaining), baseItemIterator(veryEnd));
+			handleTurningPoint(remaining, veryEnd);
+			handleJuxtaposition(remaining, veryEnd);
+		}
 	}
 };
 
 
-
 template <class XianDuanClass>
-AnalyzeZhongShu_PostOrder()
+void AnalyzeZhongShu_PostOrder()
 {
 	typedef typename XianDuanClass::baseItemType baseItemType;
 
 	AnalyzeZhongShu_PostOrder<baseItemType>();
-	AnalyzeZhongShu_Template<XianDuanClass>();
+	AnalyzeZhongShu_Template<XianDuanClass>::doWork();
 }
 
 
+template <>
+void AnalyzeZhongShu_PostOrder<Class_XianDuan<1>>()
+{
+}
 
 #endif

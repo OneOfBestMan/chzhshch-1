@@ -10,6 +10,8 @@ using namespace std;
 #include "Class_XianDuan.h"
 #include "debug.h"
 
+#include "AnalyzeZhongShu.h"
+
 Class_env* Class_env::env = NULL;
 
 
@@ -89,7 +91,10 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		preDump<Class_XianDuan<7>>(map);
 		DumpV2<Class_XianDuan<7>>(map, file);
 #endif
+
 	}
+
+	AnalyzeZhongShu_PostOrder<Class_XianDuan<7>>();
 
 	env->outputResult();
 
