@@ -17,6 +17,12 @@ void preDump<typename Class_KXian> (dumpHelperMap &helperMap)
 	Class_KXian::preDumpClass::doWork(helperMap);
 }
 
+template<>
+void Dump<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file)
+{
+	Class_KXian::DumpClass::doWork(helperMap, file);
+}
+
 
 
 
@@ -36,6 +42,22 @@ Direction operator-(const Direction& d)
 
 
 Class_KXian::ContainerType* Class_KXian::container = NULL;
+
+
+ostream& operator<<(ostream &out, Class_KXian &kxian)
+{
+	out << 'K' << "(";
+
+	out.setf(ios_base::fixed, ios_base::floatfield);
+	out.precision(2);
+	out.width(4);
+
+	out<< kxian.bar.kBot << ", ";
+	out.width(4);
+	out<<  kxian.bar.kHigh << ")";
+	return out;
+}
+
 
 void Class_KXian::initialize(bool release)
 {

@@ -13,3 +13,18 @@ void FenXianDuan<typename Class_XianDuan<1>>(bool release)
 }
 
 
+
+ostream& operator<<(ostream& ostream, Class_XianDuan<1>& objXianDuan)
+{
+	typedef Class_XianDuan<1> XianDuanClass;
+	ostream << 'X' << XianDuanClass::GRADE << "(";
+
+	ostream.setf(ios_base::fixed, ios_base::floatfield);
+	ostream.precision(2);
+	ostream.width(4);
+
+	ostream<< objXianDuan.XianDuan.low << ", ";
+	ostream.width(4);
+	ostream<< objXianDuan.XianDuan.high << ")";
+	return ostream;
+}

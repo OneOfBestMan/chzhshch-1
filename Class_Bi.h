@@ -2,9 +2,12 @@
 #ifndef CLASS_BI_H
 #define CLASS_BI_H
 
+// #define _HAS_ITERATOR_DEBUGGING 0 // 由于是对vector进行reserve space，如果不undef这个宏的话，使用[]访问元素，会报下表越界。 所以，必须在#include <vector>之前，将这个宏关闭. 注意，放置到stdafx.h中了.
+
+
 #include "Class_KXian.h"
 
-//#include <stack>
+#include <ostream>
 #include <vector>
 
 using namespace std;
@@ -14,6 +17,7 @@ class Class_Bi
 {
 public:
 	typedef vector<Class_Bi> ContainerType;
+	typedef typename baseItem_Container::value_type baseItemType;
 	
 	typedef struct {
 		typename baseItem_Container::value_type *start;
@@ -22,6 +26,10 @@ public:
 		float low;
 	} valueType;
 
+	float getHigh() const {return bi.high;}
+	float getLow()const {return bi.low;}
+	baseItemType*  getStart()const {return bi.start;}
+	baseItemType*  getEnd()const {return bi.end;}
 
 
 	Class_Bi(void) {}
@@ -49,6 +57,7 @@ public:
 	typedef vector<Class_KXian> baseItemType_Container;
 
 	typedef preDumpTemplate<Class_Bi>  preDumpClass;
+	typedef DumpTemplate<Class_Bi> DumpClass;
 
 	typedef struct {
 		baseItemType* start;
@@ -57,6 +66,11 @@ public:
 		float low;
 		Direction d;
 	} valueType;
+
+	float getHigh()const {return bi.high;}
+	float getLow()const {return bi.low;}
+	baseItemType*  getStart() const{return bi.start;}
+	baseItemType*  getEnd()const {return bi.end;}
 
 
 	Class_Bi(void) {}
@@ -68,10 +82,11 @@ public:
 	static ContainerType *container;
 
 	static void FenBi(bool release = false);
-	
-	valueType bi;
-private:
 
+	friend ostream& operator<<(ostream&, Class_Bi&);
+
+private:
+	valueType bi;
 	static void FenBi_Step1();
 	static void FenBi_Step2();
 

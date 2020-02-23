@@ -5,6 +5,8 @@
 
 
 #include <map>
+#include <ostream>
+#include <sstream> // to use istringstream
 using namespace std;
 
 typedef struct mappedInfo{
@@ -17,7 +19,6 @@ typedef map<void*, mappedInfo> dumpHelperMap;
 
 class Class_KXian;
 
-
 template<class XianDuanClass >
 class preDumpTemplate
 {
@@ -25,24 +26,28 @@ public:
 
 	static void doWork(dumpHelperMap &helperMap)
 	{
-		XianDuanClass::ContainerType::iterator p = XianDuanClass::container.begin();
-		XianDuanClass::ContainerType::iterator end   = XianDuanClass::container.end();
+		if (XianDuanClass::container == NULL) return;
+
+		XianDuanClass::ContainerType::iterator p = XianDuanClass::container->begin();
+		XianDuanClass::ContainerType::iterator end   = XianDuanClass::container->end();
 		
 		while (p != end)
 		{
 			XianDuanClass::ContainerType::value_type &item = *p;
-			XianDuanClass::baseItemType_Container::iterator xStart = item.XianDuan.start;
-			XianDuanClass::baseItemType_Container::iterator xEnd = item.XianDuan.end;
+			XianDuanClass::baseItemType *xStart = item.getStart();
+			XianDuanClass::baseItemType *xEnd = item.getEnd();
 			
 			int total = 0;
 			while (xStart != xEnd)
 			{
-				total += helperMap[&(*xStart)].total;
+				total += helperMap[xStart].total;
 				xStart++;
 			}
 			
-			sprintf(tempSpace, "(%4.2f, %4.2f)", item.XianDuan.low, item.XianDuan.high);
-			int content = strlen(tempSpace);
+			stringstream strstream;
+			strstream << item;
+
+			int content = strstream.str().length();
 			helperMap[&item] = dumpHelperMap::mapped_type(content, total);
 			p++;
 		}
@@ -52,12 +57,58 @@ public:
 
 
 template<class XianDuan_or_Bi>
-void preDump(dumpHelperMap &helperMap)
+void preDump(dumpHelperMap &helperMap) // post Order
 {
-	XianDuan_or_Bi::baseItemType::preDumpClass::doWork(helperMap);
+	preDump<XianDuan_or_Bi::baseItemType>(helperMap);
 
 	XianDuan_or_Bi::preDumpClass::doWork(helperMap);
 }
 
+
+template<class XianDuanClass >
+class DumpTemplate
+{
+public:
+
+	static void doWork(dumpHelperMap &helperMap, ostream &stream)
+	{
+		if (XianDuanClass::container == NULL) return;
+
+		XianDuanClass::ContainerType::iterator p = XianDuanClass::container->begin();
+		XianDuanClass::ContainerType::iterator end   = XianDuanClass::container->end();
+		
+		while (p != end)
+		{
+			XianDuanClass::ContainerType::value_type &item = *p;
+
+			int total = helperMap[&item].total;
+			
+			stringstream strstream;
+			strstream << item;
+
+			int left = (total - 1 - strstream.str().length()) / 2 + strstream.str().length();
+			int right = total - 1 - left;
+
+			stream << '|';
+			stream.width(left);
+			stream << strstream.str();
+			for (int i = 0; i < right; i++)
+				stream << ' ';
+
+			p++;
+		}
+		stream << '$' << '\n';
+	}
+};
+
+
+
+template<class XianDuan_or_Bi_or_KXian>
+void Dump(dumpHelperMap &helperMap, ostream &file)  // pre Order
+{
+	XianDuan_or_Bi_or_KXian::DumpClass::doWork(helperMap, file);
+
+	Dump<XianDuan_or_Bi_or_KXian::baseItemType>(helperMap, file);
+}
 
 #endif

@@ -3,9 +3,11 @@
 #include "FenXianDuan.h"
 
 #include <stdexcept>
+#include <fstream>
 using namespace std;
 
 #include "Class_XianDuan.h"
+#include "debug.h"
 
 Class_env* Class_env::env = NULL;
 
@@ -62,6 +64,18 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 
 		env = newEnv;
 		FenXianDuan<Class_XianDuan<7>>(false);
+
+		static bool doOnce = false;
+		if (!doOnce)
+		{
+			doOnce = true;
+			dumpHelperMap map;
+			ofstream file("c:\\log.txt");
+			preDump<Class_XianDuan<7>>(map);
+			Dump<Class_XianDuan<7>>(map, file);
+		}
+
+
 	}
 
     return env;

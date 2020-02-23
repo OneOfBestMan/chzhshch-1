@@ -6,6 +6,21 @@ Class_Bi<vector<Class_KXian> >::baseItemType_Container* Class_Bi<vector<Class_KX
 Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
 
 
+ostream& operator<<(ostream& out, Class_Bi<vector<Class_KXian>>& biObj)
+{
+	out << "Bi" << "(";
+
+	out.setf(ios_base::fixed, ios_base::floatfield);
+	out.precision(2);
+	out.width(4);
+
+	out<< biObj.bi.low << ", ";
+	out.width(4);
+	out<<  biObj.bi.high  << ")";
+	return out;
+
+}
+
 
 void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 {
@@ -19,7 +34,8 @@ void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 		}
 		if (base_Container && !container)
 		{
-			container = new ContainerType(base_Container->size());
+			container = new ContainerType();
+			container->reserve(base_Container->size());
 			// step 1: 考虑K线包含关系，找出 类-顶分型、类-底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
 			FenBi_Step1();
 			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，继续处理各个笔；
@@ -79,7 +95,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 			// 方向不再一致, 建立一个 类-笔
 			float high = max(start->getHigh(), (p-1)->getHigh());
 			float low = min(start->getLow(), (p-1)->getLow());
-			(*intermediate)[cnt++] = ContainerType::value_type(&(*start), &(*(p-1)), high, low, d);
+			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d));
 			start = p-1;
 
 			d = -d;

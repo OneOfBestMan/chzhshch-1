@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <vector>
 
+#include <ostream>
+#include <sstream>
 
 using namespace std;
 
@@ -29,6 +31,7 @@ public:
 	typedef vector<Class_KXian> ContainerType;
 
 	typedef preDumpTemplate<Class_KXian>  preDumpClass;
+	typedef DumpTemplate<Class_KXian> DumpClass;
 
 	typedef struct
 	{
@@ -46,7 +49,7 @@ public:
 
 	float getStart() const;
 	float getEnd() const;
-	float getHigh() const;
+	float getHigh() const; // getHigh getLow 这两个接口，与Class_XianDuan、Class_Bi 中的两个接口 是公用接口，被preDumpTemplate.doWork所使用 
 	float getLow() const;
 
 	static Direction getDirection(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
@@ -89,6 +92,9 @@ public:
 		return *this;
 	}
 
+
+	friend ostream& operator<< (ostream&, Class_KXian &);
+
 	static void initialize(bool release = false);
 private:
 	valueType bar;
@@ -111,8 +117,12 @@ public:
 		{
 			Class_KXian::ContainerType::value_type &item = *p;
 			sprintf(tempSpace, "(%4.2f, %4.2f)", item.getLow(), item.getHigh());
-			int content = strlen(tempSpace);
-			helperMap[&item] = mappedInfo(content, content + 1);
+			
+			stringstream strstream;
+			strstream<< item;
+			int content = strstream.str().length();
+
+			helperMap[&item] = mappedInfo(content, content + 1); // +1 代表 '|'字符
 			p++;
 		}
 	}
@@ -121,6 +131,7 @@ public:
 template<>
 void preDump<typename Class_KXian> (dumpHelperMap &helperMap);
 
-
+template<>
+void Dump<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file) ;
 
 #endif

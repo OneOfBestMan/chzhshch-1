@@ -17,9 +17,8 @@ public:
 			
 			if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
 			{
-				XianDuanClass::container = new XianDuanClass::ContainerType(XianDuanClass::baseItems->size());
 				//下面就是划分线段的具体逻辑
-				XianDuanClass::HuaFenXianDuan();
+				XianDuanClass::container = XianDuanClass::HuaFenXianDuan();
 			}
 		}
 		else
