@@ -12,6 +12,8 @@
 
 #include "traits.h"
 
+#include "Display.h"
+
 using namespace std;
 
 template <class baseItem_Container> 
@@ -55,6 +57,8 @@ public:
 	typedef preDumpTemplate<Class_Bi>  preDumpClass;
 	typedef DumpTemplate<Class_Bi> DumpClass;
 	typedef DumpTemplateV2<Class_Bi> DumpClassV2;
+	typedef DisplayTemplate<Class_Bi> DisplayClass;
+
 
 
 

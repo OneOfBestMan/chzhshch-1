@@ -12,6 +12,7 @@ using namespace std;
 
 #include "FenXianDuan.h"
 #include "traits.h"
+#include "Display.h"
 
 /*
 template<int grade> class Class_XianDuan;
@@ -27,6 +28,7 @@ public:
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
 	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
+	typedef DisplayTemplate<Class_XianDuan> DisplayClass;
 
 	typedef typename baseItemType_Container::iterator baseItemIterator;
 
@@ -77,6 +79,8 @@ public:
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
 	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
+	typedef DisplayTemplate<Class_XianDuan> DisplayClass;
+
 
 	typedef baseItemType_Container::iterator baseItemIterator;
 

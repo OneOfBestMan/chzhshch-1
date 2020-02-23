@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Display.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FenXianDuan.h"
 				>
 			</File>

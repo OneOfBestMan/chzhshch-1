@@ -42,6 +42,9 @@ public:
 	float getStart() const {return Start;}
 	float getEnd() const {return End;}
 
+	Class_KXian* getStartRec() {return this;}
+	Class_KXian* getEndRec() {return this;}
+
 
 	friend ostream& operator<< (ostream&, Class_KXian &);
 

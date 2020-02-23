@@ -167,6 +167,7 @@
     <ClInclude Include="Class_XianDuan.h" />
     <ClInclude Include="Class_ZhongShu.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="Display.h" />
     <ClInclude Include="FenXianDuan.h" />
     <ClInclude Include="FenXianDuan_Common.h" />
     <ClInclude Include="StdAfx.h" />

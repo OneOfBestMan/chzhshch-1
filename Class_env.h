@@ -88,9 +88,18 @@ void Dump()
 class Class_env
 {
 public:
+
+	/* 输出的线类型， 从笔 到 各个不同级别的线段 */
+	typedef enum {BI=0, XIANDUAN_1 = 1, XIANDUAN_2 = 2, XIANDUAN_3 = 3, XIANDUAN_4 = 4, XIANDUAN_5 = 5, XIANDUAN_6 = 6, XIANDUAN_7 = 7} gradeSelect;
+
+	/* 对于不同的输出线类型，需要两个数组刻画，一个是各个线段从哪里开始到哪里结束，另一个是各个线段起始价格、结束价格 */
+	typedef enum {OUTPUT_TIME = 0, OUTPUT_PRICE = 1} funcSelect;
+
+
 	~Class_env(void);
 	static Class_env* getInstance(CALCINFO *p);
 	static Class_env* getInstance();
+	void outputResult();
 	static Class_env* env;
 
 	int   getTotal() const {return totalBar;}
@@ -110,6 +119,12 @@ public:
 	int totalBar;
 
 	char* stockName;
+
+
+	gradeSelect grade;
+	funcSelect func;
+	float *resultBuf;
+
 
 	bool operator==(const Class_env &secondEnv) const 
 	{

@@ -16,6 +16,8 @@ typedef enum Direction
 Direction operator-(const Direction& d);
 
 
+class Class_KXian;
+
 template<class baseItemType, class Item>
 class traits
 { 
@@ -38,7 +40,8 @@ public:
 	baseItemType*  getEnd() const {return End;}
 	Direction getDirection() const {return d;}
 
-
+	Class_KXian* getStartRec() { return Start->getStartRec(); }
+	Class_KXian* getEndRec() { return End->getEndRec(); }
 
 	bool operator<(const Item &latter) const
 	{

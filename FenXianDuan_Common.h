@@ -199,8 +199,22 @@
 				/* 原线段延续*/
 				biFormer = CharacVecStack.back().start - 1;
 				biLatter = CharacVecStack.back().end + 1;
-				CharacVecStack.pop_back();
-				continue;
+				if (biLatter < end - 2)
+				{
+					CharacVecStack.pop_back();
+					continue;
+				}
+				else
+				{
+					/* baseItem快到最后了 */
+					if (!resultSet)
+					{
+						resultSet = new ContainerType();
+					}
+					resultSet->push_back(XianDuanClass(biStart, biFormer, d));
+					debugCnt++;
+					break;
+				}
 			} else
 			{
 				/* 原线段被破坏，将该线段添加到container中 */

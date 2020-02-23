@@ -185,7 +185,7 @@ __declspec(dllexport) int WINAPI MYBBI(CALCINFO* pData)
 /*
  缠中说禅 分笔、分线段、确定中枢
  调用方法:
-   "STOCKFUNC@CHZHSHCH(HIGH,LOW,START,END)
+   "STOCKFUNC@CHZHSHCH(START,END,LOW,HIGH,线段层级编号[0-7, 0代表分笔,1-7代表线段],输出选择[0/1,0表示时间，1表示价格])
 */
 __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
 {
