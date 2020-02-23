@@ -57,6 +57,7 @@ public:
 		baseItemIterator current = start;
 		Direction d;
 	
+		/* 先合并（可能的）新线段开始处的包含（前包后）的几笔 */
 		baseItemType possiblePrevXianDuanChracVec = *current;
 		while (current + 2 < end)
 		{
@@ -72,6 +73,7 @@ public:
 
 		prevCharacVecEnd = current;
 
+		/* 找可能出现转折的位置 */
 		baseItemType lastBi = possiblePrevXianDuanChracVec;
 		while (current + 2 < end)
 		{
@@ -95,10 +97,12 @@ public:
 		baseItemIterator possibleNewXianDuanEnd = FXD_Merge(hints, start, end, prevChacVecEnd);
 
 		
+		/*  算上合并包含关系得到的那一笔， 到可能出现转折的笔，一共（至少）3笔，那么新线段就算成立，即：3笔确立线段*/
 		if (possibleNewXianDuanEnd - prevChacVecEnd >= 2) 
 			return true;
 		else
 		{
+			/* 否则，处理合并关系得到的这一笔，被当做原线段的特征向量，原线段仍然继续 */
 			lastXianDuan_CharacVecStack.push(CharacterVec(start, prevChacVecEnd));
 			return false;
 		}
@@ -131,6 +135,7 @@ public:
 
 		do 
 		{
+			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
 			while  (biFormer + 2 < end &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
 			{
 				CharacVecStack.push_back(CharacterVec(biFormer + 1, biFormer + 1));
@@ -146,10 +151,14 @@ public:
 				continue;
 			} else
 			{
+				/* 原线段被破坏， 翻转方向 */
 				d = -d;
+				/* 新的线段的第一笔*/
 				biStart = ++ biFormer;
+				/* 新的线段的特征向量栈初始化 */
 				CharacVecStack.clear();
 
+				/* 新的线段，开始的部分，有一组互相包含的线段，可以看成是之前线段的特征向量，可以应用包含关系。合并它们 */
 				baseItemType temp = *biFormer;
 				while (biFormer + 2 < end)
 				{
