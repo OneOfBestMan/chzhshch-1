@@ -100,6 +100,10 @@ private:
 	ValueRange coreRange;  // rangeHigh, rangeLow; 中枢的区间；
 	ValueRange floatRange; // High和Low表示中枢波动的高低点
 
+	// Start/End域 是可以进行缓存的：我之前犹豫过，如果一个中枢形成之后，可以吞并其它中枢(比如，允许级别level+1中枢，可以合并一个级别level的中枢，级别依然是level+1的话)
+	// 那么End需要在content.c5.latter发生变化时更新； 是否存在这种情形，即，中枢的子中枢，合并其它后续中枢，导致该子中枢的End发生了变化，但是父中枢的End却由于缓存，导致
+	// 没有进行更新呢？ 答案是，否定的。 因为，MultiView算法，保证了子中枢在expand成为高级别中枢之后，就不会再存在于view中了，所以，该子中枢就不会再吞并后续中枢，因为view
+	// 中已经没有它了；
 	veryBaseXianDuanType *Start;
 	veryBaseXianDuanType *End;
 	Direction d; // 中枢的方向，与所在线段方向相反：即，在向下的线段中，中枢方向是向上的。
@@ -304,6 +308,30 @@ public:
 		return End;
 	}
 
+	void updateEnd(Class_ZhongShu* newEnd)
+	{
+		assert(newEnd->getStart() > getEnd());
+		switch (content.type)
+		{
+		case 1:
+			content.c1.last = newEnd;
+			break;
+		case 2:
+			assert(0);
+		case 3:
+			content.c3.last = newEnd->getEnd();
+			break;
+		case 4:
+			assert(0);
+		case 5:
+			content.c5.latter = newEnd;
+			break;
+		}
+
+		End = newEnd->getEnd();
+		floatRange || newEnd->getFloatRange();
+		coreRange && newEnd->getFloatRange();
+	}
 
 	int getGrade() {return grade;}
 

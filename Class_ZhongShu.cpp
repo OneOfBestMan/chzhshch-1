@@ -60,7 +60,7 @@ Class_ZhongShu* createZhongShu(Class_ZhongShu *zs, Class_XianDuanBase *xianDuan,
 
 Class_ZhongShu* createZhongShu(Class_ZhongShu *former, Class_ZhongShu *latter, int grade)
 {
-	assert(former->getGrade() == latter->getGrade());
+	assert(former->getGrade() == latter->getGrade() || former->getGrade() == latter->getGrade() + 1); // 允许 前一个高中枢吞并后一个低级别中枢，来进行中枢扩展；
 	// assert(grade - 1 == former->getGrade()); //TODO: 这个assertion是我不愿意注销的，但目前程序会assert。先临时禁用，以后再找找原因。
 	assert(grade < Class_ZhongShu::MAX_LEVEL && grade > 0);
 

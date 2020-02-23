@@ -393,7 +393,7 @@ public:
 
 
 	// 将 time list队列中，从from开始到to的项目，扩展成为一个新的中枢newZS
-	void ExpandZS(ElemOfView *from, ElemOfView* to, Class_ZhongShu *newZS)
+	ElemOfView* ExpandZS(ElemOfView *from, ElemOfView* to, Class_ZhongShu *newZS)
 	{
 
 		// 建立一个ElemOfView
@@ -447,7 +447,7 @@ public:
 			assert(isEmpty(&level_list[i]));*/
 
 
-		for (int i = 0; i < newLevel; i++)
+		for (int i = 0; i <= newLevel; i++)
 		{
 			int cnt = 0;
 
@@ -493,6 +493,8 @@ public:
 		max_level = max(max_level, newLevel);
 
 		assertValid();
+
+		return newEov;
 	}
 
 	// 扫描level_list[level]队列，对 “level + 1”级别的中枢，如果它的第三买卖点未指定，则寻找在它之后出现“紧跟着的”level级别中枢，并判断是否满足第三买卖点条件。
@@ -515,6 +517,9 @@ public:
 			while (nextEntry !=  &level_list[level])
 			{
 				ElemOfView *nextEov = list_entry(nextEntry, ElemOfView, level_link[level]);
+
+				nextEntry = nextEntry->next; // 需要提前获取nexEntry->next，因为nextEntry有可能会被合并 导致从view中删除
+
 				if (nextEov->elem->getGrade() == level)
 				{
 					ValueRange temp = eov->elem->getCoreRange();
@@ -524,10 +529,30 @@ public:
 						eov->elem->setThirdPoint(nextEov->elem);
 						break;
 					}
-				} // TODO: 如果有重合，那么需要更新中枢，并且当中枢级别跳升的时候，要更新View
+					else
+					{
+						// 如果有重合，那么需要更新中枢，并且当中枢级别可以上调的时候，要更新View
+						int newLevel = getZSLevel(eov->elem, nextEov->elem);
+						if (newLevel > level + 1)
+						{
+							// 一个 leve+1 级别的中枢 和一个 level级别的中枢，构成更大级别中枢
+							Class_ZhongShu *newZS = createZhongShu(eov->elem, nextEov->elem, newLevel);
+							ElemOfView *newEov = ExpandZS(eov, nextEov, newZS);
+							curr = &newEov->level_link[level];
+							break; // 之所以break，是因为，当前的newEov的级别已经调高了1级，所以，外层循环的那个level+1的项，已经失效；
+						}
+						else
+						{
+							// 一个 leve+1级别的中枢 合并 后面的一个level级别的中枢，中枢级别没有变化。
+							eov->elem->updateEnd(nextEov->elem);
+							//// RemoveElem(nextEov); // 这句非常错误，因为，level+1和level中枢之间，在time list上可能存在很多低级别中枢，所以绝不仅仅是删除掉中枢level那么简单，而是要把这两个中枢之间的低级别中枢都从view中删除掉
+							eov = ExpandZS(eov, nextEov, eov->elem);
+							curr = &eov->level_link[level];
+						}
+					}
+				} 
 				else 
 					break; // 如果一个level+1级别的中枢，之后中枢的级别大于等于该中枢，那么就别再找该中枢的第三买卖点了
-				nextEntry = nextEntry->next;
 			}
 			//if (nextEntry == &level_list[level])
 			//	break;
@@ -776,7 +801,7 @@ public:
 			ofstream file(filename.str().c_str());
 
 			file.setf(ios_base::hex, ios_base::basefield);
-			file << "time_list(0x" << &time_list << "): ";
+			file << "time_list(0x" << &time_list << "): \n";
 
 			curr = time_list.next;
 			while (curr != &time_list)
@@ -789,7 +814,7 @@ public:
 
 			for (int i = 0; i < MAX_LEVEL; i++)
 			{
-				file << "level_list[" << i << "] (0x" << &level_list[i] << "): ";
+				file << "level_list[" << i << "] (0x" << &level_list[i] << "): \n";
 				curr = level_list[i].next;
 				while (curr != &level_list[i])
 				{
@@ -1129,6 +1154,7 @@ void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView 
 		}
 		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
 		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
+		
 		//printf("break me here");
 	}
 }

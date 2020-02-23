@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Stock\FoxTrader\FmlDll/StockFunc1.dll"
+				OutputFile="C:\Stock\FoxTrader\FmlDll/StockFunc.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -351,6 +351,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include_api.h"
+				>
+			</File>
+			<File
 				RelativePath=".\slist.h"
 				>
 			</File>
@@ -359,13 +363,21 @@
 				>
 			</File>
 			<File
-				RelativePath="StockFunc.h"
-				>
-			</File>
-			<File
 				RelativePath=".\traits.h"
 				>
 			</File>
+			<Filter
+				Name="API"
+				>
+				<File
+					RelativePath=".\FoxFunc.h"
+					>
+				</File>
+				<File
+					RelativePath="StockFunc.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
