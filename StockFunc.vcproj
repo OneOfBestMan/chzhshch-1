@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="StockFunc"
-	ProjectGUID="{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}"
+	ProjectGUID="{BD44C4ED-53BB-4739-99DB-DB10CE5FD67D}"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
@@ -215,6 +215,22 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\Class_Bi.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_FenXing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_XianDuan.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_ZhongShu.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -261,6 +277,22 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\Class_Bi.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_FenXing.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_XianDuan.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_ZhongShu.h"
+				>
+			</File>
 			<File
 				RelativePath="StdAfx.h"
 				>

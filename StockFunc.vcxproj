@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}</ProjectGuid>
+    <ProjectGuid>{BD44C4ED-53BB-4739-99DB-DB10CE5FD67D}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -142,6 +142,10 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Class_Bi.cpp" />
+    <ClCompile Include="Class_FenXing.cpp" />
+    <ClCompile Include="Class_XianDuan.cpp" />
+    <ClCompile Include="Class_ZhongShu.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -149,6 +153,10 @@
     <ClCompile Include="StockFunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Class_Bi.h" />
+    <ClInclude Include="Class_FenXing.h" />
+    <ClInclude Include="Class_XianDuan.h" />
+    <ClInclude Include="Class_ZhongShu.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />
   </ItemGroup>
