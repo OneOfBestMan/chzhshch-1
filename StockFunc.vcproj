@@ -174,7 +174,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Release/StockFunc.dll"
+				OutputFile="C:\Stock\FoxTrader\FmlDll/StockFunc.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\Release/StockFunc.pdb"

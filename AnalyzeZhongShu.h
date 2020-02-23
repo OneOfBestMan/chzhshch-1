@@ -335,7 +335,10 @@ public:
 
 	int getZSLevel(Class_ZhongShu *startFrom, Class_ZhongShu *endBy)
 	{
-
+#ifdef DONT_DEPEND_ON_BASIC_XIANDUAN_COUNT
+		// 如果，两个同级别floatRange有交集，就算扩展，而不考虑所包含的Class_XianDuan<1>的数量
+		return startFrom->getGrade() + 1;
+#else
 		int baseXianDuanCount = endBy->getEnd() - startFrom->getStart() + 1;
 
 		int newLevel;
@@ -359,11 +362,11 @@ public:
 		else
 			assert(0); // 中枢级别超过支持范围
 
-
 		//if (newLevel > startFrom->getGrade() + 1)
 		//	printf("break me here");
 
 		return newLevel;
+#endif
 	}
 
 	bool canExpand(Class_ZhongShu *former, Class_ZhongShu* latter)
@@ -374,8 +377,13 @@ public:
 
 		if (former->intersect(*latter))
 		{
+#ifdef DONT_DEPEND_ON_BASIC_XIANDUAN_COUNT
+		 // 如果，两个同级别floatRange有交集，就算扩展，而不考虑所包含的Class_XianDuan<1>的数量
+			return true;
+#else
 			int newGrade = getZSLevel(former, latter);
-			return newGrade > childGrade;
+			return newGrade > childGrade;			
+#endif
 		}
 		else
 			return false;
