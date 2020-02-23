@@ -131,7 +131,7 @@ private:
 				Class_XianDuanBase *XianDuan;
 			} c2;
 			struct{
-				// 处理，9个(或3^x, x>=2个)次级别线段，构成更高级别中枢的情形
+				// 处理，多于3个次级别中枢重叠，构成更高级别中枢的情形；
 				Class_XianDuanBase *start;
 				Class_XianDuanBase *last;
 			} c3;
@@ -153,17 +153,17 @@ private:
 
 	void initializeCommon()
 	{
-		thirdPoint = NULL;
+		thirdPoint = (grade == 0) ? this : NULL;
 		Start = End = NULL;
 
 		switch(content.type)
 		{
 
 		case 1:
-			coreRange = content.c1.first->getCoreRange();
-			coreRange = coreRange && content.c1.mid->getCoreRange() && content.c1.last->getCoreRange();
+			coreRange = content.c1.first->getFloatRange();
+			coreRange = coreRange && content.c1.mid->getFloatRange() && content.c1.last->getFloatRange();
 			floatRange = content.c1.first->getFloatRange();
-			floatRange = floatRange && content.c1.mid->getFloatRange() && content.c1.last->getFloatRange();
+			floatRange = floatRange || content.c1.mid->getFloatRange() || content.c1.last->getFloatRange();
 			break;
 		case 2:
 			{
@@ -186,13 +186,7 @@ private:
 			{
 				veryBaseXianDuanType* curr = content.c3.start->getBaseXianDuanStart();
 				veryBaseXianDuanType* end = content.c3.last->getBaseXianDuanStart();
-				while (curr <= end)
-				{
-					coreRange && ValueRange(curr->getLow(), curr->getHigh());
-					floatRange || ValueRange(curr->getLow(), curr->getHigh());
-					curr++;
-				}
-
+				// coreRange和 floatRange需要单独设置，见 createZhongShu(Class_ZhongShu *zsArray[], int cntZS,  int grade)
 			}
 			break;
 		case 4:
@@ -200,10 +194,10 @@ private:
 			floatRange = coreRange;
 			break;
 		case 5:
-			coreRange = content.c5.former->getCoreRange();
-			coreRange = coreRange && content.c5.latter->getCoreRange();
+			coreRange = content.c5.former->getFloatRange();
+			coreRange = coreRange && content.c5.latter->getFloatRange();
 			floatRange = content.c5.former->getFloatRange();
-			floatRange = floatRange && content.c5.latter->getFloatRange();
+			floatRange = floatRange || content.c5.latter->getFloatRange();
 			break;
 		default:
 			assert(0);
@@ -313,6 +307,22 @@ public:
 
 	float getHigh() const {return floatRange.getHigh();}
 	float getLow() const {return floatRange.getLow();}
+
+	Class_ZhongShu* getThirdPoint() {return thirdPoint;}
+	void setThirdPoint(Class_ZhongShu* thrdPoint)
+	{
+		assert(thirdPoint == NULL);
+		thirdPoint = thrdPoint;
+		
+		// 在设置第三买卖点后，更新该中枢的floatRange
+		veryBaseXianDuanType *curr = getEnd() + 1;
+		veryBaseXianDuanType *end = thirdPoint->getStart();
+		while (curr != end)
+		{
+			floatRange || ValueRange(curr->getLow(), curr->getHigh());
+			curr++;
+		}
+	}
 	
 	Direction getDirection() const {return d;} 
 
@@ -387,6 +397,8 @@ public:
 
 	ValueRange getCoreRange() const {return coreRange;}
 	ValueRange getFloatRange() const {return floatRange;}
+	void setCoreRange(ValueRange &val) {coreRange = val;}
+	void setFloatRange(ValueRange &val) {floatRange = val;}
 
 	bool intersect(const Class_ZhongShu &latter)
 	{
@@ -407,8 +419,10 @@ public:
 	friend Class_ZhongShu* createZhongShu(Class_ZhongShu*, Class_ZhongShu*, int); // type = 5
 	friend Class_ZhongShu* createZhongShu(Class_ZhongShu *, Class_ZhongShu *, Class_ZhongShu * , int);  // type = 1 
 	friend Class_ZhongShu* createZhongShu(Class_XianDuanBase *, Class_XianDuanBase *, int ); // type = 3
+	//friend Class_ZhongShu* createZhongShu(int grade, ...);
+	friend Class_ZhongShu* createZhongShu(Class_ZhongShu *zsArray[], int cntZS,  int grade);
 
-	static const int MAX_LEVEL = 7;
+	static const int MAX_LEVEL = 8;
 	static list<Class_ZhongShu>  zsList[MAX_LEVEL];
 };
 

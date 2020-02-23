@@ -165,7 +165,7 @@ void Class_env::outputResult()
 		}
 	} else
 	{
-		assert(grade >= ZS_0 && grade <= ZS_6 && func >= OUTPUT_ZS_START_END_MARK && func <= OUTPUT_ZS_HIGHPRICE);	
+		assert(grade >= ZS_0 && grade <= ZS_7 && func >= OUTPUT_ZS_START_END_MARK && func <= OUTPUT_ZS_HIGHPRICE);	
 		Class_ZhongShu::DisplayClass::doWork(grade, func, resultBuf);
 	}
 }

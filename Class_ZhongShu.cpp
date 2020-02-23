@@ -90,4 +90,82 @@ Class_ZhongShu* createZhongShu(Class_XianDuanBase *start, Class_XianDuanBase *en
 	return &Class_ZhongShu::zsList[grade].back();
 }
 
+Class_ZhongShu* createZhongShu(Class_ZhongShu *zsArray[], int cntZS,  int grade)
+{
+	assert(grade < Class_ZhongShu::MAX_LEVEL && grade > 0);
 
+	ValueRange coreRange = zsArray[0]->getFloatRange();
+	ValueRange floatRange = zsArray[0]->getFloatRange();
+
+	for (int i = 0; i < cntZS; i++)
+	{
+		Class_ZhongShu *curr = zsArray[i];
+
+		coreRange && curr->getFloatRange();
+		floatRange || curr->getFloatRange();
+	}
+		
+	Class_ZhongShu *newZS = createZhongShu(zsArray[0]->getStart(), zsArray[cntZS-1]->getEnd(), grade);
+	newZS->setCoreRange(coreRange);
+	newZS->setFloatRange(floatRange);
+	return newZS;
+}
+
+
+/*
+Class_ZhongShu* createZhongShu(int grade, ...)
+{
+	va_list zsParms;
+	va_start(zsParms, grade);
+
+	int countZS = 0;
+	while ((curr = va_arg(zsParms, Class_ZhongShu*)) != 0)
+		countZS++
+
+	va_start(zsParms, grade);
+	switch (countZS)
+	{
+	case 0:
+		assert(0);
+		break;
+	case 1:
+		Class_XianDuanBase *curr = va_arg(zsParms, Class_XianDuanBase*);
+		return createZhongShu(curr, grade);
+	case 2:
+		Class_ZhongShu* former = va_arg(zsParms, Class_ZhongShu*);
+		Class_ZhongShu* latter = va_arg(zsParms, Class_ZhongShu*);
+		return createZhongShu(former, latter, grade);
+	case 3:
+		Class_ZhongShu* first = va_arg(zsParms, Class_ZhongShu*);
+		Class_ZhongShu* mid = va_arg(zsParms, Class_ZhongShu*);
+		Class_ZhongShu* last = va_arg(zsParms, Class_ZhongShu*);
+		return createZhongShu(first, mid, last, grade);
+	default:
+		Class_ZhongShu *first, *last;
+		ValueRange coreRange, floatRange;
+		for (int i = 1; i <= countZS; i++)
+		{
+			Class_ZhongShu *curr = va_arg(zsParms, Class_ZhongShu*);
+
+			if (i == 1)
+				coreRange = curr->getFloatRange();
+			else
+				coreRange && curr->getFloatRange();
+
+			floatRange || curr->getFloatRange();
+
+
+			if (i == 1)
+				first = curr; 
+
+			if (i == countZS) 
+				last = mid;
+		}
+		
+		Class_ZhongShu *newZS = createZhongShu(first->getStart(), last->getEnd(), grade);
+		newZS->setCoreRange(coreRange);
+		newZS->setFloatRange(floatRange);
+		return newZS;
+	}
+}
+*/

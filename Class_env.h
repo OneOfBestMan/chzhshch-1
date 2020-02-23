@@ -27,7 +27,7 @@ public:
 	/* 输出的线类型， 从笔 到 各个不同级别的线段 */	
 		BI=0, XIANDUAN_1 = 1, XIANDUAN_2 = 2, XIANDUAN_3 = 3, XIANDUAN_4 = 4, XIANDUAN_5 = 5, XIANDUAN_6 = 6, XIANDUAN_7 = 7,
 	/* 中枢的级别 */	
-		ZS_0 = 0, ZS_1=1, ZS_2 = 2, ZS_3 = 3, ZS_4 = 4, ZS_5 = 5, ZS_6 = 6
+		ZS_0 = 0, ZS_1=1, ZS_2 = 2, ZS_3 = 3, ZS_4 = 4, ZS_5 = 5, ZS_6 = 6, ZS_7 = 7
 	} gradeSelect;
 
 	
