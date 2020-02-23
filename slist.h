@@ -25,6 +25,8 @@ void append(PList_Head list, List_Entry *item)
 
 #define list_entry(addr, typeOfEntry, fieldName) ((typeOfEntry*)((char*)(addr) - (char*)(&((typeOfEntry*)0)->fieldName)))
 
+#define remove_entry(item, listField) item->listField.prev->next = item->listField.next; item->listField.next->prev = item->listField.prev;
+
 List_Entry* remove(List_Entry *item)
 {
 	item->next->prev = item->prev;

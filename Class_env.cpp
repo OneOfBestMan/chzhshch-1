@@ -94,7 +94,8 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 
 	}
 
-	AnalyzeZhongShu_PostOrder<Class_XianDuan<7>>();
+	//AnalyzeZhongShu_PostOrder<Class_XianDuan<7>>();
+	AnalyzeZhongShu_PostOrder_V2<Class_XianDuan<7>>();
 
 	env->outputResult();
 

@@ -6,6 +6,101 @@
 
 #include "slist.h"
 
+
+
+/*class IRules
+{
+	bool canChange
+}
+*/
+
+class MultiLevelZhongShuView;
+
+template <class XianDuanClass>
+class AnalyzeZhongShu_Template_V2
+{
+public:
+	typedef typename XianDuanClass::baseItemType_Container::iterator baseItemIterator;
+	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
+	typedef typename XianDuanClass::baseItemType baseItemType;
+	typedef typename XianDuanClass::ContainerType ContainerType;
+	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
+
+	/*static void handleTurningPoint(ItemIterator &curr)
+	{
+	}*/
+
+	static void handleTurningPoint(MultiLevelZhongShuView &view, baseItemType *start, baseItemType *end)
+	{
+	}
+
+	static void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *start, XianDuanClass *end)
+	{
+	}
+
+	static void handleLast(MultiLevelZhongShuView &view, baseItemType *last)
+	{
+	}
+	static void handleLast(MultiLevelZhongShuView &view, XianDuanClass *last)
+	{
+	}
+
+	/*static void handleJuxtaposition(ItemIterator &curr)
+	{
+	}
+
+	static void handleJuxtaposition(MultiLevelZhongShuView &view, baseItemType *start, baseItemType *end)
+	{
+	}*/
+
+	static void doWork(XianDuanClass &item)
+	{
+		MultiLevelZhongShuView view;
+
+		baseItemType* TP1_1 = item.getStart();
+		baseItemType* TP1_2 = TP1_1 + 1;
+		baseItemType* end = item.getEnd();
+
+		while (TP1_1 < end)
+		{
+			AnalyzeZhongShu_Template_V2<baseItemType>::doWork(*TP1_1);
+
+			if (TP1_2 < end)
+			{
+				AnalyzeZhongShu_Template_V2<baseItemType>::doWork(*TP1_2);
+				handleTurningPoint(view, TP1_1, TP1_2);
+			}
+			else
+				handleLast(view, TP1_1); // 该线段中的最后那个次级别线段
+
+
+			TP1_1 = TP1_1 + 2;
+			TP1_2 = TP1_2 + 2;
+		}
+
+		item.zsList = view.getResult();
+	}
+};
+
+
+template <>
+class AnalyzeZhongShu_Template_V2<Class_XianDuan<1>>
+{
+public:
+	static void handleTurningPoint(MultiLevelZhongShuView &view, Class_XianDuan<1> *start, Class_XianDuan<1> *end)
+	{
+	}
+
+	static void handleLast(MultiLevelZhongShuView &view, Class_XianDuan<1> *last)
+	{
+	}
+	static void doWork(Class_XianDuan<1> &item)
+	{
+	}
+
+};
+
+
 class MultiLevelZhongShuView // 多级别中枢联立视图，用于中枢扩展的分析
 {
 private:
@@ -26,38 +121,11 @@ private:
 	int total; // time_list队列所含的元素个数
 	int levelTotal[MAX_LEVEL]; // 个级别队列所含的元素个数
 
-
-public:
 	int max_level;
 	int min_level;
 	// int forward; // 增量式（随着添加中枢，随着merge）、还是待添加所有的中枢之后，再作merge。 如果是增量式，那么同级别中枢列表使用栈，否则，应该使用对列。
 
-	MultiLevelZhongShuView(/*bool mergeForward = true*/)
-	{
-		max_level = -1; 
-		min_level = MAX_LEVEL + 1; 
-
-		initializeList(&time_list);
-
-		for (int i = 0; i < MAX_LEVEL; i++)
-			initializeList(&level_list[i]);
-
-		/*forward = mergeForward;*/ 
-	}
-
-	~MultiLevelZhongShuView() 
-	{
-		if (total > 0)
-		{
-			while (!isEmpty(&time_list))
-			{
-				List_Entry *item = remove(time_list.next);
-				delete item;
-				total--;
-			}
-			assert(total == 0);
-		}
-	}
+	
 
 	void Add_Elem(IZhongShu *zs)
 	{
@@ -89,8 +157,8 @@ public:
 			assert(!isEmpty(&level_list[i]) && levelTotal[i] > 0);
 
 			// 从 level list队列中删除eov
-			eov->level_link[i].prev->next = eov->level_link[i].next;
-			eov->level_link[i].next->prev = eov->level_link[i].prev;
+
+			remove_entry(eov, level_link[i]);
 			levelTotal[i]--;
 
 			if (min_level == i && isEmpty(&level_list[i]))
@@ -125,13 +193,52 @@ public:
 			}
 		}
 
-		eov->time_link.prev->next = eov->time_link.next;
-		eov->time_link.next->prev = eov->time_link.prev;
+		remove_entry(eov, time_link);
+		delete eov;
 		total--;
 
 		if (!total) 
 			assert(isEmpty(&time_list));
 	}
+
+public:
+
+	vector<IZhongShu*>* getResult() {return NULL;}
+
+	MultiLevelZhongShuView(/*bool mergeForward = true*/)
+	{
+		max_level = -1; 
+		min_level = MAX_LEVEL + 1; 
+
+		initializeList(&time_list);
+
+		for (int i = 0; i < MAX_LEVEL; i++)
+			initializeList(&level_list[i]);
+
+		/*forward = mergeForward;*/ 
+	}
+
+	~MultiLevelZhongShuView() 
+	{
+		if (total > 0)
+		{
+			while (!isEmpty(&time_list))
+			{
+				List_Entry *item = remove(time_list.next);
+				delete item;
+				total--;
+			}
+			assert(total == 0);
+		}
+	}
+
+#if 0
+	void merge()
+	{
+
+	}
+
+
 
 	void merge(IZhongShu *zs)
 	{
@@ -201,11 +308,17 @@ public:
 		}while (changed);
 	}
 
+#endif
+
+
+	template <typename XianDuanClass> friend void AnalyzeZhongShu_Template_V2<XianDuanClass>::handleTurningPoint(MultiLevelZhongShuView &, typename XianDuanClass::baseItemType*, typename XianDuanClass::baseItemType*);
+	template <typename XianDuanClass> friend void AnalyzeZhongShu_Template_V2<XianDuanClass>::handleLast(MultiLevelZhongShuView &, typename XianDuanClass::baseItemType*);
+
 };
 
 
 
-
+#if 0
 
 template <class XianDuanClass>
 class AnalyzeZhongShu_Template
@@ -256,9 +369,11 @@ TP1_1  TP1_2/
 			{
 				IZhongShu *zs = createZhongShu(TP1_2);
 				view.Add_Elem(zs);
-				TP1_1 = TP1_1 + 2;
-				TP1_2 = TP1_2 + 2;
+
 			} 
+
+			TP1_1 = TP1_1 + 2;
+			TP1_2 = TP1_2 + 2;
 		}
 	}
 
@@ -335,8 +450,6 @@ TP1_1  TP1_2/
 
 	static void handleJuxtaposition(baseItemType *start, baseItemType *end)
 	{
-
-
 	}
 
 	static void doWork() 
@@ -379,6 +492,79 @@ void AnalyzeZhongShu_PostOrder()
 
 template <>
 void AnalyzeZhongShu_PostOrder<Class_XianDuan<1>>()
+{
+}
+
+#endif
+
+
+
+template <class XianDuanClass>
+void AnalyzeZhongShu_PostOrder_V2()
+{
+	typedef typename XianDuanClass::baseItemType baseItemType;
+	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
+
+	if (XianDuanClass::container)
+	{
+		MultiLevelZhongShuView view;
+
+		ItemIterator curr = XianDuanClass::container->begin();
+		ItemIterator end =  XianDuanClass::container->end();
+
+
+		while (curr < end)
+		{
+			XianDuanClass& TP1_1 = *curr;
+			AnalyzeZhongShu_Template_V2<XianDuanClass>::doWork(TP1_1);
+			
+			if (curr + 1 < end)
+			{
+				XianDuanClass &TP1_2 = *(curr + 1);
+				AnalyzeZhongShu_Template_V2<XianDuanClass>::doWork(TP1_2);
+
+				AnalyzeZhongShu_Template_V2<XianDuanClass>::handleTurningPoint(view, &TP1_1, &TP1_2);
+				curr += 2;
+			}
+			else
+			{
+				AnalyzeZhongShu_Template_V2<XianDuanClass>::handleLast(view, &TP1_1);
+				curr++;
+			}
+		}
+
+		// 会有一些低级别线段， 它们还没有被归纳到 高级别线段，因此需要处理这些线段
+		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
+		baseItemType *baseItemEnd = &(*(XianDuanClass::baseItems->end() - 1));
+		while (remaining <= baseItemEnd)
+		{
+			baseItemType& TP1_1 = *remaining;
+			AnalyzeZhongShu_Template_V2<baseItemType>::doWork(TP1_1);
+
+			if (remaining + 1 < baseItemEnd)
+			{
+				baseItemType &TP1_2 = *(remaining + 1);
+				AnalyzeZhongShu_Template_V2<baseItemType>::doWork(TP1_2);
+
+				AnalyzeZhongShu_Template_V2<baseItemType>::handleTurningPoint(view, &TP1_1, &TP1_2);
+				remaining += 2;
+			}
+			else
+			{
+				AnalyzeZhongShu_Template_V2<baseItemType>::handleLast(view, &TP1_1);
+				remaining++;
+			}
+		}
+	}
+	else
+	{
+		AnalyzeZhongShu_PostOrder_V2<baseItemType>();
+	}
+}
+
+
+template <>
+void AnalyzeZhongShu_PostOrder_V2<Class_XianDuan<1>>()
 {
 }
 
