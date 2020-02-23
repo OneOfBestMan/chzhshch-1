@@ -204,6 +204,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 					}
 					else if (leiBi.getHigh() > lastTopItem.val)
 					{
+						assert(analyzeStack.size() >= 2);
 
 						analyzeStack.pop(); // obsolete bottom
 						stackItem obsoleteTop = analyzeStack.top();
@@ -218,7 +219,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 							   \    . 
 							    \  .
 								 \.
-						     obsolteBot
+						     obsoleteBot
 							*/
 							lastBotItem = obsoleteTop;
 						}
