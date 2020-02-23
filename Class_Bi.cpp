@@ -125,11 +125,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 		bool is_bot() {return flag & BOTTOM;}
 		bool is_start() {return is_top() && is_bot(); /*起点，可以当成顶或底*/}
 	} stackItem;
-
+	stack<stackItem> analyzeStack;
 
 	if (intermediate == NULL) return;
-
-	stack<stackItem> analyzeStack;
 
 	ContainerType::iterator current = intermediate->begin(); // 当前 “类笔”， “类笔” 不要求满足顶、底之间至少5根互不包含的K线；
 	ContainerType::iterator end = intermediate->end();
@@ -288,9 +286,13 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 		current++;
 	}
 
+	// TODO: 根据 analyzeStack 中的各个 顶、底分型， 生成 笔列表
+
 #undef IS_TOP
 #undef IS_BOT
 
+	delete intermediate;
+	intermediate = NULL;
 }
 
 /*
