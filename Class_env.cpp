@@ -31,16 +31,16 @@ Class_env::Class_env(CALCINFO *p)
 		p->m_pCalcParam[6].m_nParamStart > 0 )
 		throw invalid_argument("输入 数组参数不正确");
 
-	startParm = p->m_pCalcParam[0].m_pfParam;
+	startParm = const_cast<float*>(p->m_pCalcParam[0].m_pfParam);
 	firstStartParm = p->m_pCalcParam[0].m_nParamStart;
 
-    endParm = p->m_pCalcParam[1].m_pfParam;
+    endParm = const_cast<float*>(p->m_pCalcParam[1].m_pfParam);
 	firstEndParm = p->m_pCalcParam[1].m_nParamStart;
 
-	lowParm = p->m_pCalcParam[2].m_pfParam;
+	lowParm = const_cast<float*>(p->m_pCalcParam[2].m_pfParam);
 	firstLowParm =  p->m_pCalcParam[2].m_nParamStart;
 
-	highParm = p->m_pCalcParam[3].m_pfParam;
+	highParm = const_cast<float*>(p->m_pCalcParam[3].m_pfParam);
 	firstHighParm = p->m_pCalcParam[3].m_nParamStart;
 
 	totalBar = p->m_nNumData;
@@ -56,6 +56,8 @@ Class_env::Class_env(CALCINFO *p)
 		stockName = strcpy(stockName, p->m_strStkLabel);
 	}
 	barKind = (DATA_TYPE)(int)p->m_dataType;
+
+	memset(resultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
 }
 
 Class_env* Class_env::getInstance(CALCINFO *p)

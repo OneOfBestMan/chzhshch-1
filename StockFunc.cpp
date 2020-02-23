@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "StockFunc.h"
+#include "include_api.h"
 #include "stdio.h"
 #include "vector"
 #include "base.h"

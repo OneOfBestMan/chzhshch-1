@@ -1,4 +1,4 @@
-// 公式
+// 交易师 公式
 
 
 	BI_TIME:="STOCKFUNC@CHZHSHCH"(Open, Close, Low, High, 0, 0, 0);
@@ -208,7 +208,7 @@
 
 
 
-// 飞狐交易师5.1版本，测试了一下，画线不太正常； 另外，飞狐交易师安装包里有自己的.zip开发包，里面的API数据结构，有些不同，需要使用的话，要更改StockFunc.h
+// 飞狐交易师5.1版本； 飞狐交易师安装包里有自己的.zip开发包，里面的API数据结构，有些不同，对应的API接口位于 FoxFunc.h中
 
 	BI_TIME:="STOCKFUNC@CHZHSHCH"(Open, Close, Low, High, 0, 0, 0);
 	BI_PRICE:="STOCKFUNC@CHZHSHCH"(Open, Close, Low, High, 0, 1, 0);

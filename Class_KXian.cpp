@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Class_KXian.h"
 
-#include "StockFunc.h"
+#include "include_api.h"
 
 #include "Class_env.h"
 /*
