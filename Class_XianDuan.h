@@ -110,6 +110,10 @@ Class_XianDuan<grade>::~Class_XianDuan(void)
 template <int grade>
 Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct)
 {
+	this->Start = &(*biStart);
+	this->End = &(*biEnd);
+	this->d = direct;
+
 	float high = (*biStart).getHigh();
 	float low = (*biStart).getLow();
 
@@ -123,9 +127,6 @@ Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator
 	this->High = high;
 	this->Low = low;
 
-	this->Start = &(*biStart);
-	this->End = &(*biEnd);
-	this->d = direct;
 
 }
 

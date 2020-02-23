@@ -24,7 +24,7 @@
 	
 		/* 先合并（可能的）新线段开始处的包含（前包后）的几笔 */
 		baseItemType possiblePrevXianDuanChracVec = *current;
-		while (end - current > 2)
+		while (current < end - 2)
 		{
 			if (possiblePrevXianDuanChracVec >> *(current + 2))
 			{
@@ -40,7 +40,7 @@
 
 		/* 找可能出现转折的位置 */
 		baseItemType lastBi = possiblePrevXianDuanChracVec;
-		while (end - current > 2)
+		while (current < end - 2)
 		{
 			d = getDirection(lastBi, *(current + 2));
 			if (d == hints)
@@ -74,6 +74,68 @@
 	}
 
 
+	static void Normalize(Direction hints, baseItemIterator start, baseItemIterator end)
+	{
+		if (hints == (*start).getDirection()) return;
+
+		baseItemIterator current = start;
+
+		/* 所有线段方向均取反，先处理序号是奇数的线段 */
+		while (current != end)
+		{
+			(*current).d = -(*current).d;
+
+			current++;
+			if (current == end)
+				break;
+			else
+				current++;
+		}
+
+		/* 对于序号是偶数的线段，除了方向取反，还需要处理高、低点 */
+		current = start + 1;
+		while (current < end - 1) // 这个条件是如何写出来的： 看下图，BC和CD，要求处理BC的时候，后面至少还有一个CD，才处理BC；因此如果，CD后面就是end，那么就有 BC < end - 1了
+		{
+			if ((*current).getDirection() == DESCENDING)
+			{
+/*
+              B                       A
+             /\                        \
+            /  \                        \
+           /    \         D              \      C
+          /      \        /               \    /\
+         /        \      /     ===>        \  /  \
+        /          \    /                   \/    \
+       A            \  /                    B      \
+                     \/                             \
+                     C                               D
+*/
+				(*current).Low = (*(current - 1)).getLow();
+				(*current).High = (*(current + 1)).getHigh();
+			}
+			else
+			{
+/*
+                    C                            D
+                   /\                           /
+                  /  \                         /
+        A        /    \                  B    /
+         \      /      \      ===>       /\  /
+          \    /        \               /  \/
+           \  /         D              /    C
+            \/                        /
+            B                        A
+
+*/
+				assert((*current).getDirection() == ASCENDING);
+				(*current).High = (*(current - 1)).getHigh();
+				(*current).Low = (*(current + 1)).getLow();
+			}
+			(*current).d = -(*current).getDirection();
+
+			current += 2;
+		}
+	}
 
 	static ContainerType* startFenXianDuan(baseItemIterator start, baseItemIterator end)
 	{
@@ -96,6 +158,8 @@
 
 		if (end - biFormer <= 2) return resultSet;
 
+		Normalize(d, biFormer, end);
+
 		analyzeStack CharacVecStack;
 
 		baseItemIterator biLatter = biFormer + 2;
@@ -104,14 +168,28 @@
 		do 
 		{
 			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
-			while  (end - biFormer > 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
+			while  (biFormer < end - 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
 			{
 				CharacVecStack.push_back(CharacterVec(biFormer + 1, biLatter - 1));
 				biFormer = biLatter;
-				biLatter += 2;
+
+				if (biLatter < end - 2)
+				{
+					biLatter += 2;
+				}
+				else
+				{
+					/* baseItem快到最后了 */
+					if (!resultSet)
+					{
+						resultSet = new ContainerType();
+					}
+					resultSet->push_back(XianDuanClass(biStart, biLatter, d));
+					debugCnt++;
+				}
 			}
 
-			if (end - biFormer <= 2)
+			if (biFormer >= end - 2)
 			{
 				break;
 			}
@@ -143,7 +221,7 @@
 
 				/* 新的线段，开始的部分，有一组互相包含的线段，可以看成是之前线段的特征向量，可以应用包含关系。合并它们 */
 				baseItemType temp = *biFormer;
-				while (end - biFormer > 2)
+				while (biFormer < end - 2)
 				{
 					if (temp >> *(biFormer + 2))
 					{

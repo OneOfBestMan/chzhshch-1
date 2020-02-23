@@ -24,10 +24,10 @@ public:
 	typedef baseItemType baseItemType;
 	typedef vector<baseItemType> baseItemType_Container;
 
-
 	float High, Low;
 	Direction d;
 	baseItemType *Start, *End;
+
 
 	traits(baseItemType* start, baseItemType* end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir;}
 	traits() {Start = End = (baseItemType*)NULL; High = Low = 0; d = UNKNOWN;}
@@ -36,6 +36,7 @@ public:
 	float getLow() const {return Low;}
 	baseItemType*  getStart() const{return Start;}
 	baseItemType*  getEnd() const {return End;}
+	Direction getDirection() const {return d;}
 
 
 
@@ -103,6 +104,7 @@ public:
 	{
 		return (this->getHigh() >= latter.getLow()) || (this->getLow() < = latter.getHigh());
 	}
+
 
 };
 
