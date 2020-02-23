@@ -36,7 +36,6 @@ public:
 
 	static const int GRADE = grade;
 
-
 	static baseItemType_Container *baseItems;
 	static ContainerType *container;
 	
@@ -88,7 +87,6 @@ public:
 
 
 	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
-
 
     static baseItemType_Container *baseItems;
     static ContainerType *container;
@@ -168,6 +166,7 @@ public:
 	typedef  Class_XianDuan<1>::baseItemType baseItemType;
 	typedef Class_XianDuan<1>::ContainerType ContainerType;
 	typedef Class_XianDuan<1> XianDuanClass; // 这样定义，就可以使用FenXianDuan_Common.h中的函数了
+	typedef Class_XianDuan<1>::baseItemType_Container baseItemType_Container;
 
 	static void doWork(bool release)
 	{

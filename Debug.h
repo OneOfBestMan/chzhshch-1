@@ -38,7 +38,7 @@ public:
 			XianDuanClass::baseItemType *xEnd = item.getEnd();
 			
 			int total = 0;
-			while (xStart != xEnd)
+			while (xStart != xEnd + 1)
 			{
 				total += helperMap[xStart].total;
 				xStart++;
@@ -121,7 +121,7 @@ public:
 	static void printChildren(typename XianDuanClass::baseItemType *start, typename XianDuanClass::baseItemType *end, ostream &stream, dumpHelperMap &helperMap)
 	{
 		XianDuanClass::baseItemType *p = start;
-		while (p != end)
+		while (p != end + 1)
 		{
 			XianDuanClass::baseItemType item = *p;
 

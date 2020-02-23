@@ -12,7 +12,7 @@ public:
 	typedef typename XianDuanClass::baseItemType_Container::iterator baseItemIterator;
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType ContainerType;
-
+	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 
 	static void doWork(bool release)
 	{

@@ -76,7 +76,7 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		env = newEnv;
 		FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(false);
 
-#if 0
+#if 1
 		static bool doOnce = false;
 		doOnce = true;
 		dumpHelperMap map;
@@ -85,8 +85,8 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		filename<<"c:\\" << env->stockName << ".txt";
 
 		ofstream file(filename.str().c_str());
-		preDump<Class_XianDuan<7>>(map);
-		DumpV2<Class_XianDuan<7>>(map, file);
+		preDump<Class_XianDuan<1>>(map);
+		DumpV2<Class_XianDuan<1>>(map, file);
 #endif
 	}
 

@@ -139,6 +139,7 @@
 
 	static ContainerType* startFenXianDuan(baseItemIterator start, baseItemIterator end)
 	{
+		baseItemType_Container* backupBeforeNormalize = (baseItemType_Container*)NULL;
 		ContainerType* resultSet = (ContainerType*)NULL;
 
 		baseItemIterator biStart = start;
@@ -158,7 +159,13 @@
 
 		if (end - biFormer <= 2) return resultSet;
 
-		Normalize(d, biFormer, end);
+		if (d != (*biFormer).getDirection())
+		{
+			backupBeforeNormalize = new baseItemType_Container();
+			backupBeforeNormalize->assign(start,end);
+
+			Normalize(d, biFormer, end);
+		}
 
 		analyzeStack CharacVecStack;
 
@@ -224,6 +231,8 @@
 				}
 				resultSet->push_back(XianDuanClass(biStart, biFormer, d));
 
+				int debugEdgeCnt = biFormer - biStart + 1;
+
 				debugCnt++;
 
 				/* 新线段需要 翻转方向 */
@@ -249,6 +258,12 @@
 				biLatter = biFormer + 2;
 			}
 		} while (1);
+
+		if (backupBeforeNormalize)
+		{
+			XianDuanClass::baseItems->assign(backupBeforeNormalize->begin(), backupBeforeNormalize->end());
+			delete backupBeforeNormalize;
+		}
 
 		return resultSet;
 	}
