@@ -110,8 +110,6 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 {
-
-
 	typedef enum {TOP = 1, BOTTOM = 2, STARTPOINT = TOP|BOTTOM} FLAGS;
 	// 一个笔的两个端点，这里叫做point; 这个端点，是顶 还是 底，用flags标记； 这个顶、底分型的值，用val保存
 	typedef struct stackItem {
@@ -414,16 +412,18 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 	}
 
 	// 根据 analyzeStack 中的各个 顶、底分型， 生成 笔列表
-
 	container = new ContainerType();
-	container->reserve(analyzeStack.size());
+	container->reserve(analyzeStack.size() - 1);
 
+	for (int i = 0; i < analyzeStack.size() - 1; i++)
+	{
+		stackItem point_start = analyzeStack[i];
+		stackItem point_end   = analyzeStack[i+1];
+
+		Direction d = (point_start.is_bot() && point_end.is_top()) ? ASCENDING : DESCENDING;
+		container->push_back(Class_Bi(point_start.point, point_end.point, point_start.val, point_end.val, d));
+	}
 	
-
-
-#undef IS_TOP
-#undef IS_BOT
-
 	delete intermediate;
 	intermediate = NULL;
 }

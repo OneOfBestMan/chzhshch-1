@@ -66,7 +66,7 @@ public:
 		float high;
 		float low;
 		Direction d;
-		int KXianCnt; // 包含几根 不包含关系的K线
+		int KXianCnt; // 包含几根 不包含关系的K线，这个域，仅在处理“类笔”的时候有效；对于“笔”，这个域没意义
 	/*
 
 	解释下KXianCnt = 4
@@ -88,8 +88,12 @@ public:
 
 	Class_Bi(void) {}
 	~Class_Bi(void){}
+	/* 类笔 的构造函数*/
 	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct, int Cnt)
 	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct; bi.KXianCnt = Cnt;}
+	/* 笔 的构造函数*/
+	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct)
+	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct; bi.KXianCnt = -1;}
 
 	static baseItemType_Container *base_Container;
 	static ContainerType *container;
