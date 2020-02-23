@@ -15,16 +15,6 @@ using namespace std;
 #include "Debug.h"
 #include "traits.h"
 
-/*
-typedef enum Direction
-{
-	ASCENDING =1,
-	DESCENDING = 2,
-	ENCLOSING = 3
-}  Direction;
-
-Direction operator-(const Direction& d);
-*/
 
 class Class_KXian: public traits<void, Class_KXian>
 {

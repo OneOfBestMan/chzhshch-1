@@ -133,24 +133,6 @@ Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator
 }
 
 
-/*
-template<int grade>
-ostream& operator<<(ostream& ostream, typename Class_XianDuan<grade>& objXianDuan)
-{
-	typedef Class_XianDuan<grade> XianDuanClass;
-	ostream << 'X' << XianDuanClass::GRADE << "(";
-
-	ostream.precision(2);
-	ostream.width(4);
-
-	ostream<< objXianDuan.XianDuan.low << ", ";
-	ostream.width(4);
-	ostream<< objXianDuan.XianDuan.high << ")";
-
-	return ostream;
-}
-*/
-
 template<int grade>
 typename Class_XianDuan<grade>::baseItemType_Container* Class_XianDuan<grade>::baseItems = (typename Class_XianDuan<grade>::baseItemType_Container*)NULL;
 

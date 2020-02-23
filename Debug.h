@@ -114,6 +114,12 @@ public:
 template<class XianDuan_or_Bi_or_KXian>
 void Dump(dumpHelperMap &helperMap, ostream &file)  // pre Order
 {
+	/* 大致思路是：
+	（1）从高级线段、到低级线段，逐层打印； 在打印高层线段时，其包含的低层线段，也被打印出来；
+	（2）在完成(1)之后，低层次线段队列可能依然有线段没有打印出来，这是由于这些低层线段，
+	其对应的高层线段没有建立，即，低级别线段尚未完成，所以高级别线段也没有建立。 因此，需要把这些低层级线段，逐层打印出来。
+	（3）实现的时候，按照自低层向高层，逐层求取 输出所占的 宽度
+	*/
 	XianDuan_or_Bi_or_KXian::DumpClass::doWork(helperMap, file);
 
 	Dump<XianDuan_or_Bi_or_KXian::baseItemType>(helperMap, file);
