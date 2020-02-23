@@ -20,11 +20,13 @@ public:
 	static Class_env* getInstance(CALCINFO *p);
 	static Class_env* getInstance();
 	static Class_env* env;
-    float getKHigh(int pos);
-	float getKLow(int pos);
-	float getKStart(int pos);
-	float getKEnd(int pos);
+    static float getKHigh(int pos);
+	static float getKLow(int pos);
+	static float getKStart(int pos);
+	static float getKEnd(int pos);
 	int   getTotal() {return totalBar;}
+	static bool rangeContain(float k1B, float k1T, float k2B, float k2T);
+	static void updateMergedRange(int direction, int bar, float &mergedBot, float &mergedTop);
 private:
 
 

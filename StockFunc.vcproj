@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="StockFunc"
 	ProjectGUID="{BD44C4ED-53BB-4739-99DB-DB10CE5FD67D}"
+	RootNamespace="StockFunc"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
@@ -77,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Debug/StockFunc.dll"
+				OutputFile="C:\Stock\KingTrader\FmlDll/StockFunc.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

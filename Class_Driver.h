@@ -22,7 +22,7 @@ public:
 private:
     Class_env *env;
 
-	stack<Class_Bi*>  pending[totalGrade];
+	//stack<Class_Bi*>  pending[totalGrade];
 };
 
 #endif
