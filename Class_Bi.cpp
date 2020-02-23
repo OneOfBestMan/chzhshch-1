@@ -4,12 +4,60 @@
 
 
 
-Class_Bi<vector<Class_KXian> >::baseItemType_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItemType_Container*)NULL;
-Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
-Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::intermediate = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
+Class_Bi::baseItemType_Container* Class_Bi::base_Container = (Class_Bi::baseItemType_Container*)NULL;
+Class_Bi::ContainerType* Class_Bi::container = (Class_Bi::ContainerType*)NULL;
+
+Class_LeiBi::baseItemType_Container* Class_LeiBi::base_Container = (Class_LeiBi::baseItemType_Container*)NULL;
+Class_LeiBi::ContainerType* Class_LeiBi::container = (Class_LeiBi::ContainerType*)NULL;
 
 
-ostream& operator<<(ostream& out, Class_Bi<vector<Class_KXian>>& biObj)
+Class_Bi::Class_Bi(Class_Bi::leiBi *biStart, Class_Bi::leiBi *biEnd)
+{
+	Start = biStart;
+	End = biEnd;
+	
+	d = Start->getDirection();
+
+	float high = (*biStart).getHigh();
+	float low = (*biStart).getLow();
+
+	while (biStart != biEnd + 1)
+	{
+		high = max(high, (*biStart).getHigh());
+		low = min(low, (*biStart).getLow());
+		biStart++;
+	}
+
+	this->High = high;
+	this->Low = low;
+}
+
+Class_Bi::Class_Bi(Class_Bi::leiBi *biStart)
+{
+	Start = End = biStart;
+	d = Start->getDirection();
+	this->High = (*biStart).getHigh();
+	this->Low = (*biStart).getLow();
+}
+
+
+
+ostream& operator<<(ostream& out, Class_Bi& biObj)
+{
+	out << "Bi" << "(";
+
+	out.setf(ios_base::fixed, ios_base::floatfield);
+	out.precision(2);
+	out.width(4);
+
+	out<< biObj.getLow() << ", ";
+	out.width(4);
+	out<<  biObj.getHigh()  << ")";
+	return out;
+
+}
+
+ostream& operator<<(ostream& out, Class_LeiBi& biObj)
 {
 	out << "Bi" << "(";
 
@@ -25,7 +73,7 @@ ostream& operator<<(ostream& out, Class_Bi<vector<Class_KXian>>& biObj)
 }
 
 
-void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
+void Class_LeiBi::FenBi(bool release)
 {
 	if (release == false)
 	{
@@ -39,12 +87,12 @@ void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 		{
 			// step 1: 考虑K线包含关系，找出 类-顶分型、类-底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
 			FenBi_Step1();
-			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，生成各个笔；
-			FenBi_Step2();
 		}
 	} else
 	{
 		delete container;
+		// delete intermediate;
+		// intermediate = container = NULL;
 		container = NULL;
 
 		Class_KXian::initialize(true);
@@ -52,13 +100,12 @@ void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 	}
 }
 
-void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
+
+void Class_LeiBi::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	container = intermediate = new ContainerType();
-
-	Class_env *env = Class_env::getInstance();
+	ContainerType* intermidiate = new ContainerType();
 
 	baseItemType_Container::iterator start = base_Container->begin();
 	baseItemType_Container::iterator end = base_Container->end();
@@ -103,7 +150,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		if (p == end)
 		{
 			// TODO: 建立最后的一个  类-笔
-			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+			intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			break;
@@ -117,8 +164,17 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		}
 		else
 		{
-			// 方向不再一致, 建立一个 类-笔
-			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+			if (KXianCnt == 1)
+			{
+				// 如果KXianCnt 等于1，那么就是第1类笔，但是方向猜错了，不是ASCENDING，而应该是DESCENDING，所以，将方向取反，然后重新开始
+				d = -d;
+				start = base_Container->begin();
+				p = start;
+				temp = *start;
+				continue;
+			}
+			else // 方向不再一致, 建立一个 类-笔
+				intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			d = -d;
@@ -128,10 +184,280 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 			low = start->getEnd();
 		}
 	}while (p != end);
+
+	/* 对intermidiate中的各个类笔，做处理，检查下列情形：即 这3个类笔，各自KXianCnt都是2， 并且 第1、第3 类笔 同向或包含， 将这3个类笔，合并成为1个类笔，总笔数是4
+
+      。 
+            。
+          。   
+                 。
+       
+    */
+	container = new ContainerType();
+	ContainerType::iterator former = intermidiate->begin();
+	ContainerType::iterator endl = intermidiate->end();
+
+	while (former < endl - 2)
+	{
+		ContainerType::iterator latter = former + 2;
+
+		int fKXianCnt = (*former).getKXianCnt();
+		int mKXianCnt = (*(former + 1)).getKXianCnt();
+		int lKXianCnt = (*latter).getKXianCnt();
+
+		if (lKXianCnt != 2)
+		{
+			container->push_back(*former);
+			container->push_back(*(former + 1));
+			container->push_back(*latter);
+			former = latter + 1;
+			continue;
+		} else if (mKXianCnt != 2)
+		{
+			container->push_back(*former);
+			container->push_back(*(former + 1));
+			former = latter;
+			continue;
+		} else if (fKXianCnt != 2)
+		{
+			container->push_back(*former);
+			former++;
+			continue;
+		}
+		
+		Direction df = (*former).getDirection();
+		
+		if (df == getDirection(*former, *latter))
+		{
+			float high = max((*former).getHigh(), (*latter).getHigh());
+			float low = min((*former).getLow(), (*latter).getLow());
+
+			container->push_back(ContainerType::value_type((*former).getStart(), (*latter).getEnd(), high, low, df, 4));
+			former = latter + 1;
+		}
+		else if (*former >> *latter)
+		{
+			ContainerType::value_type merg = (*former);
+			merg.merge(*latter, df);
+			container->push_back(ContainerType::value_type((*former).getStart(), (*latter).getEnd(), merg.getHigh(), merg.getLow(), df, 4));
+
+			former = latter + 1;
+		}
+		else
+		{
+			container->push_back(*former);
+			++former;
+		}
+	}
+	// 拷贝剩余的类笔
+	while (former != endl)
+	{
+		container->push_back(*former);
+		former++;
+	}
+	delete intermidiate;
 }
 
-void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
+
+void Class_Bi::FenBi(bool release)
 {
+	if (release == false)
+	{
+		if (base_Container == NULL)
+		{
+			baseItemType::FenBi();
+			base_Container = baseItemType::container;
+		}
+		if (base_Container && !container)
+		{
+			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，生成各个笔；
+			FenBi_Step2();
+		}
+	} else
+	{
+		delete container;
+		// delete intermediate;
+		// intermediate = container = NULL;
+		container = NULL;
+
+		baseItemType::FenBi(true);
+		base_Container = NULL;
+	}
+}
+
+bool Class_Bi::bckwdSearch(ContainerType::reverse_iterator from, Class_LeiBi *cmpTo, Direction d)
+//bool Class_Bi::bckwdSearch(int from, Class_LeiBi *cmpTo, Direction d)
+{
+	// backward search
+
+	//Class_Bi temp(cmpTo);
+	//container->push_back(temp);
+
+	ContainerType::reverse_iterator former = from;
+	//ContainerType::reverse_iterator former = container->rbegin() + from;
+	ContainerType::reverse_iterator latter = container->rbegin();
+	ContainerType::reverse_iterator end = container->rend();
+	ContainerType::reverse_iterator result = container->rbegin();
+
+	//while (former < end - 2)
+	//while (end - former > 2)
+	while (former < end)
+	{
+		Direction d = (*latter).getDirection();
+		if (d == getDirection(*former, *latter))
+		{
+			result = former;
+			break;
+		}
+		else if (*former <<  *latter)
+		{
+			latter = former;
+
+			if (former < end - 2)
+				former += 2;
+			else
+				break;
+		} else
+			break;
+			
+	}
+
+	if (result != container->rbegin())
+	{
+		Class_LeiBi *s = (*result).getStart();
+		Class_LeiBi *e = cmpTo;
+		latter = container->rbegin();
+		while (latter != result + 1)
+		{
+			latter++;
+			container->pop_back();
+		}
+		container->push_back(Class_Bi(s, e));
+		return true;
+	} else
+	{
+		// 将 temp 弹出
+		container->pop_back();
+		return false;
+	}
+}
+
+void Class_Bi::checkValid()
+{
+	ContainerType::iterator former =  container->begin();
+	ContainerType::iterator endl = container->end();
+	int length = container->size();
+	while (former != endl - 1)
+	{
+		assert((*former).getEndRec() == (*(former+1)).getStartRec());
+		former++;
+	}
+}
+
+void Class_Bi::FenBi_Step2()
+{
+	container = new ContainerType();
+	
+	baseItemType_Container::iterator current = base_Container->begin();
+	while (current < base_Container->end() - 2)
+	{
+		Class_LeiBi obj = *current;
+		if ((*current).getKXianCnt() >= 5)
+		{
+			container->push_back(ContainerType::value_type(&(*current)));
+			current++;
+		}
+		else
+		{
+		
+		/*
+		case 1：第1类笔、第3类笔 同向， 则 “类笔1、类笔2、类笔3”构成  1笔
+        。
+          。      。
+            。  。  。
+              。      。
+                        。
+
+		case 2：第1类笔、第3类笔 后包前， 则考察（1）类笔1 是否和 前两类笔 构成1笔（2）类笔1、类笔2 是否可以和前一类笔 构成1笔。考察方法是：
+		逆向 扫描， 如果反向包含 或 反向时， 停止； 如果同向，那么就算找到了 1笔；如果包含，向前继续扫描。
+                       。
+         。          。  。
+           。      。      。
+             。  。          。
+               。              。
+                                 。
+		case 3：第1类笔、第3类笔 前包后：向前扫描， 如果 后包前 或 反向， 停止；  如果前包后 或者 同向， 向前扫描。
+         。
+           。          。
+             。      。  。
+               。  。      。
+                 。
+		case 4：第1类笔、第3类笔 反向，则考察： 第1、第2类笔 逆向扫描；  第1类笔 逆向扫描。
+                      。
+        。          。  。
+          。      。      。
+            。  。
+              。
+
+		*/
+			Direction d = (*current).getDirection();
+			Direction dBi = leiBi::getDirection(*current, *(current + 2));
+			if (d == dBi)
+			{
+				container->push_back(ContainerType::value_type(&(*current), &(*(current+2))));
+				current = current + 3;
+			}
+			else if (-d == dBi  ||  *current << *(current + 2) )
+			{
+				if (container->size())
+				{
+					Class_Bi temp(&(*(current + 1)));
+					container->push_back(temp);
+					if (bckwdSearch(container->rbegin() + 1, &(*(current + 1)), -d))
+					{
+						current += 2;
+						continue;
+					}
+				}
+
+				if (container->size() > 1)
+				{
+					Class_Bi temp(&(*current));
+					container->push_back(temp);
+					if (bckwdSearch(container->rbegin() + 2,  &(*current), d))
+					{
+						current++;
+						continue;
+					}
+
+				}
+				
+				{
+					container->push_back(ContainerType::value_type(&(*current)));
+					container->push_back(ContainerType::value_type(&(*(current+1))));
+					current = current + 2;
+				}
+			}else
+			{
+				if (container->size() > 1)
+				{
+					Class_Bi temp(&(*current));
+					container->push_back(temp);
+					if (bckwdSearch(container->rbegin() + 2,  &(*current), d))
+					{
+						current++;
+						continue;
+					}
+				}
+				
+				{
+					container->push_back(ContainerType::value_type(&(*current), &(*(current+2))));
+					current = current + 3;
+				}
+			}
+		}
+	}
+
 
 }
 
@@ -598,8 +924,5 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 */
 
 
-template<class baseItem_Container>
-Class_Bi<baseItem_Container>::~Class_Bi(void)
-{
-}
+
 

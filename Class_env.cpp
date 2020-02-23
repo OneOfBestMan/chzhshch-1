@@ -134,7 +134,7 @@ void Class_env::outputResult()
 
 		if (grade == BI)
 		{
-			Class_Bi<vector<Class_KXian> >::DisplayClass::doWork(func, resultBuf);
+			Class_Bi::DisplayClass::doWork(func, resultBuf);
 		}
 		else
 		{

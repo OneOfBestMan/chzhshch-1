@@ -70,7 +70,7 @@ private:
 };
 
 template<>
-class Class_XianDuan<1>: public traits<Class_Bi<vector<Class_KXian> >, Class_XianDuan<1>> 
+class Class_XianDuan<1>: public traits<Class_Bi, Class_XianDuan<1>> 
 {
 public:
 
