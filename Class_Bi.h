@@ -26,8 +26,6 @@ public:
 
 	Class_Bi(void) {}
 	~Class_Bi(void);
-    
-	void accept(int bar);
 
 
 	static baseItem_Container *base_Container;
@@ -58,8 +56,6 @@ public:
 
 	Class_Bi(void) {}
 	~Class_Bi(void);
-    
-	void accept(int bar);
 
 
 	static baseItem_Container *base_Container;

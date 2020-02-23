@@ -22,8 +22,12 @@ void Class_Bi<vector<Class_KXian>>::FenBi()
 
 	if (base_Container && !container)
 	{
-		// 分笔
 		container = new ContainerType();
+
+		// step 1: 考虑K线包含关系，找出 类似 顶分型、底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
+
+		// step 2: 结合顶分型、底分型之间，至少5根k线的要求，继续处理各个笔；
+
 	}
 }
 
@@ -45,30 +49,3 @@ Class_Bi<baseItem_Container>::~Class_Bi(void)
 {
 }
 
-
-template<class baseItem_Container>
-void Class_Bi<baseItem_Container>::accept(int bar)
-{
-	/*
-	if (contains.empty())
-	{
-		contains.push(bar);
-		return;
-	} else
-	{
-		int lastBar = contains.top();
-        if (bar - lastBar > 1)
-		{
-			// handle mergedTop and mergedBot
-			if (Class_env::rangeContain(mergedBot, mergedTop, Class_env::getKLow(bar), Class_env::getKHigh(bar)))
-				Class_env::updateMergedRange(direction, bar, mergedBot, mergedTop);
-			else 
-			{
-
-			}
-		}
-
-	}*/
-
-
-}
