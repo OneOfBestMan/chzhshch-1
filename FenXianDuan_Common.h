@@ -1,11 +1,35 @@
-	typedef struct CharacterVec
+  class CharacterVec: public IComparable
 	{
+	public:
 		// 特征向量； 如果，特征向量只有1笔，那么start和end指向同一个笔，否则，分别指向第一、最后一笔；
-		baseItemIterator start; 
-		baseItemIterator end;
-		CharacterVec(baseItemIterator &s, baseItemIterator &e) {start = s; end = e;}
-		CharacterVec() {}
-	} CharacterVec;
+		baseItemIterator start, end;
+
+		float getHigh() const {return High;}
+		float getLow() const {return Low;}
+		void setHigh(float h) {High = h;}
+		void setLow(float l) {Low = l;}
+
+		CharacterVec(baseItemIterator &s, baseItemIterator &e) 
+		{
+			assert((*s).getDirection() == (*e).getDirection());
+			start = s; 
+			end = e;
+			d = (*s).getDirection();
+			
+			High = (*s).getHigh();
+			Low = (*s).getLow();
+
+			while (s != e)
+			{
+				s += 2;
+				merge(*s, -d);
+			}
+		}
+
+	private:
+		Direction d;
+		float High, Low;	
+	};
 
 	typedef vector<CharacterVec> analyzeStack;
 
