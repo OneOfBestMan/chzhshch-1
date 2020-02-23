@@ -268,7 +268,7 @@
 
 				if (biLatter >= end)  break;
 
-				if (getDirection(*biFormer, *biLatter) == d)
+				if (getDirection(*biFormer, *biLatter) == d || (*biFormer >> *biLatter))
 				{
 					/*
                     情形1： biFormer 与 biLatter之间的方向， 与 原线段方向相同
@@ -282,11 +282,32 @@
                     /                \  /        
                                       \/
                    |<  原线段 >|<-  特征向量 ->|<- 原线段延续 ->|
-				                   
+
+                   情形2： biFormer 包含 biLatter
+
+                                 /\
+                                /  \                  /\
+                       /\      /    \        /\      /  \  /
+                      /  \ biFormer  \      /  \ biLatter\/
+                     /    \  /        \    /    \  /
+                    /      \/          \  /      \/
+                   /                    \/
+                   
+                   |<   原线段  >|<-  特征向量 ->|<- 新线段 ->|
+                                     
+            
 					*/
 					if (biLatter < end - 2)
 					{
 						CharacVecStack.pop_back();
+						
+						
+						if (*biFormer >> *biLatter)
+						{
+							biFormer = biLatter;
+							biLatter += 2;
+						}
+
 						continue;
 					}
 					else
@@ -306,7 +327,7 @@
 				} else
 				{
 					/*
-                    情形2： biFormer 与 biLatter之间的方向， 与 原线段方向相反
+                    情形3： biFormer 与 biLatter之间的方向， 与 原线段方向相反
 
                                /\                          /
                               /  \                  /\    /
@@ -318,18 +339,20 @@
                    |<  原线段 >|<-  特征向量 ->|<- 新线段 ->|
                                |   形成新线段  |
 
-                   情形3： biFormer 被 biLatter 包含
 
-                                                      /\
-                               /\                    /  \      /
-                              /  \                  /    \    /
-                       /\ biFormer\        /\   biLatter  \  /
-                      /  \  /      \      /  \    /        \/
+                   情形4： biFormer 被 biLatter 包含
+
+                                                      /
+                               /\                    /
+                              /  \                  /
+                       /\ biFormer\        /\   biLatter
+                      /  \  /      \      /  \    /
                      /    \/        \    /    \  /
                     /                \  /      \/
                                       \/
-                   |<  原线段 >|<-  特征向量 ->|<- 新线段 ->|
-                                   形成新线段
+                   |<  原线段 >|<-  特征向量 ->|<- 原线段延续 ->|
+                               |   形成新线段  |
+
 
 					*/
 
