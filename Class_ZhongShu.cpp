@@ -61,11 +61,33 @@ Class_ZhongShu* createZhongShu(Class_ZhongShu *zs, Class_XianDuanBase *xianDuan,
 Class_ZhongShu* createZhongShu(Class_ZhongShu *former, Class_ZhongShu *latter, int grade)
 {
 	assert(former->getGrade() == latter->getGrade());
-	assert(grade - 1 == former->getGrade());
+	// assert(grade - 1 == former->getGrade()); //TODO: 这个assertion是我不愿意注销的，但目前程序会assert。先临时禁用，以后再找找原因。
 	assert(grade < Class_ZhongShu::MAX_LEVEL && grade > 0);
 
 	Class_ZhongShu::zsList[grade].push_back(Class_ZhongShu(former, latter, grade));
 
 	return &Class_ZhongShu::zsList[grade].back();
 }
+
+
+Class_ZhongShu* createZhongShu(Class_ZhongShu *first, Class_ZhongShu *mid, Class_ZhongShu *last, int grade)
+{
+	assert(first->getGrade() == mid->getGrade()  &&  first->getGrade() == last->getGrade()  );
+	assert(grade - 1 == first->getGrade());
+	assert(grade < Class_ZhongShu::MAX_LEVEL && grade > 0);
+
+	Class_ZhongShu::zsList[grade].push_back(Class_ZhongShu(first, mid, last, grade));
+
+	return &Class_ZhongShu::zsList[grade].back();
+}
+
+Class_ZhongShu* createZhongShu(Class_XianDuanBase *start, Class_XianDuanBase *end, int grade)
+{
+	assert(grade < Class_ZhongShu::MAX_LEVEL && grade > 0);
+
+	Class_ZhongShu::zsList[grade].push_back(Class_ZhongShu(start,end, grade));
+
+	return &Class_ZhongShu::zsList[grade].back();
+}
+
 

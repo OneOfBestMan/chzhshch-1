@@ -130,7 +130,7 @@ private:
 		append(&time_list, &eov->time_link);
 		total++;
 
-		for (int i = min_level; i <= level; i++)
+		for (int i = 0; i <= level; i++)
 		{
 			append(&level_list[i], &eov->level_link[i]);
 			levelTotal[i]++;
@@ -149,7 +149,7 @@ private:
 		append(&time_list, &elem->time_link);
 		total++;
 
-		for (int i = min_level; i <= level; i++)
+		for (int i = 0; i <= level; i++)
 		{
 			append(&level_list[i], &elem->level_link[i]);
 			levelTotal[i]++;
@@ -164,7 +164,7 @@ private:
 
 		int possibleMaxLevel = -1;
 
-		for (int i = min_level; i <= level; i++)
+		for (int i = 0; i <= level; i++)
 		{
 			assert(!isEmpty(&level_list[i]) && levelTotal[i] > 0);
 
@@ -228,6 +228,9 @@ public:
 
 		total = 0;
 		initializeList(&time_list);
+		for (int i = 0; i < min_level; i++)
+			assert(isEmpty(&level_list[i]));
+
 		for (int i = min_level; i <= max_level; i++)
 		{
 			initializeList(&level_list[i]);
@@ -317,22 +320,30 @@ public:
 
 		int baseXianDuanCount = endBy->getEnd() - startFrom->getStart() + 1;
 
-		if (baseXianDuanCount < 3) return 0;
+		int newLevel;
 
-		if (baseXianDuanCount < 9) return 1;
+		if (baseXianDuanCount < 3)
+			newLevel = 0;
+		else if (baseXianDuanCount < 9)
+			newLevel = 1;
+		else if (baseXianDuanCount < 27) 
+			newLevel = 2;
+		else if (baseXianDuanCount < 81) 
+			newLevel = 3;
+		else if (baseXianDuanCount < 243) 
+			newLevel = 4;
+		else if (baseXianDuanCount < 729)
+			newLevel = 5;
+		else if (baseXianDuanCount < 2187)
+			newLevel = 6;
+		else
+			assert(0); // 中枢级别超过支持范围
 
-		if (baseXianDuanCount < 27) return 2;
 
-		if (baseXianDuanCount < 81) return 3;
+		if (newLevel > startFrom->getGrade() + 1)
+			printf("break me here");
 
-		if (baseXianDuanCount < 243) return 4;
-
-		if (baseXianDuanCount < 729) return 5;
-
-		if (baseXianDuanCount < 2187) return 6;
-
-		assert(0); // 中枢级别超过支持范围
-		return -1;
+		return newLevel;
 	}
 
 	bool canExpand(Class_ZhongShu *former, Class_ZhongShu* latter)
@@ -351,12 +362,13 @@ public:
 	}
 
 
-	void ExpandZS(ElemOfView *from, ElemOfView* to, int newLevel)
+	// 将 time list队列中，从from开始到to的项目，扩展成为一个新的中枢newZS
+	void ExpandZS(ElemOfView *from, ElemOfView* to, Class_ZhongShu *newZS)
 	{
 
 		// 建立一个ElemOfView
-		Class_ZhongShu *zs = createZhongShu(from->elem, to->elem, newLevel);
-		ElemOfView* newEov = new ElemOfView(zs);
+		int newLevel = newZS->getGrade();
+		ElemOfView* newEov = new ElemOfView(newZS);
 		
 		List_Entry *curr = &from->time_link;
 		List_Entry *end = to->time_link.next;
@@ -376,14 +388,16 @@ public:
 		while (insertAt != &time_list)
 		{
 			ElemOfView *eov = list_entry(insertAt, ElemOfView, time_link);
-			if (eov->elem->getGrade() == newLevel)
+			if (eov->elem->getGrade() >= newLevel)
 				break;
 			insertAt = insertAt->prev;
 		}
 
 		// 将 newEov 插入 newLevel队列
 		if (insertAt == &time_list)
+		{
 			insertAt = &level_list[newLevel];
+		}
 		else
 			insertAt = &list_entry(insertAt, ElemOfView, time_link)->level_link[newLevel];
 
@@ -396,7 +410,10 @@ public:
 
 		// 遍历 level link，将打上标记的一段 从链表中移除
 		List_Entry *posToInsert;
-		for (int i = 0; i < newLevel; i++)
+		for (int i = 0; i < min_level; i++)
+			assert(isEmpty(&level_list[i]));
+
+		for (int i = min_level; i < newLevel; i++)
 		{
 			int cnt = 0;
 
@@ -404,9 +421,8 @@ public:
 			while (curr != &level_list[i] && list_entry(curr, ElemOfView, level_link[i])->flags == 0)
 				curr = curr->next;
 
-			if (curr == &level_list[i]) continue;
-
-			posToInsert = curr;
+			posToInsert = curr->prev;
+			
 			while (curr != &level_list[i] && list_entry(curr, ElemOfView, level_link[i])->flags == 1)
 			{
 				curr = curr->next;
@@ -418,6 +434,9 @@ public:
 			newEov->level_link[i].next = curr;
 			curr->prev = &newEov->level_link[i];
 			levelTotal[i] -= (cnt - 1);
+
+			if (min_level == i && isEmpty(&level_list[i]))
+				min_level++;
 		}
 
 
@@ -436,6 +455,8 @@ public:
 			delete elem;
 			curr = next;
 		}
+
+		max_level = max(max_level, newLevel);
 	}
 
 	void merge(Class_XianDuanBase *TP1_2)
@@ -445,7 +466,7 @@ public:
 		{
 			changed = false;
 
-			for (int level = min_level; level < max_level; level++)
+			for (int level = min_level; level <= max_level; level++)
 			{
 				if (levelTotal[level] < 2) continue;
 
@@ -463,36 +484,63 @@ public:
 					if (startFrom == &level_list[level])
 						break;
 					
-					ElemOfView *eovl = list_entry(latter, ElemOfView, level_link[level]);
+					ElemOfView *eovl = list_entry(latter, ElemOfView, level_link[level]); // eov latter
 					ValueRange range = eovl->elem->getCoreRange();
 
-					ElemOfView *eovf;
+					ElemOfView *eovf, *eovm; // eov former; eov middle
 					List_Entry *former = latter->prev;
+					int countOverlapZS = 1; // 统计 重叠区间的中枢个数
 					while (former != startFrom->prev)
 					{
 						eovf = list_entry(former, ElemOfView, level_link[level]);
 						range && eovf->elem->getCoreRange();
 						if (range.isNulValueRange())
 							break;
+						countOverlapZS++;
 						former = former->prev;
 					}
 					former = former->next;
 
 					if (former == latter)
 					{
-						latter = former;
+						if (former != startFrom)
+							latter = former->prev;
+
 						continue;
 					} 
-					else
-						latter = former->prev;
 
+					if (former != startFrom)
+						latter = former->prev;
+					else
+						latter = former;
 
 					eovf = list_entry(former, ElemOfView, level_link[level]);
 
+					if (countOverlapZS == 3)
+					{
+						eovm = list_entry(former->next, ElemOfView, level_link[level]);;
+					}
+
 					if (canExpand(eovf->elem, eovl->elem))
 					{
+						Class_ZhongShu *newZS;
 						int newLevel = getZSLevel(eovf->elem, eovl->elem);
-						ExpandZS(eovf, eovl, newLevel);
+						switch (countOverlapZS)
+						{
+						case 2:
+							newZS = createZhongShu(eovf->elem, eovl->elem, newLevel);
+							break;
+						case 3:
+							newZS = createZhongShu(eovf->elem, eovm->elem, eovl->elem, newLevel);
+							break;
+						case 1:
+							assert(0);
+							break;
+						default: //countOverlapZS > 3
+							newZS = createZhongShu(eovf->elem->getStart(), eovl->elem->getEnd(), newLevel);
+							break;
+						}
+						ExpandZS(eovf, eovl, newZS);
 						changed = true;
 					}
 				} 
@@ -735,6 +783,10 @@ void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, Xian
 		}
 		TP1_2->zsList = NULL;
 	}
+
+	if (view.total >= 4)
+		printf("break me here");
+	view.merge(TP1_2);
 }
 
 template <class XianDuanClass>
@@ -802,6 +854,7 @@ void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView 
 		}
 		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
 		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
+		printf("break me here");
 	}
 }
 

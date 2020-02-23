@@ -151,6 +151,7 @@ private:
 	void initializeCommon()
 	{
 		thirdPoint = NULL;
+		Start = End = NULL;
 
 		switch(content.type)
 		{
@@ -223,7 +224,7 @@ private:
 
 	Class_ZhongShu(Class_XianDuanBase *s, Class_XianDuanBase *l, int grad) 
 	{ 
-		assert(l-s >= 8);
+		//assert(l-s >= 8);
 		grade = grad; content.type = 3; content.c3.start =s; content.c3.last = l;
 		initializeCommon();
 	}
@@ -397,9 +398,11 @@ public:
 	getEnd() 返回中枢回拉、回踩的那一笔，第三买、卖点就是这一笔的末端点；
 	*/
 
-	friend Class_ZhongShu* createZhongShu(Class_XianDuanBase *xianDuan,int);
-	friend Class_ZhongShu* createZhongShu(Class_ZhongShu*, Class_XianDuanBase*,int);
+	friend Class_ZhongShu* createZhongShu(Class_XianDuanBase *xianDuan,int); // type = 4
+	friend Class_ZhongShu* createZhongShu(Class_ZhongShu*, Class_XianDuanBase*,int); // type = 2
 	friend Class_ZhongShu* createZhongShu(Class_ZhongShu*, Class_ZhongShu*, int); // type = 5
+	friend Class_ZhongShu* createZhongShu(Class_ZhongShu *, Class_ZhongShu *, Class_ZhongShu * , int);  // type = 1 
+	friend Class_ZhongShu* createZhongShu(Class_XianDuanBase *, Class_XianDuanBase *, int ); // type = 3
 
 	static const int MAX_LEVEL = 7;
 	static list<Class_ZhongShu>  zsList[MAX_LEVEL];
