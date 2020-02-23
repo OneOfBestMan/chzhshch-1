@@ -155,6 +155,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StockFunc.cpp" />
+    <ClCompile Include="traits.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base.h" />
@@ -167,8 +168,10 @@
     <ClInclude Include="Class_ZhongShu.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="FenXianDuan.h" />
+    <ClInclude Include="normalize.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />
+    <ClInclude Include="traits.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

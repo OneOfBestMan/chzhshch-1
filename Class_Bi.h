@@ -10,6 +10,8 @@
 #include <ostream>
 #include <vector>
 
+#include "traits.h"
+
 using namespace std;
 
 template <class baseItem_Container> 
@@ -19,12 +21,9 @@ public:
 	typedef vector<Class_Bi> ContainerType;
 	typedef typename baseItem_Container::value_type baseItemType;
 	
-	typedef struct {
-		typename baseItem_Container::value_type *start;
-		typename baseItem_Container::value_type *end;
-		float high;
-		float low;
-	} valueType;
+
+
+
 
 	float getHigh() const {return bi.high;}
 	float getLow()const {return bi.low;}
@@ -43,16 +42,15 @@ public:
 
 private:
 
-	valueType bi;
+	typename baseItem_Container::value_type *start;
+	typename baseItem_Container::value_type *end;
+	
 };
 
 template<>
-class Class_Bi<vector<Class_KXian> >
+class Class_Bi<vector<Class_KXian> >: public traits<Class_KXian, Class_Bi<vector<Class_KXian>> >
 {
 public:
-	typedef vector<Class_Bi> ContainerType;
-	typedef Class_KXian baseItemType;
-	typedef vector<Class_KXian> baseItemType_Container;
 
 	typedef preDumpTemplate<Class_Bi>  preDumpClass;
 	typedef DumpTemplate<Class_Bi> DumpClass;
@@ -60,40 +58,15 @@ public:
 
 
 
-	typedef struct {
-		baseItemType* start;
-		baseItemType* end;
-		float high;
-		float low;
-		Direction d;
-		int KXianCnt; // 包含几根 不包含关系的K线，这个域，仅在处理“类笔”的时候有效；对于“笔”，这个域没意义
-	/*
-
-	解释下KXianCnt = 4
-
-            |               |
-        |   |             | |
-        | | |     =       | |
-      | | |             | |
-    | |               | |
-    |                 |
-	*/
-	} valueType;
-
-	float getHigh()const {return bi.high;}
-	float getLow()const {return bi.low;}
-	baseItemType*  getStart() const{return bi.start;}
-	baseItemType*  getEnd()const {return bi.end;}
-
-
 	Class_Bi(void) {}
 	~Class_Bi(void){}
 	/* 类笔 的构造函数*/
 	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct, int Cnt)
-	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct; bi.KXianCnt = Cnt;}
+		:traits(biStart, biEnd, high, low, direct) {KXianCnt = Cnt;}
+
 	/* 笔 的构造函数*/
 	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct)
-	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct; bi.KXianCnt = -1;}
+		:traits(biStart, biEnd, high, low, direct) {KXianCnt = -1;}
 
 	static baseItemType_Container *base_Container;
 	static ContainerType *container;
@@ -106,11 +79,26 @@ public:
 	static const int MIN_BI_KXIAN = 5; // 一笔 至少包含 5根 无包含关系的K线；
 
 private:
-	valueType bi;
+
+		/*
+
+	解释下KXianCnt = 4
+
+            |               |
+        |   |             | |
+        | | |     =       | |
+      | | |             | |
+    | |               | |
+    |                 |
+	*/
+	int KXianCnt; // 包含几根 不包含关系的K线，这个域，仅在处理“类笔”的时候有效；对于“笔”，这个域没意义
+
 
 	/* FenBi_Step1  实现的是 第65课中的 分笔定义 */
 	static void FenBi_Step1();
+
 	/* FenBi_Step2 实现的是 第69课中的 分笔思想 */
+	/* 之前的实现，在调试的时候，发现是不对的。 目前看，分笔的实现，本质上还是划分线段，特征向量就是“类笔”中，那些非常小的类笔； */
 	static void FenBi_Step2();
 
 };

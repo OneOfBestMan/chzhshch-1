@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{519f46a2-8331-4565-bf24-b641ae25969d}</UniqueIdentifier>
+      <UniqueIdentifier>{142bd8b5-41ad-40fd-988c-1361e91834d2}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{e1182ca9-8f1c-4c71-bcf3-43c7fb836274}</UniqueIdentifier>
+      <UniqueIdentifier>{2c16d6dd-c331-4a80-ab15-7a0ea038c8a4}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{017a8ac1-37f0-4de7-9a26-99d9ea1b11d2}</UniqueIdentifier>
+      <UniqueIdentifier>{be2b5c0f-353f-4ea6-a504-e9f7ef2ed188}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -40,6 +40,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StockFunc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="traits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,10 +77,16 @@
     <ClInclude Include="FenXianDuan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="normalize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StockFunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="traits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

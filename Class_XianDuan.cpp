@@ -23,8 +23,8 @@ ostream& operator<<(ostream& ostream, Class_XianDuan<1>& objXianDuan)
 	ostream.precision(2);
 	ostream.width(4);
 
-	ostream<< objXianDuan.XianDuan.low << ", ";
+	ostream<< objXianDuan.getLow() << ", ";
 	ostream.width(4);
-	ostream<< objXianDuan.XianDuan.high << ")";
+	ostream<< objXianDuan.getHigh() << ")";
 	return ostream;
 }

@@ -285,6 +285,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\traits.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -331,11 +335,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\normalize.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>
 			<File
 				RelativePath="StockFunc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\traits.h"
 				>
 			</File>
 		</Filter>

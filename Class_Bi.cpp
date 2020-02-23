@@ -17,9 +17,9 @@ ostream& operator<<(ostream& out, Class_Bi<vector<Class_KXian>>& biObj)
 	out.precision(2);
 	out.width(4);
 
-	out<< biObj.bi.low << ", ";
+	out<< biObj.getLow() << ", ";
 	out.width(4);
-	out<<  biObj.bi.high  << ")";
+	out<<  biObj.getHigh()  << ")";
 	return out;
 
 }
@@ -106,6 +106,8 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 	}while (p != end);
 }
 
+
+#if 0
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 {
 	typedef enum {TOP = 1, BOTTOM = 2, STARTPOINT = TOP|BOTTOM} FLAGS;
@@ -549,6 +551,15 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 	delete intermediate;
 	intermediate = NULL;
 }
+
+#endif
+
+
+void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
+{
+
+}
+
 
 /*
  µœ÷ ± 

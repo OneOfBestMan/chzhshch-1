@@ -11,6 +11,7 @@
 using namespace std;
 
 #include "FenXianDuan.h"
+#include "traits.h"
 
 /*
 template<int grade> class Class_XianDuan;
@@ -19,13 +20,9 @@ ostream& operator<< (ostream& ostream, Class_XianDuan<1> & objXianDuan);
 */
 
 template<int grade>
-class Class_XianDuan
+class Class_XianDuan: public traits<Class_XianDuan<grade-1>, Class_XianDuan<grade> >
 {
 public:
-	typedef Class_XianDuan<grade-1> baseItemType;
-	typedef vector<baseItemType> baseItemType_Container;
-	typedef vector<Class_XianDuan> ContainerType; 
-
 	typedef preDumpTemplate<Class_XianDuan>  preDumpClass;
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
 	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
@@ -35,18 +32,6 @@ public:
 
 	static const int GRADE = grade;
 
-	typedef struct
-	{
-		typename baseItemType *start;
-		typename baseItemType *end;
-		float high;
-		float low;
-	} valueType;
-
-	float& getHigh() {return XianDuan.high;}
-	float& getLow() {return XianDuan.low;}
-	baseItemType* & getStart() {return XianDuan.start;}
-	baseItemType* & getEnd() {return XianDuan.end;}
 
 	static baseItemType_Container *baseItems;
 	static ContainerType *container;
@@ -66,29 +51,23 @@ public:
 		file.precision(2);
 		file.width(4);
 
-		file<< objXianDuan.XianDuan.low << ", ";
+		file<< objXianDuan.getLow() << ", ";
 		file.width(4);
-		file<< objXianDuan.XianDuan.high << ")";
+		file<< objXianDuan.getHigh() << ")";
 
 		return file;
 	}
 
 private:
-	valueType XianDuan;
+
 };
 
 template<>
-class Class_XianDuan<1>
+class Class_XianDuan<1>: public traits<Class_Bi<vector<Class_KXian> >, Class_XianDuan<1>> 
 {
 public:
 
 	//static void printMe() {printf("This is %d, specialized. \n", GRADE); }
-
-	typedef vector<Class_KXian> KXian_Container;
-	typedef Class_Bi<KXian_Container> baseItemType;
-    typedef vector<baseItemType> Bi_Container;
-	typedef Bi_Container baseItemType_Container;
-	typedef vector<Class_XianDuan> ContainerType;
 
 	typedef preDumpTemplate<Class_XianDuan>  preDumpClass;
 	typedef DumpTemplate<Class_XianDuan> DumpClass;
@@ -97,17 +76,8 @@ public:
 
 	static const int GRADE = 1;
 
-	typedef struct {
-		baseItemType *start;
-		baseItemType *end;
-		float high;
-		float low;
-	} valueType;
 
-	float getHigh() const {return XianDuan.high;}
-	float getLow() const {return XianDuan.low;}
-	baseItemType*  getStart() const {return XianDuan.start;}
-	baseItemType*  getEnd() const {return XianDuan.end;}
+
 
     static baseItemType_Container *baseItems;
     static ContainerType *container;
@@ -117,7 +87,7 @@ public:
 	friend ostream& operator<<(ostream&, Class_XianDuan&);
 
 private:
-	valueType XianDuan;
+
 
 };
 

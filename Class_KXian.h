@@ -13,8 +13,9 @@ using namespace std;
 
 
 #include "Debug.h"
+#include "traits.h"
 
-
+/*
 typedef enum Direction
 {
 	ASCENDING =1,
@@ -23,23 +24,14 @@ typedef enum Direction
 }  Direction;
 
 Direction operator-(const Direction& d);
+*/
 
-class Class_KXian
+class Class_KXian: public traits<void, Class_KXian>
 {
 public:
 
-	typedef vector<Class_KXian> ContainerType;
-
 	typedef preDumpTemplate<Class_KXian>  preDumpClass;
 	typedef DumpTemplate<Class_KXian> DumpClass;
-
-	typedef struct
-	{
-		float kStart;
-		float kEnd;
-		float kBot;
-		float kHigh;
-	} valueType;
 
 	static ContainerType *container;
 
@@ -47,57 +39,16 @@ public:
 	Class_KXian(float kStart, float kEnd, float kBot, float kHigh);
 	~Class_KXian(void);
 
-	float getStart() const;
-	float getEnd() const;
-	float getHigh() const; // getHigh getLow 这两个接口，与Class_XianDuan、Class_Bi 中的两个接口 是公用接口，被preDumpTemplate.doWork所使用 
-	float getLow() const;
-
-	static Direction getDirection(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
-	static bool isAscending(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
-	static bool isDecending(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
-	static bool isEnclosing(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
-
-	bool operator>> (const Class_KXian &secondKXian) const
-	{
-		return isDecending(*this, secondKXian);
-	}
-
-	bool operator<< (const Class_KXian &secondKXian) const
-	{
-		return isAscending(*this, secondKXian);
-	}
-
-	bool operator==(const Class_KXian &secondKXian) const
-	{
-		return isEnclosing(*this, secondKXian);
-	}
-
-	Class_KXian& merge(const Class_KXian &secondKXian, Direction d) // 合并两条具有包含关系的K线
-	{
-		assert(*this == secondKXian);
-
-		switch (d)
-		{
-		case ASCENDING:
-			this->bar.kHigh = max(this->getHigh(), secondKXian.getHigh());
-			this->bar.kBot = max(this->getLow(), secondKXian.getLow());
-			break;
-		case DESCENDING:
-			this->bar.kHigh = min(this->getHigh(), secondKXian.getHigh());
-			this->bar.kBot = min(this->getLow(), secondKXian.getLow());
-			break;
-		default:
-			assert(0);
-		}
-		return *this;
-	}
+	float getStart() const {return Start;}
+	float getEnd() const {return End;}
 
 
 	friend ostream& operator<< (ostream&, Class_KXian &);
 
 	static void initialize(bool release = false);
 private:
-	valueType bar;
+	float Start;
+	float End;
 };
 
 

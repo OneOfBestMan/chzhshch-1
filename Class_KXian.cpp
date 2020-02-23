@@ -31,22 +31,6 @@ void DumpV2<typename Class_KXian>(dumpHelperMap &helperMap, ostream &file)
 
 
 
-
-Direction operator-(const Direction& d)
-{
-	switch (d)
-	{
-	case ASCENDING:
-		return DESCENDING;
-	case DESCENDING:
-		return ASCENDING;
-	default:
-		assert(0);
-	}
-	return d;
-}
-
-
 Class_KXian::ContainerType* Class_KXian::container = NULL;
 
 
@@ -58,9 +42,9 @@ ostream& operator<<(ostream &out, Class_KXian &kxian)
 	out.precision(2);
 	out.width(4);
 
-	out<< kxian.bar.kBot << ", ";
+	out<< kxian.getLow() << ", ";
 	out.width(4);
-	out<<  kxian.bar.kHigh << ")";
+	out<<  kxian.getHigh() << ")";
 	return out;
 }
 
@@ -87,64 +71,14 @@ void Class_KXian::initialize(bool release)
 	}
 }
 
-bool Class_KXian::isAscending(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
+Class_KXian::Class_KXian(float kStart, float kEnd, float kBot, float kHigh) : traits((void*)0xdeaddead, (void*)0xdeaddead , kHigh, kBot)
 {
-	return (firstKXian.getHigh() < secondKXian.getHigh()  && firstKXian.getLow() < secondKXian.getLow());
-}
+	Start = kStart;
+	End = kEnd;
 
-bool Class_KXian::isDecending(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
-{
-	return (firstKXian.getHigh() > secondKXian.getHigh()  && firstKXian.getLow() > secondKXian.getLow());
-}
-
-bool Class_KXian::isEnclosing(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
-{
-	return (firstKXian.getHigh() >= secondKXian.getHigh()  && firstKXian.getLow() <= secondKXian.getLow()) ||
-		   (firstKXian.getHigh() <= secondKXian.getHigh()  && firstKXian.getLow() >= secondKXian.getLow());
-}
-
-Direction Class_KXian::getDirection(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
-{
-	if (isAscending(firstKXian, secondKXian))
-		return ASCENDING;
-	else if (isDecending(firstKXian, secondKXian))
-		return DESCENDING;
-	else
-		return ENCLOSING;
-}
-
-
-
-Class_KXian::Class_KXian(float kStart, float kEnd, float kBot, float kHigh)
-{
-
-	bar.kStart = kStart;
-	bar.kEnd = kEnd;
-	bar.kHigh = kHigh;
-	bar.kBot = kBot;
 }
 
 Class_KXian::~Class_KXian(void)
 {
 }
 
-
-float Class_KXian::getStart() const
-{
-	return bar.kStart;
-}
-
-float Class_KXian::getEnd() const
-{
-	return bar.kEnd;
-}
-
-float Class_KXian::getHigh() const
-{
-	return bar.kHigh;
-}
-
-float Class_KXian::getLow() const
-{
-	return bar.kBot;
-}
