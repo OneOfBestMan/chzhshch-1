@@ -281,10 +281,10 @@ public:
 		switch (content.type)
 		{
 		case 1:
-			End = content.c1.first->getEnd();
+			End = content.c1.last->getEnd();
 			break;
 		case 2:
-			End = content.c2.first->getEnd();
+			End = content.c2.XianDuan->getBaseXianDuanEnd();
 			break;
 		case 3:
 			End = content.c3.last->getBaseXianDuanEnd();
@@ -446,6 +446,7 @@ public:
 			{
 			case 0: // 中枢开始、结束的标记
 				resultBuf[zs.getStartRec() - veryStart] = 1; // 开始位置 mark 成1
+				resultBuf[zs.getStartRec() - veryStart + (zs.getEndRec() - zs.getStartRec())/2] = 1.5; //这个位置显示注释文字
 				resultBuf[zs.getEndRec() - veryStart] = 2; // 结束位置 mark 成2
 				break;
 			case 1: // 中枢持续的K线单位的个数
@@ -453,10 +454,12 @@ public:
 				break;
 			case 2: // low price
 				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getLow();
+				resultBuf[zs.getStartRec() - veryStart + (zs.getEndRec() - zs.getStartRec())/2] = zs.getFloatRange().getLow(); //这个位置显示注释文字
 				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getLow();
 				break;
 			case 3: // high price
 				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getHigh();
+				resultBuf[zs.getStartRec() - veryStart + (zs.getEndRec() - zs.getStartRec())/2] = zs.getFloatRange().getHigh(); //这个位置显示注释文字
 				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getHigh();
 				break;
 			default:

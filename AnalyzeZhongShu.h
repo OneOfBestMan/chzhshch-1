@@ -6,6 +6,9 @@
 
 #include "slist.h"
 
+#include <list>
+using namespace std;
+
 /*
   对于向上的线段说，转折点TurningPoint(TP)是指 这样的点： TP1、TP2
 
@@ -102,7 +105,7 @@ typedef Class_XianDuan<1> veryBaseXianDuanType;
 
 	static const int MAX_LEVEL = Class_ZhongShu::MAX_LEVEL; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
 private:
-	struct ElemOfView
+	typedef struct ElemOfView
 	{
 		Class_ZhongShu *elem;
 		List_Entry level_link[MAX_LEVEL]; 
@@ -110,7 +113,16 @@ private:
 		ElemOfView(Class_ZhongShu* cs) {elem = cs; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; flags = 0;}
 		ElemOfView() {elem = NULL; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; flags = 0; }
 		char flags; // 用来在merge链表，删除操作的时候，对需要merge的项目进行标记
-	};
+	}ElemOfView;
+
+	typedef struct mergeRecord {
+		ElemOfView *from; // 中枢扩张 起始于
+		ElemOfView *to;   // 中枢扩张 终止于
+		int countOverlapZS; // 中枢扩张 包含的低级别中枢个数
+		int newLevel;      // 扩张的中枢级别
+		mergeRecord() { from = to = NULL; countOverlapZS = 0; newLevel = 0;}
+		mergeRecord(ElemOfView *f, ElemOfView* t, int cnt, int level) { from = f; to = t; countOverlapZS = cnt; newLevel = level; }
+	} mergeRecord;
 
 	List_Entry time_list;
 	List_Entry level_list[MAX_LEVEL];
@@ -493,21 +505,116 @@ public:
 			while (nextEntry !=  &level_list[level])
 			{
 				ElemOfView *nextEov = list_entry(nextEntry, ElemOfView, level_link[level]);
-				assert(nextEov->elem->getGrade() == level);
-
-				ValueRange temp = eov->elem->getCoreRange();
-				temp && nextEov->elem->getFloatRange();
-				if (temp.isNulValueRange())
+				if (nextEov->elem->getGrade() == level)
 				{
-					eov->elem->setThirdPoint(nextEov->elem);
-					break;
+					ValueRange temp = eov->elem->getCoreRange();
+					temp && nextEov->elem->getFloatRange();
+					if (temp.isNulValueRange())
+					{
+						eov->elem->setThirdPoint(nextEov->elem);
+						break;
+					}
 				} // TODO: 如果有重合，那么需要更新中枢，并且当中枢级别跳升的时候，要更新View
+				else 
+					break; // 如果一个level+1级别的中枢，之后中枢的级别大于等于该中枢，那么就别再找该中枢的第三买卖点了
 				nextEntry = nextEntry->next;
 			}
 			if (nextEntry == &level_list[level])
 				break;
-			assert(eov->elem->getThirdPoint());
+			
 			curr = locate_level_equal(&level_list[level], curr->next, level + 1);
+		}
+	}
+
+	/* 对 level_list，实施merge; merge操作的实施方案，在operation中*/
+	void applyMergeOps(PList_Head listHead, list<mergeRecord> &operations)
+	{
+		// 确定 listHead 的 级别
+		int listLevel = 0;
+		for ( ; listHead != &level_list[listLevel]; listLevel++) ; 
+
+		Class_ZhongShu *newZS = NULL;
+		Class_ZhongShu *lastMergeZS = NULL;
+		bool setLaterAs3rdPoint = false;
+		while (!operations.empty())
+		{
+			mergeRecord op = operations.front();
+			operations.pop_front();
+
+			switch (op.countOverlapZS)
+			{
+			case 1:
+				assert(0);
+				break;
+			case 2:
+				newZS = createZhongShu(op.from->elem, op.to->elem, op.newLevel);
+				break;
+			case 3:
+				{
+					ElemOfView *eovm = list_entry(op.from->level_link[listLevel].next, ElemOfView, level_link[listLevel]);
+					assert(eovm->elem->getGrade() == listLevel);
+					newZS = createZhongShu(op.from->elem, eovm->elem, op.to->elem, op.newLevel);
+				}
+				break;
+			default:
+				Class_ZhongShu **zsArray = new Class_ZhongShu*[op.countOverlapZS];
+				ElemOfView *curr = op.from;
+				int cnt = 0;
+				while (curr != op.to)
+				{
+					zsArray[cnt++] = curr->elem;
+					curr = list_entry(curr->level_link[listLevel].next, ElemOfView, level_link[listLevel]);
+					assert(curr->elem->getGrade() == listLevel);
+				}
+				assert(curr == op.to);
+				zsArray[cnt++] = op.to->elem;
+				assert(cnt == op.countOverlapZS);
+				newZS = createZhongShu(zsArray, op.countOverlapZS, op.newLevel);
+				delete[] zsArray;
+				break;
+			}
+
+			if (setLaterAs3rdPoint)
+			{
+				setLaterAs3rdPoint = false;
+				lastMergeZS->setThirdPoint(newZS);
+				lastMergeZS = NULL;
+			}
+
+			if (!operations.empty())
+			{
+				// 分析newZS的第三买卖点
+				mergeRecord& next = operations.front();
+				if (op.newLevel == listLevel + 1) // 新产生的扩张中枢， 级别比 低级别中枢，高出1个级别
+				{
+					
+					if (next.newLevel >= op.newLevel)
+					{
+					
+						ElemOfView *eovAfterNewZS = list_entry(op.to->level_link[listLevel].next, ElemOfView, level_link[listLevel]);
+					
+						//assert(eovAfterNewZS->elem->getGrade() == listLevel);
+						ValueRange range = eovAfterNewZS->elem->getFloatRange();
+						range && newZS->getCoreRange();
+						assert(range.isNulValueRange());
+
+						if (eovAfterNewZS != next.from)
+							newZS->setThirdPoint(eovAfterNewZS->elem);// 这两个级别扩张的中枢之间，存在一个低级别的中枢，不属于这两个中枢。 那么，这个低级别中枢，就构成了第一个扩张中枢的第三买卖点。
+						else
+							newZS->setThirdPoint(eovAfterNewZS->elem);//第三买卖点后，又延伸出一个同级或更大级别的中枢，此时，这两个中枢就存在扩张成为更大中枢的可能。
+					}
+				
+				} else // 如果， 新产生的扩张中枢级别比当前队列的级别高出2个或更多
+				{ 
+					if (next.newLevel == op.newLevel - 1 )   // 下一个扩张中枢，级别 低于 当前扩张中枢 1 个级别					
+					{
+						lastMergeZS = newZS; 
+						setLaterAs3rdPoint = true; // 再生成下一个中枢的时候，设置它成为这个中枢的第三买卖点；
+					}
+				}
+			}
+
+			ExpandZS(op.from, op.to, newZS);
 		}
 	}
 
@@ -520,27 +627,38 @@ public:
 
 			for (int level = 0 /*min_level*/; level <= max_level; level++)
 			{
-				//updateThirdPoint(level);
 				
-				/*debugCounter++;
-				if (debugCounter == 78)
+				debugCounter++;
+				/*
+				if (debugCounter == 14281)
 				{
 					printf("break me here");
 					assertValid(true);
-				}*/
+				}
+				*/
+				
+				//updateThirdPoint(level);		
 
-				if (levelTotal[level] < 2) continue;
+				if (levelTotal[level] < 2)
+					continue;
 
 				List_Entry *startFrom = locate_level_equal(&level_list[level], level_list[level].next, level);
 				List_Entry *endAt = locate_level_higher(&level_list[level], startFrom, level);
-				List_Entry *latter = endAt->prev;
+				List_Entry *former = startFrom;
+
+				list<mergeRecord> mergeOperations;
+
 				while (startFrom != &level_list[level])
-				{			
-					while (latter == startFrom && startFrom != &level_list[level])
+				{
+					while (former == endAt && startFrom != &level_list[level])
 					{
+						if (!mergeOperations.empty())
+							applyMergeOps(&level_list[level], mergeOperations);
+
+						// 定位出一段区间，该区间是一段都是level级别的中枢，结束于一个级别高于level的中枢
 						startFrom = locate_level_equal(&level_list[level], endAt, level);
 						endAt = locate_level_higher(&level_list[level], startFrom, level);
-						latter = endAt->prev;
+						former = startFrom;
 					}
 					if (startFrom == &level_list[level])
 						break;
@@ -553,81 +671,45 @@ public:
 							break;
 					}*/
 					
-					ElemOfView *eovl = list_entry(latter, ElemOfView, level_link[level]); // eov latter
-					//ValueRange range = eovl->elem->getCoreRange();
-					ValueRange range = eovl->elem->getFloatRange();
+					ElemOfView *eovf = list_entry(former, ElemOfView, level_link[level]); // eov latter
 
-					ElemOfView *eovf, *eovm; // eov former; eov middle
-					List_Entry *former = latter->prev;
+					ValueRange range = eovf->elem->getFloatRange();
+
+					ElemOfView *eovl; // eov former; eov middle
+					List_Entry *latter = former->next;
 					int countOverlapZS = 1; // 统计 重叠区间的中枢个数
-					while (former != startFrom->prev)
+					while (latter != endAt)
 					{
-						eovf = list_entry(former, ElemOfView, level_link[level]);
+						// 对区间中的各个中枢，从前向后，进行merge处理；这段区间结束于一个级别高于level的中枢；
+						eovl = list_entry(latter, ElemOfView, level_link[level]);
 						//range && eovf->elem->getCoreRange();
-						range && eovf->elem->getFloatRange();
+						range && eovl->elem->getFloatRange();
 						if (range.isNulValueRange())
 							break;
 						countOverlapZS++;
-						former = former->prev;
+						latter = latter->next;
 					}
-					former = former->next;
+					latter = latter->prev;
 
-					if (former == latter)
+					if (latter == former)
 					{
-						if (former != startFrom)
-							latter = former->prev;
-
+						former = latter->next;
 						continue;
 					} 
 
-					if (former != startFrom)
-						latter = former->prev;
+					if (latter != endAt->prev)
+						former = latter->next;
 					else
-						latter = former;
+						former = endAt;
 
-					eovf = list_entry(former, ElemOfView, level_link[level]);
-
-					if (countOverlapZS == 3)
-					{
-						eovm = list_entry(former->next, ElemOfView, level_link[level]);;
-					}
+					eovl = list_entry(latter, ElemOfView, level_link[level]);
 
 					if (canExpand(eovf->elem, eovl->elem))
 					{
-						Class_ZhongShu *newZS;
 						int newLevel = getZSLevel(eovf->elem, eovl->elem);
-						switch (countOverlapZS)
-						{
-						case 2:
-							newZS = createZhongShu(eovf->elem, eovl->elem, newLevel);
-							break;
-						case 3:
-							newZS = createZhongShu(eovf->elem, eovm->elem, eovl->elem, newLevel);
-							break;
-						case 1:
-							assert(0);
-							break;
-						default: //countOverlapZS > 3
-							//newZS = createZhongShu(eovf->elem->getStart(), eovl->elem->getEnd(), newLevel);
-							Class_ZhongShu **zsArray = new Class_ZhongShu*[countOverlapZS];
-							ElemOfView *curr = eovf;
-							int cnt = 0;
-							while (curr != eovl)
-							{
-								zsArray[cnt++] = curr->elem;
-								curr = list_entry(curr->level_link[level].next, ElemOfView, level_link[level]);
-								assert(curr->elem->getGrade() == level);
-							}
-							assert(curr = eovl);
-							zsArray[cnt++] = eovl->elem;
-							assert(cnt == countOverlapZS);
-							newZS = createZhongShu(zsArray,countOverlapZS,newLevel);
-							delete[] zsArray;
-							break;
-						}
+
+						mergeOperations.push_back(mergeRecord(eovf, eovl, countOverlapZS, newLevel));
 						
-						ExpandZS(eovf, eovl, newZS);
-						//assertValid();
 						changed = true;
 					}
 				} 
