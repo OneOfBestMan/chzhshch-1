@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{dd97e42f-d150-459c-9080-406e694cbbd4}</UniqueIdentifier>
+      <UniqueIdentifier>{d53d7a61-b82c-4994-b2d5-b2d32502b26d}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{f6a60a8a-f5fc-478b-9269-2e48bff99044}</UniqueIdentifier>
+      <UniqueIdentifier>{bf59170e-34f7-4332-ae7e-8587cf21a58f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{7c151aac-fdfc-4688-85b8-221bad1b7550}</UniqueIdentifier>
+      <UniqueIdentifier>{f6cd9d66-9951-42d3-a12c-edfcf6e26be8}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -47,6 +47,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnalyzeZhongShu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>

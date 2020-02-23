@@ -84,7 +84,7 @@
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>C:\Stock\KingTrader\FmlDll/StockFunc.dll</OutputFile>
+      <OutputFile>C:\Stock\FoxTrader\FmlDll/StockFunc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/StockFunc.pdb</ProgramDatabaseFile>
@@ -158,6 +158,7 @@
     <ClCompile Include="traits.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnalyzeZhongShu.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Class_Bi.h" />
     <ClInclude Include="Class_Driver.h" />
