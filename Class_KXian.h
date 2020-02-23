@@ -108,7 +108,7 @@ class preDumpTemplate<typename Class_KXian>
 public:
 	static void doWork(dumpHelperMap &helperMap)
 	{
-		char tempSpace[20]; // 类似这样的串：(####.##, ####.##)
+		char tempSpace[50]; // 类似这样的串：(####.##, ####.##)
 		if (Class_KXian::container == NULL) return;
 
 		Class_KXian::ContainerType::iterator p = Class_KXian::container->begin();

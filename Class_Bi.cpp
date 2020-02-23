@@ -80,7 +80,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 			// TODO: 建立最后的一个  类-笔
 			float high = max (start->getHigh(), (p-1)->getHigh());
 			float low = min (start->getLow(), (p-1)->getLow());
-			(*intermediate)[cnt++] = ContainerType::value_type(&(*start), &(*(p-1)), high, low, d);
+			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d));
 			start = p-1;
 			break;
 		}

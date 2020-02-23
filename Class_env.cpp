@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 #include "Class_XianDuan.h"
@@ -25,17 +26,17 @@ Class_env::Class_env(CALCINFO *p)
 		p->m_pCalcParam[3].m_nParamStart < 0)
 		throw invalid_argument("输入 数组参数不正确");
 
-	highParm = p->m_pCalcParam[0].m_pfParam;
-	firstHighParm = p->m_pCalcParam[0].m_nParamStart;
+	startParm = p->m_pCalcParam[0].m_pfParam;
+	firstStartParm = p->m_pCalcParam[0].m_nParamStart;
 
-    lowParm = p->m_pCalcParam[1].m_pfParam;
-	firstLowParm = p->m_pCalcParam[1].m_nParamStart;
+    endParm = p->m_pCalcParam[1].m_pfParam;
+	firstEndParm = p->m_pCalcParam[1].m_nParamStart;
 
-	startParm = p->m_pCalcParam[2].m_pfParam;
-	firstStartParm =  p->m_pCalcParam[2].m_nParamStart;
+	lowParm = p->m_pCalcParam[2].m_pfParam;
+	firstLowParm =  p->m_pCalcParam[2].m_nParamStart;
 
-	endParm = p->m_pCalcParam[3].m_pfParam;
-	firstEndParm = p->m_pCalcParam[3].m_nParamStart;
+	highParm = p->m_pCalcParam[3].m_pfParam;
+	firstHighParm = p->m_pCalcParam[3].m_nParamStart;
 
 	totalBar = p->m_nNumData;
 
@@ -66,15 +67,15 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		FenXianDuan<Class_XianDuan<7>>(false);
 
 		static bool doOnce = false;
-		if (!doOnce)
-		{
-			doOnce = true;
-			dumpHelperMap map;
-			ofstream file("c:\\log.txt");
-			preDump<Class_XianDuan<7>>(map);
-			DumpV2<Class_XianDuan<7>>(map, file);
-		}
+		doOnce = true;
+		dumpHelperMap map;
 
+		stringstream filename;
+		filename<<"c:\\" << env->stockName << ".txt";
+
+		ofstream file(filename.str().c_str());
+		preDump<Class_XianDuan<7>>(map);
+		DumpV2<Class_XianDuan<7>>(map, file);
 
 	}
 
