@@ -340,8 +340,8 @@ public:
 			assert(0); // 中枢级别超过支持范围
 
 
-		if (newLevel > startFrom->getGrade() + 1)
-			printf("break me here");
+		//if (newLevel > startFrom->getGrade() + 1)
+		//	printf("break me here");
 
 		return newLevel;
 	}
@@ -754,8 +754,8 @@ void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, Xian
 	typedef MultiLevelZhongShuView::ElemOfView ElemOfView;
 
 	debugCounter++;
-	if (debugCounter == 2734)
-		printf("break me here");
+	//if (debugCounter == 2734)
+	//	printf("break me here");
 
 	List_Entry *curr = TP1_1->zsList;
 	while (curr != NULL)
@@ -784,8 +784,8 @@ void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, Xian
 		TP1_2->zsList = NULL;
 	}
 
-	if (view.total >= 4)
-		printf("break me here");
+	//if (view.total >= 4)
+	//	printf("break me here");
 	view.merge(TP1_2);
 }
 
@@ -854,7 +854,7 @@ void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView 
 		}
 		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
 		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
-		printf("break me here");
+		//printf("break me here");
 	}
 }
 

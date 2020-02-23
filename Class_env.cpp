@@ -19,15 +19,16 @@ Class_env::Class_env(CALCINFO *p)
 {
 	handle = p;
 
-    if (p->m_nNumParam != 6) 
+    if (p->m_nNumParam != 7) 
 		throw invalid_argument("输入 参数个数不正确");
 
 	if (p->m_pCalcParam[0].m_nParamStart < 0  || 
 		p->m_pCalcParam[1].m_nParamStart < 0  ||
 		p->m_pCalcParam[2].m_nParamStart < 0  || 
 		p->m_pCalcParam[3].m_nParamStart < 0  ||
-		p->m_pCalcParam[4].m_nParamStart > 0 ||
-		p->m_pCalcParam[5].m_nParamStart > 0 )
+		p->m_pCalcParam[4].m_nParamStart > 0  ||
+		p->m_pCalcParam[5].m_nParamStart > 0  || 
+		p->m_pCalcParam[6].m_nParamStart > 0 )
 		throw invalid_argument("输入 数组参数不正确");
 
 	startParm = p->m_pCalcParam[0].m_pfParam;
@@ -46,6 +47,7 @@ Class_env::Class_env(CALCINFO *p)
 
 	grade = static_cast<gradeSelect>((int)(p->m_pCalcParam[4].m_fParam));
 	func =  static_cast<funcSelect>((int)(p->m_pCalcParam[5].m_fParam));
+	ZSorXD =  static_cast<ZsXdSelect>((int)(p->m_pCalcParam[6].m_fParam));
 	resultBuf = p->m_pResultBuf;
 
 	if (p->m_strStkLabel)
@@ -64,6 +66,8 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 	{
 		env->grade = newEnv->grade;
 		env->func = newEnv->func;
+		env->ZSorXD = newEnv->ZSorXD;
+
 		env->resultBuf = newEnv->resultBuf;
 
 		delete newEnv;
@@ -74,6 +78,9 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		{
 			FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(true);
 			delete env;
+
+			for (int i = 0; i < Class_ZhongShu::MAX_LEVEL; i++)
+				Class_ZhongShu::zsList[i].clear();
 		}
 
 		env = newEnv;
@@ -119,40 +126,46 @@ Class_env::~Class_env(void)
 
 void Class_env::outputResult()
 {
-	assert(grade >= BI && grade <= XIANDUAN_7 && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
+	if (ZSorXD == XIANDUAN)
+	{
+		assert(grade >= BI && grade <= XIANDUAN_7 && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
 
-	if (grade == BI)
-	{
-		Class_Bi<vector<Class_KXian> >::DisplayClass::doWork(func, resultBuf);
-	}
-	else
-	{
-		switch (grade)
+		if (grade == BI)
 		{
-		case XIANDUAN_1:
-			Class_XianDuan<XIANDUAN_1>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_2:
-			Class_XianDuan<XIANDUAN_2>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_3:
-			Class_XianDuan<XIANDUAN_3>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_4:
-			Class_XianDuan<XIANDUAN_4>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_5:
-			Class_XianDuan<XIANDUAN_5>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_6:
-			Class_XianDuan<XIANDUAN_6>::DisplayClass::doWork(func, resultBuf);
-			break;
-		case XIANDUAN_7:
-			Class_XianDuan<XIANDUAN_7>::DisplayClass::doWork(func, resultBuf);
-			break;
-		default:
-			assert(0);
+			Class_Bi<vector<Class_KXian> >::DisplayClass::doWork(func, resultBuf);
 		}
-		
+		else
+		{
+			switch (grade)
+			{
+			case XIANDUAN_1:
+				Class_XianDuan<XIANDUAN_1>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_2:
+				Class_XianDuan<XIANDUAN_2>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_3:
+				Class_XianDuan<XIANDUAN_3>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_4:
+				Class_XianDuan<XIANDUAN_4>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_5:
+				Class_XianDuan<XIANDUAN_5>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_6:
+				Class_XianDuan<XIANDUAN_6>::DisplayClass::doWork(func, resultBuf);
+				break;
+			case XIANDUAN_7:
+				Class_XianDuan<XIANDUAN_7>::DisplayClass::doWork(func, resultBuf);
+				break;
+			default:
+				assert(0);
+			}
+		}
+	} else
+	{
+		assert(grade >= ZS_0 && grade <= ZS_6 && func >= OUTPUT_ZS_START_END_MARK && func <= OUTPUT_ZS_HIGHPRICE);	
+		Class_ZhongShu::DisplayClass::doWork(grade, func, resultBuf);
 	}
 }

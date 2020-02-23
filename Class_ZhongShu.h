@@ -10,6 +10,7 @@
 using namespace std;
 
 
+
 class ValueRange
 {
 private:
@@ -46,6 +47,7 @@ public:
 };
 
 
+class DisplayZhongShu;
 
 class Class_ZhongShu
 {
@@ -54,6 +56,7 @@ private:
 
 	typedef Class_XianDuan<1> veryBaseXianDuanType;
 	typedef Class_ZhongShu subZhongShuType;
+	
 /*
                             此处高点一定要高于High
                                    /\
@@ -244,6 +247,7 @@ private:
 	}
 
 public:	
+	typedef DisplayZhongShu DisplayClass;
 
 	Class_ZhongShu(void) {}
 	~Class_ZhongShu(void) {}
@@ -409,10 +413,47 @@ public:
 };
 
 
+class DisplayZhongShu
+{
+public:
+	static void doWork(int grade, int timeOrLowOrHigh, float *resultBuf)
+	{
+		assert(grade < Class_ZhongShu::MAX_LEVEL);
+
+		Class_KXian *veryStart = &(*Class_KXian::container->begin());
+
+		list<Class_ZhongShu>::iterator curr = Class_ZhongShu::zsList[grade].begin();
+		list<Class_ZhongShu>::iterator end = Class_ZhongShu::zsList[grade].end();
+		while (curr != end)
+		{
+			Class_ZhongShu &zs = *curr;
+
+			switch (timeOrLowOrHigh)
+			{
+			case 0: // 中枢开始、结束的标记
+				resultBuf[zs.getStartRec() - veryStart] = 1; // 开始位置 mark 成1
+				resultBuf[zs.getEndRec() - veryStart] = 2; // 结束位置 mark 成2
+				break;
+			case 1: // 中枢持续的K线单位的个数
+				resultBuf[zs.getStartRec() - veryStart] = zs.getEndRec() - zs.getStartRec();
+				break;
+			case 2: // low price
+				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getLow();
+				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getLow();
+				break;
+			case 3: // high price
+				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getHigh();
+				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getHigh();
+				break;
+			default:
+				assert(0);
+			}
+			curr++;
+		}
+	}
+};
 
 
 /* 中枢0，等同于级别1线段； 这样在应用TurningPoint/JustaPosition算法的时候，对于级别2线段，可以把它的每条子线段（级别是1），视作级别0中枢。这样，中枢合并的分析程序就可以简单进行模板化，而不必在区分中枢级别1，是由3条线段1构成的；而更高级别中枢，须由3个低级别中枢构成。 */
-
-
 
 #endif
