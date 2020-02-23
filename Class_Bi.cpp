@@ -2,8 +2,11 @@
 #include "Class_Bi.h"
 #include "Class_env.h"
 
+
+
 Class_Bi<vector<Class_KXian> >::baseItemType_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItemType_Container*)NULL;
 Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
+Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::intermediate = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
 
 
 ostream& operator<<(ostream& out, Class_Bi<vector<Class_KXian>>& biObj)
@@ -55,8 +58,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	// ContainerType*  intermediate = new ContainerType();
-	ContainerType*  intermediate = container;
+	intermediate = new ContainerType();;
 
 	Class_env *env = Class_env::getInstance();
 
@@ -108,6 +110,186 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 {
+
+
+	typedef enum {TOP = 1, BOTTOM = 2, STARTPOINT = TOP|BOTTOM} FLAGS;
+	// 一个笔的两个端点，这里叫做point; 这个端点，是顶 还是 底，用flags标记； 这个顶、底分型的值，用val保存
+	typedef struct stackItem {
+		baseItemType* point;
+		FLAGS flag; 
+		float val;
+		stackItem(baseItemType* p, FLAGS f, float v) {point =p; flag = f; val = v;}
+		stackItem() {point = NULL; flag = (FLAGS)0; val = 0; }
+
+		bool is_top() {return flag & TOP;}
+		bool is_bot() {return flag & BOTTOM;}
+		bool is_start() {return is_top() && is_bot(); /*起点，可以当成顶或底*/}
+	} stackItem;
+
+
+	if (intermediate == NULL) return;
+
+	stack<stackItem> analyzeStack;
+
+	ContainerType::iterator current = intermediate->begin(); // 当前 “类笔”， “类笔” 不要求满足顶、底之间至少5根互不包含的K线；
+	ContainerType::iterator end = intermediate->end();
+
+	// 某个股票的上市第一天的开盘价格，作为第一个笔的 首端点的价格；
+	Class_Bi leiBi = *current;
+    stackItem lastTopItem, lastBotItem;
+	lastTopItem = lastBotItem = stackItem(leiBi.getStart(), STARTPOINT, leiBi.getStart()->getStart());
+	analyzeStack.push(lastTopItem);
+
+
+	while (current != end) 
+	{
+		leiBi = *current;
+
+		if (leiBi.bi.KXianCnt >= MIN_BI_KXIAN)
+		{
+			if (leiBi.bi.d == ASCENDING)
+			{
+				if (lastBotItem.point == leiBi.getStart())
+				{
+					lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+					analyzeStack.push(lastTopItem);
+				}
+				else
+				{
+					assert(analyzeStack.size() >= 2);
+					assert(leiBi.getLow() < lastTopItem.val && leiBi.getLow() >= lastBotItem.val);
+					if (analyzeStack.top().is_top())
+					{
+						if (leiBi.getHigh() > lastTopItem.val)
+						{
+						 /*
+									 T
+							 T      /
+							/  .   /
+						   /    . /
+						  /      B
+						 BT
+						 */
+							analyzeStack.pop(); // obsolete top
+							lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+							analyzeStack.push(lastTopItem);
+						}
+					} else
+					{
+						/*
+						T/B
+                          \       T      T
+						   \     .  .   /
+						    \   .    . /
+							 \ .      B
+							  B
+						*/
+						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+						analyzeStack.push(lastTopItem);
+					}
+
+				}
+			}else
+			{
+				// TODO
+			}
+		} else
+		{
+			if (leiBi.bi.d == ASCENDING)
+			{
+				if (lastBotItem.point == leiBi.getStart()) 
+				{
+					if (lastBotItem.is_start())
+					{
+						// lastBot是start point
+						assert(analyzeStack.size() == 1);
+					}
+					else if (leiBi.getHigh() > lastTopItem.val)
+					{
+
+						analyzeStack.pop(); // obsolete bottom
+						stackItem obsoleteTop = analyzeStack.top();
+
+						assert(lastTopItem.point == obsoleteTop.point);
+						if (obsoleteTop.is_start())
+						{
+							/* 
+							           T
+							          .
+							start    .
+							   \    . 
+							    \  .
+								 \.
+						     obsolteBot
+							*/
+							lastBotItem = obsoleteTop;
+						}
+						else
+						{
+						/*
+						           T
+                            T     .
+                           / \   .
+                          /   \ .
+                         /     B
+						B
+
+						*/
+							analyzeStack.pop(); // obsolete top
+							lastBotItem = analyzeStack.top();
+						}
+
+						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+						analyzeStack.push(lastTopItem);
+					}
+				}
+				else
+				{
+					assert(analyzeStack.size() >= 2);
+					assert(leiBi.getLow() < lastTopItem.val && leiBi.getLow() >= lastBotItem.val);
+					if (analyzeStack.top().is_top())
+					{
+						 /*
+									 T
+							 T      .
+							/  .   .
+						   /    . .
+						  /      B
+						 B
+
+						 */
+						if (leiBi.getHigh() > lastTopItem.val)
+						{
+							analyzeStack.pop(); // obsolete top
+							lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+							analyzeStack.push(lastTopItem);
+						}
+
+					}
+					else
+					{
+						/*
+						T
+						 \       T
+						  \     . .   T
+						   \   .   . .
+						    \ .     B
+							 B
+						*/
+						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
+						analyzeStack.push(lastTopItem);
+					}
+				}
+			}
+			else
+			{
+			}
+		}
+		current++;
+	}
+
+#undef IS_TOP
+#undef IS_BOT
 
 }
 

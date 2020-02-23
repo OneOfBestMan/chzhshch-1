@@ -9,6 +9,7 @@
 
 #include <ostream>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -49,8 +50,6 @@ private:
 template<>
 class Class_Bi<vector<Class_KXian> >
 {
-
-
 public:
 	typedef vector<Class_Bi> ContainerType;
 	typedef Class_KXian baseItemType;
@@ -95,10 +94,13 @@ public:
 
 	static baseItemType_Container *base_Container;
 	static ContainerType *container;
+	static ContainerType *intermediate; // 用来保存 "类-笔"，是计算 “笔”的中间结果；
 
 	static void FenBi(bool release = false);
 
 	friend ostream& operator<<(ostream&, Class_Bi&);
+
+	static const int MIN_BI_KXIAN = 5; // 一笔 至少包含 5根 无包含关系的K线；
 
 private:
 	valueType bi;
