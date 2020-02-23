@@ -42,6 +42,7 @@ public:
 			break;
 		case 4:
 			Start = content.c4.xianDuan->getBaseXianDuanStart();
+			break;
 		default:
 			assert(0);
 		}
@@ -65,7 +66,8 @@ public:
 			End = content.c3.last->getBaseXianDuanEnd();
 			break;
 		case 4:
-			End = content.c4.xianDuan->getBaseXianDuanStart();
+			End = content.c4.xianDuan->getBaseXianDuanEnd();
+			break;
 		default:
 			assert(0);
 		}
@@ -113,12 +115,12 @@ public:
 		case 1:
 		case 2:
 		case 3:
+		default:
 			assert(0);
 			break;
 		case 4:
 			Start = content.c4.xianDuan->getBaseXianDuanStart();
-		default:
-			assert(0);
+			break;
 		}
 
 		return Start;
@@ -133,12 +135,12 @@ public:
 		case 1:
 		case 2:
 		case 3:
+		default:
 			assert(0);
 			break;
 		case 4:
-			End = content.c4.xianDuan->getBaseXianDuanStart();
-		default:
-			assert(0);
+			End = content.c4.xianDuan->getBaseXianDuanEnd();
+			break;
 		}
 
 		return End;
