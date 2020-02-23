@@ -38,7 +38,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 			container->reserve(base_Container->size());
 			// step 1: 考虑K线包含关系，找出 类-顶分型、类-底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
 			FenBi_Step1();
-			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，继续处理各个笔；
+			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，生成各个笔；
 			FenBi_Step2();
 		}
 	} else
@@ -65,11 +65,11 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 	Class_KXian temp = *start;
 
-	int cnt = 0;
+	int KXianCnt = 1; // 一笔内 无“包含关系”的K线的数量； 顶分型、底分型的K线，算在内； 一笔的KXianCnt，应该大于等于5
 	baseItemType_Container::iterator p = start;
 	do
 	{
-		while (p != end && temp == *p)
+		while (p != end && temp == *p) // == 表示“包含：
 		{
 			temp.merge(*p, d);
 			p++;
@@ -80,7 +80,8 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 			// TODO: 建立最后的一个  类-笔
 			float high = max (start->getHigh(), (p-1)->getHigh());
 			float low = min (start->getLow(), (p-1)->getLow());
-			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d));
+			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+
 			start = p-1;
 			break;
 		}
@@ -89,22 +90,25 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		{
 			temp = *p;
 			p++;
+			KXianCnt++;
 		}
 		else
 		{
 			// 方向不再一致, 建立一个 类-笔
 			float high = max(start->getHigh(), (p-1)->getHigh());
 			float low = min(start->getLow(), (p-1)->getLow());
-			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d));
-			start = p-1;
+			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
+			start = p-1;
 			d = -d;
+			KXianCnt = 1;
 		}
 	}while (p != end);
 }
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 {
+
 }
 
 /*

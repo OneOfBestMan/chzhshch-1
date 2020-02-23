@@ -60,12 +60,26 @@ public:
 	typedef DumpTemplate<Class_Bi> DumpClass;
 	typedef DumpTemplateV2<Class_Bi> DumpClassV2;
 
+
+
 	typedef struct {
 		baseItemType* start;
 		baseItemType* end;
 		float high;
 		float low;
 		Direction d;
+		int KXianCnt; // 包含几根 不包含关系的K线
+	/*
+
+	解释下KXianCnt = 4
+
+            |               |
+        |   |             | |
+        | | |     =       | |
+      | | |             | |
+    | |               | |
+    |                 |
+	*/
 	} valueType;
 
 	float getHigh()const {return bi.high;}
@@ -76,8 +90,8 @@ public:
 
 	Class_Bi(void) {}
 	~Class_Bi(void){}
-	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct)
-	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct;}
+	Class_Bi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct, int Cnt)
+	                                               { bi.start = biStart; bi.end = biEnd; bi.high = high;  bi.low = low; bi.d = direct; bi.KXianCnt = Cnt;}
 
 	static baseItemType_Container *base_Container;
 	static ContainerType *container;
