@@ -2,7 +2,7 @@
 
 #define INCLUDE_API_H
 
-
+#define DA_JIAO_YI_SHI
 
 #ifdef DA_JIAO_YI_SHI 
 // 大交易师
