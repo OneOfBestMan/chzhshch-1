@@ -410,10 +410,10 @@ public:
 
 		// 遍历 level link，将打上标记的一段 从链表中移除
 		List_Entry *posToInsert;
-		for (int i = 0; i < min_level; i++)
-			assert(isEmpty(&level_list[i]));
+		/*for (int i = 0; i < min_level; i++)
+			assert(isEmpty(&level_list[i]));*/
 
-		for (int i = min_level; i < newLevel; i++)
+		for (int i = 0; i < newLevel; i++)
 		{
 			int cnt = 0;
 
