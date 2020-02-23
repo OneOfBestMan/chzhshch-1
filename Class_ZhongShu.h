@@ -13,6 +13,7 @@ using namespace std;
 
 class ValueRange
 {
+friend class Class_ZhongShu;
 private:
 	float low, high;
 public:
@@ -317,11 +318,52 @@ public:
 		// 在设置第三买卖点后，更新该中枢的floatRange
 		veryBaseXianDuanType *curr = getEnd() + 1;
 		veryBaseXianDuanType *end = thirdPoint->getStart();
+
+		ValueRange tmpRange = ValueRange(curr->getLow(), curr->getHigh());
 		while (curr != end)
 		{
-			floatRange || ValueRange(curr->getLow(), curr->getHigh());
+			tmpRange || ValueRange(curr->getLow(), curr->getHigh());
 			curr++;
 		}
+
+
+		/* 这么更新floatRange的用意，在于，在两条线段转折的地方，增加中枢扩展的机会，比如，下图中，第2个“中枢1”，位于两个线段的转折处：
+\
+ \      /\
+  \    /  \      
+   \  0    \      /\
+    \/      \    0  \ 
+	         \  /    \                                /\<---
+              \/      \   第三卖点                   /  \
+       |<--中枢1-->|   \      /\                    /    \
+                        \    0  \          /\     ATT     \
+                         \  /    \        /  \    /        \
+                          \/      \      /    0  /          \
+                                   \    /      \/            \
+                                    \  /                      \        
+                                     \/                        \      /\
+                          |<------ 中枢1 ----->|                \    0  \
+                                                                 \  /    \
+                                                                  \/      \
+                                                              第三卖点     \
+
+	   前后两个级别1的中枢，他们的floatRange本来没有交集，但是画“<---”的地方，是高过第一个中枢1的floagRange低点的。下面的处理，可以把"ATT"作为第2个中枢1的次级别波动，合并到第2个中枢的floatRange中；这样，两个中枢1的
+	   floatRange就会产生交集，并且有可能会扩充成为更高级别的中枢；
+		*/
+		if (end->getStartRec()->getLow() > getCoreRange().getHigh())
+		{
+			// 第三买卖点，在中枢上方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 低于 原来floatRange.low的部分
+			if (tmpRange.getLow() < floatRange.getLow())
+				floatRange.low = tmpRange.getLow();
+
+		} else if (end->getStartRec()->getHigh() < getCoreRange().getLow())
+		{
+			// 第三买卖点，在中枢下方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 高于 原来floatRange.high的部分
+			if (tmpRange.getHigh() > floatRange.getHigh())
+				floatRange.high = tmpRange.getHigh();
+		}
+		else
+			assert(0);
 	}
 	
 	Direction getDirection() const {return d;} 
@@ -432,6 +474,28 @@ class DisplayZhongShu
 public:
 	static void doWork(int grade, int timeOrLowOrHigh, float *resultBuf)
 	{
+		/*
+		显示中枢成如下的梯形：
+
+floatRange.high
+        |\
+        | \
+        |  \
+        |   \
+        |    \coreRange.high
+        |    |
+        |  d |
+        |    |
+        |    /coreRange.low
+        |   /
+        |  /
+        | /
+        |/
+floatRange.low
+
+		*/
+
+
 		assert(grade < Class_ZhongShu::MAX_LEVEL);
 
 		Class_KXian *veryStart = &(*Class_KXian::container->begin());
@@ -455,12 +519,12 @@ public:
 			case 2: // low price
 				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getLow();
 				resultBuf[zs.getStartRec() - veryStart + (zs.getEndRec() - zs.getStartRec())/2] = zs.getFloatRange().getLow(); //这个位置显示注释文字
-				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getLow();
+				resultBuf[zs.getEndRec() - veryStart] = zs.getCoreRange().getLow();
 				break;
 			case 3: // high price
 				resultBuf[zs.getStartRec() - veryStart] = zs.getFloatRange().getHigh();
 				resultBuf[zs.getStartRec() - veryStart + (zs.getEndRec() - zs.getStartRec())/2] = zs.getFloatRange().getHigh(); //这个位置显示注释文字
-				resultBuf[zs.getEndRec() - veryStart] = zs.getFloatRange().getHigh();
+				resultBuf[zs.getEndRec() - veryStart] = zs.getCoreRange().getHigh();
 				break;
 			default:
 				assert(0);

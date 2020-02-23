@@ -519,8 +519,8 @@ public:
 					break; // 如果一个level+1级别的中枢，之后中枢的级别大于等于该中枢，那么就别再找该中枢的第三买卖点了
 				nextEntry = nextEntry->next;
 			}
-			if (nextEntry == &level_list[level])
-				break;
+			//if (nextEntry == &level_list[level])
+			//	break;
 			
 			curr = locate_level_equal(&level_list[level], curr->next, level + 1);
 		}
@@ -577,7 +577,12 @@ public:
 			if (setLaterAs3rdPoint)
 			{
 				setLaterAs3rdPoint = false;
-				lastMergeZS->setThirdPoint(newZS);
+				
+				ValueRange range = newZS->getFloatRange();
+				range && lastMergeZS->getCoreRange();
+				if (range.isNulValueRange())
+					lastMergeZS->setThirdPoint(newZS);
+				
 				lastMergeZS = NULL;
 			}
 
@@ -592,7 +597,7 @@ public:
 					{
 					
 						ElemOfView *eovAfterNewZS = list_entry(op.to->level_link[listLevel].next, ElemOfView, level_link[listLevel]);
-					
+
 						//assert(eovAfterNewZS->elem->getGrade() == listLevel);
 						ValueRange range = eovAfterNewZS->elem->getFloatRange();
 						range && newZS->getCoreRange();
@@ -600,8 +605,8 @@ public:
 
 						if (eovAfterNewZS != next.from)
 							newZS->setThirdPoint(eovAfterNewZS->elem);// 这两个级别扩张的中枢之间，存在一个低级别的中枢，不属于这两个中枢。 那么，这个低级别中枢，就构成了第一个扩张中枢的第三买卖点。
-						else
-							newZS->setThirdPoint(eovAfterNewZS->elem);//第三买卖点后，又延伸出一个同级或更大级别的中枢，此时，这两个中枢就存在扩张成为更大中枢的可能。
+						//else
+						//	newZS->setThirdPoint(eovAfterNewZS->elem);//第三买卖点后，又延伸出一个同级或更大级别的中枢，此时，这两个中枢就存在扩张成为更大中枢的可能。
 					}
 				
 				} else // 如果， 新产生的扩张中枢级别比当前队列的级别高出2个或更多
@@ -637,7 +642,7 @@ public:
 				}
 				*/
 				
-				//updateThirdPoint(level);		
+				updateThirdPoint(level);		
 
 				if (levelTotal[level] < 2)
 					continue;
