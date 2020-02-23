@@ -211,7 +211,7 @@
 		do 
 		{
 			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
-			while  (biFormer < end - 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
+			while  (biFormer < end - 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter) || (*biFormer >> *biLatter)) )
 			{
 				CharacVecStack.push_back(CharacterVec(biFormer + 1, biLatter - 1));
 				biFormer = biLatter;
@@ -301,13 +301,13 @@
 					{
 						CharacVecStack.pop_back();
 						
-						
+#if 0						
 						if (*biFormer >> *biLatter)
 						{
 							biFormer = biLatter;
 							biLatter += 2;
 						}
-
+#endif
 						continue;
 					}
 					else
@@ -342,9 +342,9 @@
 
                    情形4： biFormer 被 biLatter 包含
 
-                                                      /
-                               /\                    /
-                              /  \                  /
+                                                      /\
+                               /\                    /  \  /
+                              /  \                  /    \/
                        /\ biFormer\        /\   biLatter
                       /  \  /      \      /  \    /
                      /    \/        \    /    \  /
@@ -368,7 +368,7 @@
 					// 新线段
 					CharacVecStack.clear();
 					biFormer = biStart = biLatter;
-
+#if 0
 					/* 新的线段，开始的部分，可能有一组互相包含的线段 */
 					baseItemType temp = *biFormer;
 					while (biFormer < end - 2)
@@ -384,6 +384,10 @@
 					}
 					if (biFormer < end - 2)
 						biLatter = biFormer + 2;
+#endif
+					if (biLatter < end - 2)
+						biLatter += 2;
+
 				}
 
 			} else
@@ -409,7 +413,7 @@
 				biStart = ++ biFormer;
 				/* 新的线段的特征向量栈初始化 */
 				CharacVecStack.clear();
-
+#if 0
 				/* 新的线段，开始的部分，有一组互相包含的线段，可以看成是之前线段的特征向量，可以应用包含关系。合并它们 */
 				baseItemType temp = *biFormer;
 				while (biFormer < end - 2)
@@ -424,6 +428,9 @@
 						break;
 				}
 				biLatter = biFormer + 2;
+#endif
+				if (biFormer < end - 2)
+					biLatter = biFormer + 2;
 			}
 		} while (1);
 
