@@ -69,7 +69,7 @@ public:
 	ZsXdSelect ZSorXD;
 
 	// 最小中枢的单位，是笔还是线段：对于1分、5分k线图，把XianDuan<1>作为最小级别的中枢； 而之上的K线图，把笔作为最小级别的中枢
-	bool treatBiAsZS;
+	bool treatBiAsZS() {return barKind > MIN5_DATA;}
 
 	float *resultBuf;
 

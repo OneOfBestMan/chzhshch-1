@@ -57,7 +57,6 @@ Class_env::Class_env(CALCINFO *p)
 		stockName = strcpy(stockName, p->m_strStkLabel);
 	}
 	barKind = (DATA_TYPE)(int)p->m_dataType;
-	treatBiAsZS = (barKind > MIN5_DATA);
 
 	memset(resultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
 }
@@ -77,14 +76,22 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		delete newEnv;
 	} else
 	{
-		// 释放之前的分析结果
 		if (env)
 		{
+#if 1
+			stringstream oldLogName;
+			oldLogName<<"c:\\" << env->stockName << env->barKind << ".txt";
+			ofstream oldLog(oldLogName.str().c_str(), ios_base::app); // 追加写入
+#endif
+			// 释放之前的分析结果
 			FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(true);
 			delete env;
 
 			for (int i = 0; i < Class_ZhongShu::MAX_LEVEL; i++)
+			{
+				oldLog << "Delete ZS level " << i << ", contains " << Class_ZhongShu::zsList[i].size() << endl;
 				Class_ZhongShu::zsList[i].clear();
+			}
 		}
 
 		env = newEnv;
@@ -95,18 +102,19 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		doOnce = true;
 		dumpHelperMap map;
 
-		stringstream filename;
-		filename<<"c:\\" << env->stockName << env->barKind << ".txt";
+		stringstream newLogName;
+		newLogName<<"c:\\" << env->stockName << env->barKind << ".txt";
 
-		ofstream file(filename.str().c_str());
+		ofstream newLog(newLogName.str().c_str(), ios_base::app);
 		preDump<Class_XianDuan<7>>(map);
-		DumpV2<Class_XianDuan<7>>(map, file);
+		DumpV2<Class_XianDuan<7>>(map, newLog);
 #endif
+
+		//AnalyzeZhongShu_PostOrder<Class_XianDuan<7>>();
+		AnalyzeZhongShu_PostOrder_V2<Class_XianDuan<7>>();
 
 	}
 
-	//AnalyzeZhongShu_PostOrder<Class_XianDuan<7>>();
-	AnalyzeZhongShu_PostOrder_V2<Class_XianDuan<7>>();
 
 	env->outputResult();
 

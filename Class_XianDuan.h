@@ -169,7 +169,7 @@ public:
 			}
 			if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
 			{
-				if ((Class_env::getInstance())->treatBiAsZS)
+				if ((Class_env::getInstance())->treatBiAsZS())
 				{
 					/* 中枢划分的算法，把XianDuan<1>作为最小级别的中枢； 因此，如果我们希望把“笔”作为最小级别的中枢，那么只需要
 					把 笔 复制到XianDuan<1>中，即：让每一个级别1的线段，就是一笔，就可以让笔成为 最小级别的中枢。
