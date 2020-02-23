@@ -125,7 +125,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 		bool is_bot() {return flag & BOTTOM;}
 		bool is_start() {return is_top() && is_bot(); /*起点，可以当成顶或底*/}
 	} stackItem;
-	stack<stackItem> analyzeStack;
+	vector<stackItem> analyzeStack;
 
 	if (intermediate == NULL) return;
 
@@ -136,7 +136,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 	Class_Bi leiBi = *current;
     stackItem lastTopItem, lastBotItem;
 	lastTopItem = lastBotItem = stackItem(leiBi.getStart(), STARTPOINT, leiBi.getStart()->getStart());
-	analyzeStack.push(lastTopItem);
+	analyzeStack.push_back(lastTopItem);
 
 
 	while (current != end) 
@@ -150,13 +150,13 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 				if (lastBotItem.point == leiBi.getStart())
 				{
 					lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-					analyzeStack.push(lastTopItem);
+					analyzeStack.push_back(lastTopItem);
 				}
 				else
 				{
 					assert(analyzeStack.size() >= 2);
 					assert(leiBi.getLow() < lastTopItem.val && leiBi.getLow() >= lastBotItem.val);
-					if (analyzeStack.top().is_top())
+					if (analyzeStack.back().is_top())
 					{
 						if (leiBi.getHigh() > lastTopItem.val)
 						{
@@ -168,9 +168,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                           /      B
                          BT
 						 */
-							analyzeStack.pop(); // obsolete top
+							analyzeStack.pop_back(); // obsolete top
 							lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-							analyzeStack.push(lastTopItem);
+							analyzeStack.push_back(lastTopItem);
 						}
 					} else
 					{
@@ -183,7 +183,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                               B
 						*/
 						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-						analyzeStack.push(lastTopItem);
+						analyzeStack.push_back(lastTopItem);
 					}
 
 				}
@@ -192,13 +192,13 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 				if (lastTopItem.point == leiBi.getStart())
 				{
 					lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-					analyzeStack.push(lastBotItem);
+					analyzeStack.push_back(lastBotItem);
 				}
 				else
 				{
 					assert(analyzeStack.size() >= 2);
 					assert(leiBi.getHigh() < lastTopItem.val && leiBi.getHigh() >= lastBotItem.val);
-					if (analyzeStack.top().is_top())
+					if (analyzeStack.back().is_top())
 					{
 						/*
                           T
@@ -210,7 +210,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                                 B
 						*/
 						lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-						analyzeStack.push(lastBotItem);
+						analyzeStack.push_back(lastBotItem);
 					}
 					else
 					{
@@ -226,9 +226,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 						*/
 						if (leiBi.getLow() < lastBotItem.val)
 						{
-							analyzeStack.pop(); // obsolete bottom
+							analyzeStack.pop_back(); // obsolete bottom
 							lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-							analyzeStack.push(lastBotItem);
+							analyzeStack.push_back(lastBotItem);
 						}
 					}
 				}
@@ -248,8 +248,8 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 					{
 						assert(analyzeStack.size() >= 2);
 
-						analyzeStack.pop(); // obsolete bottom
-						stackItem obsoleteTop = analyzeStack.top();
+						analyzeStack.pop_back(); // obsolete bottom
+						stackItem obsoleteTop = analyzeStack.back();
 
 						assert(lastTopItem.point == obsoleteTop.point);
 						if (obsoleteTop.is_start())
@@ -276,19 +276,19 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                         B
 
 						*/
-							analyzeStack.pop(); // obsolete top
-							lastBotItem = analyzeStack.top();
+							analyzeStack.pop_back(); // obsolete top
+							lastBotItem = analyzeStack.back();
 						}
 
 						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-						analyzeStack.push(lastTopItem);
+						analyzeStack.push_back(lastTopItem);
 					}
 				}
 				else
 				{
 					assert(analyzeStack.size() >= 2);
 					assert(leiBi.getLow() < lastTopItem.val && leiBi.getLow() >= lastBotItem.val);
-					if (analyzeStack.top().is_top())
+					if (analyzeStack.back().is_top())
 					{
 						 /*
                                      T
@@ -301,9 +301,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 						 */
 						if (leiBi.getHigh() > lastTopItem.val)
 						{
-							analyzeStack.pop(); // obsolete top
+							analyzeStack.pop_back(); // obsolete top
 							lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-							analyzeStack.push(lastTopItem);
+							analyzeStack.push_back(lastTopItem);
 						}
 
 					}
@@ -318,7 +318,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                              B
 						*/
 						lastTopItem = stackItem(leiBi.getEnd(), TOP, leiBi.getHigh());
-						analyzeStack.push(lastTopItem);
+						analyzeStack.push_back(lastTopItem);
 					}
 				}
 			}
@@ -334,9 +334,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 					else if (leiBi.getLow() < lastBotItem.val)
 					{
 						assert(analyzeStack.size() >= 2);
-						analyzeStack.pop(); // obsolete top
+						analyzeStack.pop_back(); // obsolete top
 
-						stackItem obsoleteBot = analyzeStack.top();
+						stackItem obsoleteBot = analyzeStack.back();
 
 						assert(lastBotItem.point == obsoleteBot.point);
 						if (obsoleteBot.is_start())
@@ -363,18 +363,18 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                                B     .
                                       B
 							*/
-							analyzeStack.pop(); // obsolete bottom
-							lastTopItem = analyzeStack.top();
+							analyzeStack.pop_back(); // obsolete bottom
+							lastTopItem = analyzeStack.back();
 						}
 						lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-						analyzeStack.push(lastBotItem);
+						analyzeStack.push_back(lastBotItem);
 					}
 				}
 				else
 				{
 					assert(analyzeStack.size() >= 2);
 					assert(leiBi.getHigh() >= lastBotItem.val && leiBi.getHigh() < lastTopItem.val);
-					if (analyzeStack.top().is_top())
+					if (analyzeStack.back().is_top())
 					{
 						/*
                          T
@@ -387,7 +387,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
                  B/T
 					 */
 						lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-						analyzeStack.push(lastBotItem);
+						analyzeStack.push_back(lastBotItem);
 					}
 					else
 					{
@@ -402,9 +402,9 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 						*/
 						if (leiBi.getLow() < lastBotItem.val)
 						{
-							analyzeStack.pop(); // obsolete bottom
+							analyzeStack.pop_back(); // obsolete bottom
 							lastBotItem = stackItem(leiBi.getEnd(), BOTTOM, leiBi.getLow());
-							analyzeStack.push(lastBotItem);
+							analyzeStack.push_back(lastBotItem);
 						}
 					}
 				}

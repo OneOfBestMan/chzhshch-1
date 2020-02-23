@@ -9,7 +9,6 @@
 
 #include <ostream>
 #include <vector>
-#include <stack>
 
 using namespace std;
 
