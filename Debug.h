@@ -50,22 +50,14 @@ public:
 };
 
 
-/*
-template<>
-class preDumpTemplate<typename Class_KXian, class AUX = map<void*, mappedInfo> >;
-*/
 
-
-template<class XianDuan_or_Bi>  // AUX = typename map<void*, mappedInfo>
+template<class XianDuan_or_Bi>
 void preDump(dumpHelperMap &helperMap)
 {
 	XianDuan_or_Bi::baseItemType::preDumpClass::doWork(helperMap);
 
 	XianDuan_or_Bi::preDumpClass::doWork(helperMap);
 }
-
-
-
 
 
 #endif

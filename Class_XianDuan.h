@@ -7,7 +7,6 @@
 #include "Class_Bi.h"
 
 #include <vector>
-//#include <stack>
 using namespace std;
 
 #include "FenXianDuan.h"
@@ -74,19 +73,11 @@ public:
 		float high;
 		float low;
 	} valueType;
-/*
-	Class_XianDuan<1>(void);
-	~Class_XianDuan<1>(void);
-*/
+
     static baseItemType_Container *baseItems;
     static ContainerType *container;
 
 	static void HuaFenXianDuan() {}
-
-	//static void FenBi();
-
-
-	
 
 private:
 	valueType XianDuan;

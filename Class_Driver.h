@@ -16,13 +16,8 @@ public:
 	Class_Driver();
 	Class_Driver(Class_env *in);
 	~Class_Driver(void);
-
-
-	void process();
 private:
     Class_env *env;
-
-	//stack<Class_Bi*>  pending[totalGrade];
 };
 
 #endif
