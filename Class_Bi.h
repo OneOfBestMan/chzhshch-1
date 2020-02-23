@@ -107,7 +107,10 @@ public:
 
 private:
 	valueType bi;
+
+	/* FenBi_Step1  实现的是 第65课中的 分笔定义 */
 	static void FenBi_Step1();
+	/* FenBi_Step2 实现的是 第69课中的 分笔思想 */
 	static void FenBi_Step2();
 
 };
