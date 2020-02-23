@@ -8,8 +8,6 @@
 #include <map>
 
 
-#include "Class_XianDuan.h"
-
 using namespace std;
 
 /*
@@ -25,7 +23,7 @@ public:
 	
 	typedef enum {
 	/* 输出的线类型， 从笔 到 各个不同级别的线段 */	
-		BI=0, XIANDUAN_1 = 1, XIANDUAN_2 = 2, XIANDUAN_3 = 3, XIANDUAN_4 = 4, XIANDUAN_5 = 5, XIANDUAN_6 = 6, XIANDUAN_7 = 7,
+		LEI_BI = -1, BI=0, XIANDUAN_1 = 1, XIANDUAN_2 = 2, XIANDUAN_3 = 3, XIANDUAN_4 = 4, XIANDUAN_5 = 5, XIANDUAN_6 = 6, XIANDUAN_7 = 7,
 	/* 中枢的级别 */	
 		ZS_0 = 0, ZS_1=1, ZS_2 = 2, ZS_3 = 3, ZS_4 = 4, ZS_5 = 5, ZS_6 = 6, ZS_7 = 7
 	} gradeSelect;
@@ -65,9 +63,13 @@ public:
 	DATA_TYPE barKind; // K线图的时间类型
 
 
+	// ouput 相关
 	gradeSelect grade;
 	funcSelect func;
 	ZsXdSelect ZSorXD;
+
+	// 最小中枢的单位，是笔还是线段：对于1分、5分k线图，把XianDuan<1>作为最小级别的中枢； 而之上的K线图，把笔作为最小级别的中枢
+	bool treatBiAsZS;
 
 	float *resultBuf;
 

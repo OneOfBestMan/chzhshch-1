@@ -10,6 +10,8 @@
 #include <ostream>
 using namespace std;
 
+#include "Class_env.h"
+
 #include "FenXianDuan.h"
 #include "traits.h"
 #include "Display.h"
@@ -167,10 +169,26 @@ public:
 			}
 			if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
 			{
-				//下面就是划分线段的具体逻辑
-				baseItemIterator begin = XianDuanClass::baseItems->begin();
-				baseItemIterator end = XianDuanClass::baseItems->end();
-				XianDuanClass::container = startFenXianDuan(begin, end);
+				if ((Class_env::getInstance())->treatBiAsZS)
+				{
+					/* 中枢划分的算法，把XianDuan<1>作为最小级别的中枢； 因此，如果我们希望把“笔”作为最小级别的中枢，那么只需要
+					把 笔 复制到XianDuan<1>中，即：让每一个级别1的线段，就是一笔，就可以让笔成为 最小级别的中枢。
+					*/
+					XianDuanClass::container = new ContainerType();
+					XianDuanClass::baseItemIterator start = XianDuanClass::baseItems->begin();
+					XianDuanClass::baseItemIterator end = XianDuanClass::baseItems->end();
+					while (start != end)
+					{
+						XianDuanClass::container->push_back(XianDuanClass(start, start, (*start).getDirection()));
+						start++;
+					}
+				}else
+				{
+					//下面就是划分线段的具体逻辑
+					baseItemIterator begin = XianDuanClass::baseItems->begin();
+					baseItemIterator end = XianDuanClass::baseItems->end();
+					XianDuanClass::container = startFenXianDuan(begin, end);
+				}
 			}
 		} else
 		{		

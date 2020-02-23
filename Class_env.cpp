@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Class_env.h"
-#include "FenXianDuan.h"
+
 
 #include <stdexcept>
 #include <fstream>
@@ -8,6 +8,7 @@
 using namespace std;
 
 #include "Class_XianDuan.h"
+#include "FenXianDuan.h"
 #include "debug.h"
 
 #include "AnalyzeZhongShu.h"
@@ -56,6 +57,7 @@ Class_env::Class_env(CALCINFO *p)
 		stockName = strcpy(stockName, p->m_strStkLabel);
 	}
 	barKind = (DATA_TYPE)(int)p->m_dataType;
+	treatBiAsZS = (barKind > MIN5_DATA);
 
 	memset(resultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
 }
@@ -130,11 +132,15 @@ void Class_env::outputResult()
 {
 	if (ZSorXD == XIANDUAN)
 	{
-		assert(grade >= BI && grade <= XIANDUAN_7 && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
+		assert(grade >= LEI_BI && grade <= XIANDUAN_7 && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
 
 		if (grade == BI)
 		{
 			Class_Bi::DisplayClass::doWork(func, resultBuf);
+		}
+		else if (grade == LEI_BI)
+		{
+			Class_LeiBi::DisplayClass::doWork(func, resultBuf);
 		}
 		else
 		{

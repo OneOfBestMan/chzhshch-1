@@ -164,17 +164,27 @@ void Class_LeiBi::FenBi_Step1()
 		}
 		else
 		{
+			
 			if (KXianCnt == 1)
 			{
-				// 如果KXianCnt 等于1，那么就是第1类笔，但是方向猜错了，不是ASCENDING，而应该是DESCENDING，所以，将方向取反，然后重新开始
-				d = -d;
-				start = base_Container->begin();
-				p = start;
-				temp = *start;
-				continue;
+				/* KXianCnt 是1，只可能发生在最开始 几根K线，存在包含关系。 例如：
+
+                     |
+                   | |   |
+                   | | | |
+                   | | | |
+                     | |
+                     |
+
+				  由于，我假定，初始的方向是acscending，所以，在处理了第1、第2 k线包含关系后，发现第3根k线 与之 方向相反，此时，KXianCnt是1；所以把ascending变为descending，
+				  再来一次，但是，在处理了第1、2、3k线的包含关系后，第4根k线又与包含关系k线相反，此时KXianCnt依然是1；所以，开始处的这几根包含关系k线，既不能说是向上、也不能说是向下；
+				  所以，这种情况，打破了我对“类笔”至少由 2根 没有包含关系的K线构成的认识。 处理的方式是： 假设第1根k线，之前有一个虚无的k线，构成一个类笔。
+			   */
+				assert(start == base_Container->begin());
+				KXianCnt = 2;
 			}
-			else // 方向不再一致, 建立一个 类-笔
-				intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+
+			intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			d = -d;
@@ -336,7 +346,7 @@ bool Class_Bi::bckwdSearch(ContainerType::reverse_iterator from, Class_LeiBi *cm
 		return true;
 	} else
 	{
-		// 将 temp 弹出
+		// 将 cmpTo 弹出
 		container->pop_back();
 		return false;
 	}

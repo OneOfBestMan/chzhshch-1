@@ -686,6 +686,7 @@ public:
 				List_Entry *endAt = locate_level_higher(&level_list[level], startFrom, level);
 				List_Entry *former = startFrom;
 
+				// 设立mergeOperations，原因在于：为了避免startFrom指针的失效，遍历pool的时候，避免merge； 而是记录下可以合并的中枢，当pool遍历完成后，再进行merge.
 				list<mergeRecord> mergeOperations;
 
 				while (startFrom != &level_list[level])
@@ -695,7 +696,7 @@ public:
 						if (!mergeOperations.empty())
 							applyMergeOps(&level_list[level], mergeOperations);
 
-						// 定位出一段区间，该区间是一段都是level级别的中枢，结束于一个级别高于level的中枢
+						// 定位出一段区间，该区间是一段都是level级别的中枢，结束于一个级别高于level的中枢，成为一个pool
 						startFrom = locate_level_equal(&level_list[level], endAt, level);
 						endAt = locate_level_higher(&level_list[level], startFrom, level);
 						former = startFrom;
