@@ -143,7 +143,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Class_Bi.cpp" />
+    <ClCompile Include="Class_env.cpp" />
     <ClCompile Include="Class_FenXing.cpp" />
+    <ClCompile Include="Class_KXian.cpp" />
     <ClCompile Include="Class_XianDuan.cpp" />
     <ClCompile Include="Class_ZhongShu.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -154,7 +156,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class_Bi.h" />
+    <ClInclude Include="Class_env.h" />
     <ClInclude Include="Class_FenXing.h" />
+    <ClInclude Include="Class_KXian.h" />
     <ClInclude Include="Class_XianDuan.h" />
     <ClInclude Include="Class_ZhongShu.h" />
     <ClInclude Include="StdAfx.h" />

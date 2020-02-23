@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{c45e0ecd-a9f7-4878-b367-db2a0d84c165}</UniqueIdentifier>
+      <UniqueIdentifier>{8a1295ab-cc62-4058-8833-3ed6892ae4e6}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{adc4af7f-579e-4905-8549-d9eb80075373}</UniqueIdentifier>
+      <UniqueIdentifier>{a8e5b1c8-bb6b-403b-a8c6-bea19e247d24}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{ab1af52d-e232-4963-a8c2-eef830d66c70}</UniqueIdentifier>
+      <UniqueIdentifier>{f57421d2-0d0d-44f0-88b6-7d5c87aa7816}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -18,7 +18,13 @@
     <ClCompile Include="Class_Bi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Class_env.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Class_FenXing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class_KXian.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Class_XianDuan.cpp">
@@ -38,7 +44,13 @@
     <ClInclude Include="Class_Bi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Class_env.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Class_FenXing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class_KXian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class_XianDuan.h">

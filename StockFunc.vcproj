@@ -219,7 +219,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Class_env.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Class_FenXing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_KXian.cpp"
 				>
 			</File>
 			<File
@@ -282,7 +290,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Class_env.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Class_FenXing.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Class_KXian.h"
 				>
 			</File>
 			<File
