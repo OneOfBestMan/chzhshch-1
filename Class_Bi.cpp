@@ -6,25 +6,31 @@ Class_Bi<vector<Class_KXian> >::baseItem_Container* Class_Bi<vector<Class_KXian>
 Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
 
 
-void Class_Bi<vector<Class_KXian>>::FenBi()
+void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
 {
-	if (base_Container == NULL)
+	if (release == false)
 	{
-		// 创建 K线 vector
-		Class_KXian::initialize();
-		base_Container = Class_KXian::container;
-	}
-
-	if (base_Container && !container)
+		if (base_Container == NULL)
+		{
+			// 创建 K线 vector
+			Class_KXian::initialize();
+			base_Container = Class_KXian::container;
+		}
+		if (base_Container && !container)
+		{
+			container = new ContainerType();
+			// step 1: 考虑K线包含关系，找出 类-顶分型、类-底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
+			FenBi_Step1();
+			// step 2: 结合顶分型、底分型之间，至少5根k线的要求，继续处理各个笔；
+			FenBi_Step2();
+		}
+	} else
 	{
-		container = new ContainerType();
+		delete container;
+		container = NULL;
 
-		// step 1: 考虑K线包含关系，找出 类-顶分型、类-底分型；但是，并没有考虑，顶分型、底分型之间 有 5根K线的要求。
-		FenBi_Step1();
-
-		// step 2: 结合顶分型、底分型之间，至少5根k线的要求，继续处理各个笔；
-		FenBi_Step2();
-
+		Class_KXian::initialize(true);
+		base_Container = NULL;
 	}
 }
 

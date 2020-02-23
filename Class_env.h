@@ -15,27 +15,37 @@
 */
 
 template<class XianDuanClass>
-void HuaFenXianDuan()
+void HuaFenXianDuan(bool release = false)
 {
 	int grade = XianDuanClass::GRADE;
 
-	if (XianDuanClass::baseItems == NULL)
+	if (release == false)
 	{
-		HuaFenXianDuan<XianDuanClass::baseItemType>();
-		XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
-	}
+		if (XianDuanClass::baseItems == NULL)
+		{
+			HuaFenXianDuan<XianDuanClass::baseItemType>(release);
+			XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
+		}
+		
+		if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
+		{
+			XianDuanClass::container = new XianDuanClass::ContainerType(XianDuanClass::baseItems->size());
+			//下面就是划分线段的具体逻辑
+			XianDuanClass::HuaFenXianDuan();
+		}
+	} else
+	{
+		delete XianDuanClass::container;
+		XianDuanClass::container = NULL;
 
-	if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
-	{
-		XianDuanClass::container = new XianDuanClass::ContainerType(XianDuanClass::baseItems->size());
-		//下面就是划分线段的具体逻辑
-		XianDuanClass::HuaFenXianDuan();
+		HuaFenXianDuan<XianDuanClass::baseItemType>(release);
+		XianDuanClass::baseItems = NULL;
 	}
 }
 
 
 template<>
-void HuaFenXianDuan<typename Class_XianDuan<1> >();
+void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release);
 
 
 
@@ -68,7 +78,18 @@ public:
 
 	int totalBar;
 
+	int stockName;
 
+	bool operator==(const Class_env &secondEnv) const 
+	{
+		return (stockName == secondEnv.stockName &&
+			totalBar  == secondEnv.totalBar);
+	}
+
+	static void releaseOldCalculation(Class_env *p)
+	{
+
+	}
 
 private:
 

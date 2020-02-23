@@ -10,22 +10,32 @@ using namespace std;
 
 
 template<>
-void HuaFenXianDuan<typename Class_XianDuan<1> >()
+void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release = false)
 {
 	typedef Class_XianDuan<1> XianDuanClass;
 
-	if (XianDuanClass::baseItems == NULL) 
+	if (release == false)
 	{
-		//XianDuanClass::FenBi();
-		XianDuanClass::baseItemType::FenBi();
-		XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
-	}
+		if (XianDuanClass::baseItems == NULL) 
+		{
+			//XianDuanClass::FenBi();
+			XianDuanClass::baseItemType::FenBi();
+			XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
+		}
+		
+		if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
+		{
+			XianDuanClass::container = new XianDuanClass::ContainerType();
+			//下面就是划分线段的具体逻辑
+			XianDuanClass::HuaFenXianDuan();
+		}
+	} else
+	{
+		delete XianDuanClass::container;
+		XianDuanClass::container = NULL;
 
-	if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
-	{
-		XianDuanClass::container = new XianDuanClass::ContainerType();
-		//下面就是划分线段的具体逻辑
-		XianDuanClass::HuaFenXianDuan();
+		XianDuanClass::baseItemType::FenBi(true);
+		XianDuanClass::baseItems = NULL;
 	}
 }
 
@@ -65,8 +75,24 @@ Class_env::Class_env(CALCINFO *p)
 
 Class_env* Class_env::getInstance(CALCINFO *p)
 {
-	if (env) return env;
-	env = new Class_env(p);
+	Class_env* newEnv = new Class_env(p);
+
+	if (env && *env == *newEnv)
+	{
+		delete newEnv;
+	} else
+	{
+		// 释放之前的分析结果
+		if (env)
+		{
+			HuaFenXianDuan<Class_XianDuan<7>>(true);
+			delete env;
+		}
+
+		env = newEnv;
+		HuaFenXianDuan<Class_XianDuan<7>>();
+	}
+
     return env;
 }
 

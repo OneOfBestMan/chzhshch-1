@@ -27,18 +27,25 @@ Direction operator-(const Direction& d)
 
 Class_KXian::ContainerType* Class_KXian::container = NULL;
 
-void Class_KXian::initialize()
+void Class_KXian::initialize(bool release)
 {
-	// 创建 K线 vector
-	Class_env *env = Class_env::getInstance();
-	int total = env->getTotal();
-	
-	if (total > 0)
-		container = new ContainerType(total);
-
-	for (int i = 0; i < total; i++)
+	if (release == false)
 	{
-		(*container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
+		// 创建 K线 vector
+		Class_env *env = Class_env::getInstance();
+		int total = env->getTotal();
+		
+		if (total > 0)
+			container = new ContainerType(total);
+		
+		for (int i = 0; i < total; i++)
+		{
+			(*container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
+		}
+	} else 
+	{
+		delete container;
+		container = NULL;
 	}
 }
 

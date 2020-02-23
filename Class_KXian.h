@@ -82,7 +82,7 @@ public:
 		return *this;
 	}
 
-	static void initialize();
+	static void initialize(bool release = false);
 private:
 	valueType bar;
 };

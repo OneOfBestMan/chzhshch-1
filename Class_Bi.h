@@ -55,13 +55,13 @@ public:
 
 
 	Class_Bi(void) {}
-	~Class_Bi(void);
+	~Class_Bi(void){}
 
 
 	static baseItem_Container *base_Container;
 	static ContainerType *container;
 
-	static void FenBi();
+	static void FenBi(bool release = false);
 
 private:
 

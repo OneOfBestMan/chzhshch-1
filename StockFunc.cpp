@@ -195,7 +195,5 @@ __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 
-	HuaFenXianDuan<Class_XianDuan<7>>();
-
 	return 0; //TODO: 这个返回值，不应该是0，而应该是result数组的个数
 }
