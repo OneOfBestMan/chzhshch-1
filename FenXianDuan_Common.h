@@ -266,7 +266,9 @@
 					assert(getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter));
 					CharacVecStack.pop_back();
 
-					/*if (getDirection(*biFormer, *biLatter) == d)
+					/*
+					// 这段代码在进行了 NormalizeV2之后，应该就不会再有用处了。
+					if (getDirection(*biFormer, *biLatter) == d)
 					{
 						CharacVecStack.pop_back();
 					}
