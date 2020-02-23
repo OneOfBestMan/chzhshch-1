@@ -51,6 +51,7 @@ Class_env::Class_env(CALCINFO *p)
 		stockName = new char[strlen(p->m_strStkLabel) + 1];
 		stockName = strcpy(stockName, p->m_strStkLabel);
 	}
+	barKind = (DATA_TYPE)(int)p->m_dataType;
 }
 
 Class_env* Class_env::getInstance(CALCINFO *p)
@@ -82,7 +83,7 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		dumpHelperMap map;
 
 		stringstream filename;
-		filename<<"c:\\" << env->stockName << ".txt";
+		filename<<"c:\\" << env->stockName << env->barKind << ".txt";
 
 		ofstream file(filename.str().c_str());
 		preDump<Class_XianDuan<2>>(map);

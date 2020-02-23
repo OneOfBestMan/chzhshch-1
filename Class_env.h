@@ -117,8 +117,8 @@ public:
 	int firstEndParm;
 
 	int totalBar;
-
 	char* stockName;
+	DATA_TYPE barKind; // K线图的时间类型
 
 
 	gradeSelect grade;
@@ -129,7 +129,7 @@ public:
 	bool operator==(const Class_env &secondEnv) const 
 	{
 		return (!strcmp(stockName, secondEnv.stockName) &&
-			totalBar  == secondEnv.totalBar);
+			totalBar  == secondEnv.totalBar  && barKind == secondEnv.barKind);
 	}
 
 private:
