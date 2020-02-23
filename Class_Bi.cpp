@@ -162,7 +162,7 @@ void Class_LeiBi::FenBi_Step1()
 			p++;
 			KXianCnt++;
 		}
-		else
+		else if (Class_KXian::getDirection(temp, *p) == -d)
 		{
 			
 			if (KXianCnt == 1)
@@ -191,7 +191,7 @@ void Class_LeiBi::FenBi_Step1()
 			KXianCnt = 1;
 
 			high = start->getHigh();
-			low = start->getEnd();
+			low = start->getLow();
 		}
 	}while (p != end);
 
@@ -247,8 +247,16 @@ void Class_LeiBi::FenBi_Step1()
 		}
 		else if (*former >> *latter)
 		{
+			/*
+			这两个线段，前包后，merge之后，应该是按照df取 former方向相反的方式来merge
+                 /\     _ high
+                /  \  / 
+             former \/
+              /         
+                        - low
+			*/
 			ContainerType::value_type merg = (*former);
-			merg.merge(*latter, df);
+			merg.merge(*latter, -df);
 			container->push_back(ContainerType::value_type((*former).getStart(), (*latter).getEnd(), merg.getHigh(), merg.getLow(), df, 4));
 
 			former = latter + 1;
