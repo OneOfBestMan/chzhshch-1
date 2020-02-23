@@ -15,6 +15,18 @@
 */
 
 template<class XianDuanClass>
+void DumpOut()
+{
+	/* 大致思路是：
+	（1）从高级线段、到低级线段，逐层打印； 在打印高层线段时，其包含的低层线段，也被打印出来；
+	（2）在完成(1)之后，低层次线段队列可能依然有线段没有打印出来，这是由于这些低层线段，
+	其对应的高层线段没有建立，即，低级别线段尚未完成，所以高级别线段也没有建立。 因此，需要把这些低层级线段，逐层打印出来。
+	*/
+	
+}
+
+
+template<class XianDuanClass>
 void HuaFenXianDuan(bool release = false)
 {
 	int grade = XianDuanClass::GRADE;

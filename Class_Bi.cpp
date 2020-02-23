@@ -38,13 +38,15 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	ContainerType*  intermediate = new ContainerType();
+	// ContainerType*  intermediate = new ContainerType();
+	ContainerType*  intermediate = container;
 
 	Class_env *env = Class_env::getInstance();
 	int total = env->getTotal();
 
 
 	Class_KXian temp = (*base_Container)[0];
+	Class_KXian* start = &(*base_Container)[0];
 
 	int i = 1;
 	do 
@@ -58,6 +60,10 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		if (i == total)
 		{
 			// TODO: 建立最后的一个  类-笔
+			float high = max(start->getHigh(), (*base_Container)[i-1].getHigh());
+			float low = min(start->getLow(), (*base_Container)[i-1].getLow());
+			intermediate->push(ContainerType::value_type(start, &(*base_Container)[i-1], high, low, d));
+			start = &(*base_Container)[i-1];
 			break;
 		}
 		if (Class_KXian::getDirection(temp, (*base_Container)[i]) == d)
@@ -67,10 +73,16 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		}
 		else
 		{
-			// 方向不再一致
+			// 方向不再一致, 建立一个 类-笔
+			float high = max(start->getHigh(), (*base_Container)[i-1].getHigh());
+			float low = min(start->getLow(), (*base_Container)[i-1].getLow());
+			intermediate->push(ContainerType::value_type(start, &(*base_Container)[i-1], high, low, d));
+			start = &(*base_Container)[i-1];
+
 			d = -d;
 		}
 	} while (true);
+
 }
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
