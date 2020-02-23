@@ -7,7 +7,7 @@
 #include "Class_Bi.h"
 
 #include <vector>
-#include <stack>
+//#include <stack>
 using namespace std;
 
 
@@ -52,7 +52,7 @@ public:
 
 	typedef vector<Class_KXian> KXian_Container;
 	typedef Class_Bi<KXian_Container> baseItemType;
-    typedef stack<baseItemType> Bi_Container;
+    typedef vector<baseItemType> Bi_Container;
 	typedef Bi_Container baseItemType_Container;
 	typedef vector<Class_XianDuan> ContainerType;
 

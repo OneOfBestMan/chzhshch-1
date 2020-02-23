@@ -7,7 +7,64 @@ using namespace std;
 #include "Class_XianDuan.h"
 
 
+template <>
+void preDump<typename Class_KXian>(dumpHelperMap &helperMap)
+{
 
+	char tempSpace[20]; // 类似这样的串：(####.##, ####.##)
+
+	if (Class_KXian::container == NULL) return;
+
+	Class_KXian::ContainerType::iterator p = Class_KXian::container->begin();
+	Class_KXian::ContainerType::iterator end   = Class_KXian::container->end();
+
+	while (p != end)
+	{
+		Class_KXian::ContainerType::value_type &item = *p;
+
+		sprintf(tempSpace, "(%4.2f, %4.2f)", item.getLow(), item.getHigh());
+		int content = strlen(tempSpace);
+
+		helperMap[&item] = dumpHelperMap::mapped_type(content, content + 1);
+		p++;
+	}
+}
+
+
+template <>
+void preDump<typename Class_Bi<vector<Class_KXian> >>(dumpHelperMap &helperMap)
+{
+	typedef Class_Bi<vector<Class_KXian> >  BiClass;
+
+	char tempSpace[20]; // 类似这样的串：(####.##, ####.##)
+
+	preDump<BiClass::baseItemType>(helperMap);
+
+	if (BiClass::container == NULL) return;
+
+	BiClass::ContainerType::iterator p = BiClass::container->begin();
+	BiClass::ContainerType::iterator end   = BiClass::container->end();
+
+	while (p != end)
+	{
+		BiClass::ContainerType::value_type &item = *p;
+		BiClass::baseItemType *xStart = item.bi.start;
+		BiClass::baseItemType *xEnd = item.bi.end;
+
+		int total = 0;
+		while (xStart != xEnd) 
+		{
+			total += helperMap[xStart].total;
+			xStart++;
+		}
+
+		sprintf(tempSpace, "(%4.2f, %4.2f)", item.bi.low, item.bi.high);
+		int content = strlen(tempSpace);
+
+		helperMap[&item] = dumpHelperMap::mapped_type(content, total);
+		p++;
+	}
+}
 
 template<>
 void HuaFenXianDuan<typename Class_XianDuan<1> >(bool release = false)

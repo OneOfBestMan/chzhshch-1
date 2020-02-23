@@ -2,8 +2,9 @@
 #include "Class_Bi.h"
 #include "Class_env.h"
 
-Class_Bi<vector<Class_KXian> >::baseItem_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItem_Container*)NULL;
+Class_Bi<vector<Class_KXian> >::baseItemType_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItemType_Container*)NULL;
 Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
+
 
 
 void Class_Bi<vector<Class_KXian>>::FenBi(bool release)
@@ -42,47 +43,48 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 	ContainerType*  intermediate = container;
 
 	Class_env *env = Class_env::getInstance();
-	int total = env->getTotal();
 
+	baseItemType_Container::iterator start = base_Container->begin();
+	baseItemType_Container::iterator end = base_Container->end();
 
-	Class_KXian temp = (*base_Container)[0];
-	Class_KXian* start = &(*base_Container)[0];
+	Class_KXian temp = *start;
 
-	int i = 1;
-	do 
+	int cnt = 0;
+	baseItemType_Container::iterator p = start;
+	do
 	{
-		while (i<total && temp == (*base_Container)[i])
+		while (p != end && temp == *p)
 		{
-			temp.merge((*base_Container)[i], d);
-			i++;
+			temp.merge(*p, d);
+			p++;
 		}
-	
-		if (i == total)
+
+		if (p == end)
 		{
 			// TODO: 建立最后的一个  类-笔
-			float high = max(start->getHigh(), (*base_Container)[i-1].getHigh());
-			float low = min(start->getLow(), (*base_Container)[i-1].getLow());
-			intermediate->push(ContainerType::value_type(start, &(*base_Container)[i-1], high, low, d));
-			start = &(*base_Container)[i-1];
+			float high = max (start->getHigh(), (p-1)->getHigh());
+			float low = min (start->getLow(), (p-1)->getLow());
+			(*intermediate)[cnt++] = ContainerType::value_type(&(*start), &(*(p-1)), high, low, d);
+			start = p-1;
 			break;
 		}
-		if (Class_KXian::getDirection(temp, (*base_Container)[i]) == d)
+
+		if (Class_KXian::getDirection(temp, *p) == d)
 		{
-			temp = (*base_Container)[i];
-			i++;
+			temp = *p;
+			p++;
 		}
 		else
 		{
 			// 方向不再一致, 建立一个 类-笔
-			float high = max(start->getHigh(), (*base_Container)[i-1].getHigh());
-			float low = min(start->getLow(), (*base_Container)[i-1].getLow());
-			intermediate->push(ContainerType::value_type(start, &(*base_Container)[i-1], high, low, d));
-			start = &(*base_Container)[i-1];
+			float high = max(start->getHigh(), (p-1)->getHigh());
+			float low = min(start->getLow(), (p-1)->getLow());
+			(*intermediate)[cnt++] = ContainerType::value_type(&(*start), &(*(p-1)), high, low, d);
+			start = p-1;
 
 			d = -d;
 		}
-	} while (true);
-
+	}while (p != end);
 }
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
