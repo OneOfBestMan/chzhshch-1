@@ -763,7 +763,10 @@ public:
 	{
 		List_Entry *curr = time_list.next;
 
-		List_Entry *currLevel[MAX_LEVEL] = {&level_list[0], &level_list[1], &level_list[2], &level_list[3], &level_list[4], &level_list[5], &level_list[6], &level_list[7]};
+		List_Entry *currLevel[MAX_LEVEL];
+		for (int i = 0; i < MAX_LEVEL; i++)
+			currLevel[i] = &level_list[i];
+
 		int levelCnt[MAX_LEVEL] = {0};
 		int totalCnt = 0;
 
