@@ -14,12 +14,13 @@ public:
 
 	void accept(int bar);
 private:
-    stack<int> contains;
 
 	typedef struct
 	{
-		int barHigh, int barLow;
-	} barState
+		int barIndex, int cont; // 这个结构用于处理具有包含关系的k线； cont表示后面有几根k线，和barIndex开始的k线存在包含关系
+	} singleBar;
+
+	stack<singleBar*> contains;
 
 	Class_FenXing start;
 	Class_FenXing end;
