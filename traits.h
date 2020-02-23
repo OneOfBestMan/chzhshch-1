@@ -7,7 +7,7 @@ using namespace std;
 
 typedef enum Direction
 {
-	UNKNOWN = -1,
+	UNKNOWN = -1, // 对于K线，是没有方向的；
 	ASCENDING =1,
 	DESCENDING = 2,
 	ENCLOSING = 3
@@ -96,6 +96,11 @@ public:
 			assert(0);
 		}
 		return *this;
+	}
+
+	bool intersect(const Item &latter)
+	{
+		return (this->getHigh() >= latter.getLow()) || (this->getLow() < = latter.getHigh());
 	}
 
 };
