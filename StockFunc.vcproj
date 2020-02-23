@@ -339,10 +339,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\normalize.h"
-				>
-			</File>
-			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>
