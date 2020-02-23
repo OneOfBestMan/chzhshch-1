@@ -5,6 +5,7 @@
 #include <assert.h>
 using namespace std;
 
+#include "slist.h"
 
 typedef enum Direction
 {
@@ -20,10 +21,10 @@ Direction operator-(const Direction& d);
 
 class Class_KXian;
 template<int grade> class Class_XianDuan;
-class IZhongShu;
+class Class_ZhongShu;
 
 
-class Itraits
+class Class_XianDuanBase
 {
 	/* 设立这个接口的目的，是因为，MultiLevelZhongShuView.merge需要一个 线段作为参数，来辅助判断，是否形成了更大级别的中枢；参数的类型
 	可能是Class_XianDuan<1>  Class_XianDuan<2> Class_XianDuan<3>等等。如果没有Itraits接口，那么，这也就意味着MultiLevelZhongShuView的成员函数
@@ -38,11 +39,19 @@ public:
 	/* 这两个接口，是给中枢服务的，中枢最小的构成单位是级别1线段 */
 	virtual Class_XianDuan<1>* getBaseXianDuanStart() = 0;
 	virtual Class_XianDuan<1>* getBaseXianDuanEnd() = 0;
+
+	List_Entry* zsList; //该线段所包含的 中枢列表，是View的time link;
+	/*void addZhongShu(Class_ZhongShu* zs)
+	{
+		if (!zsList)
+			zsList = new vector<Class_ZhongShu*>;
+		zsList->push_back(zs);
+	}*/
 };
 
 
 template<class baseItemType, class Item>
-class traits : public Itraits
+class traits : public Class_XianDuanBase
 { 
 public:
 	typedef vector<Item> ContainerType;
@@ -52,7 +61,6 @@ public:
 	float High, Low;
 	Direction d;
 	baseItemType *Start, *End;
-
 
 	traits(baseItemType* start, baseItemType* end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir; zsList = NULL;}
 	traits() {Start = End = (baseItemType*)NULL; High = Low = 0; d = UNKNOWN; zsList = NULL;}
@@ -67,13 +75,7 @@ public:
 	Class_KXian* getStartRec() { return Start->getStartRec(); }
 	Class_KXian* getEndRec() { return End->getEndRec(); }
 
-	vector<IZhongShu*> *zsList; //该线段所包含的 中枢列表
-	void addZhongShu(IZhongShu* zs)
-	{
-		if (!zsList)
-			zsList = new vector<IZhongShu*>;
-		zsList->push_back(zs);
-	}
+
 
 	bool operator<(const Item &latter) const
 	{
@@ -147,6 +149,7 @@ public:
 	}
 };
 
+#if 0
 
 /* 设立这个接口，是因为线段，可能包含若干个不同级别的中枢，这些中枢需要放置到一个列表中，因此，这个列表是个异质的列表，因此，需要维护虚类的指针，以便处理这些异质的中枢。 */
 
@@ -407,6 +410,6 @@ public:
 		return (high1 >= high2 && high2 >= low1 || high1 <= high2 && high1 >= low2);
 	}
 };
-
+#endif
 
 #endif

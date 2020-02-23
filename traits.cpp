@@ -4,6 +4,7 @@
 
 #include <assert.h>
 
+
 Direction operator-(const Direction& d)
 {
 	switch (d)

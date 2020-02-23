@@ -95,31 +95,49 @@ template <typename XianDuanClass> friend void handleLast(MultiLevelZhongShuView 
 
 typedef Class_XianDuan<1> veryBaseXianDuanType;
 
-private:
-	static const int MAX_LEVEL = 7; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
 
+	static const int MAX_LEVEL = Class_ZhongShu::MAX_LEVEL; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
+private:
 	struct ElemOfView
 	{
-		IZhongShu *elem;
+		Class_ZhongShu *elem;
 		List_Entry level_link[MAX_LEVEL]; 
 		List_Entry time_link;
-		ElemOfView(IZhongShu* cs) {elem = cs; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; }
-		ElemOfView() {elem = NULL; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL;  }
+		ElemOfView(Class_ZhongShu* cs) {elem = cs; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; flags = 0;}
+		ElemOfView() {elem = NULL; time_link.prev = time_link.next = NULL; for (int i = 0; i < MAX_LEVEL; i++) level_link[i].prev = level_link[i].next = NULL; flags = 0; }
+		char flags; // 用来在merge链表，删除操作的时候，对需要merge的项目进行标记
 	};
 
 	List_Entry time_list;
 	List_Entry level_list[MAX_LEVEL];
 
-	int total; // time_list队列所含的元素个数
-	int levelTotal[MAX_LEVEL]; // 个级别队列所含的元素个数
+	volatile int total; // time_list队列所含的元素个数
+	volatile int levelTotal[MAX_LEVEL]; // 个级别队列所含的元素个数
 
 	volatile int max_level; // 之所以，要将它们设成volatile，是因为，在merge的循环中，如果出现中枢扩张的情形，那么这两个变量可能会发生变化；这样可以避免编译器对循环变量进行优化
 	volatile int min_level; 
 	// int forward; // 增量式（随着添加中枢，随着merge）、还是待添加所有的中枢之后，再作merge。 如果是增量式，那么同级别中枢列表使用栈，否则，应该使用对列。
 
 	
+	void Add_Elem(ElemOfView *eov)
+	{
+		int level = eov->elem->getGrade();
+		assert(level < MAX_LEVEL);
 
-	void Add_Elem(IZhongShu *zs)
+		max_level = max(level, max_level);
+		min_level = min(level, min_level);
+
+		append(&time_list, &eov->time_link);
+		total++;
+
+		for (int i = min_level; i <= level; i++)
+		{
+			append(&level_list[i], &eov->level_link[i]);
+			levelTotal[i]++;
+		}
+	}
+
+	void Add_Elem(Class_ZhongShu *zs)
 	{
 		int level = zs->getGrade();
 		assert(level < MAX_LEVEL);
@@ -195,18 +213,42 @@ private:
 
 public:
 
-	vector<IZhongShu*>* getResult() {return NULL;}
+	List_Entry* exportResult() 
+	{
+		if (isEmpty(&time_list))
+			return NULL;
+
+		List_Entry *result = time_list.next;
+
+		time_list.prev->next = NULL;
+		time_list.next->prev = NULL;
+
+
+		total = 0;
+		initializeList(&time_list);
+		for (int i = min_level; i <= max_level; i++)
+		{
+			initializeList(&level_list[i]);
+			levelTotal[i] = 0;
+		}
+		
+		return result;
+	}
 
 	MultiLevelZhongShuView(/*bool mergeForward = true*/)
 	{
 		max_level = -1; 
 		min_level = MAX_LEVEL + 1; 
+		total = 0;
 
 		initializeList(&time_list);
 
 		for (int i = 0; i < MAX_LEVEL; i++)
+		{
 			initializeList(&level_list[i]);
-
+			levelTotal[i] = 0;
+		}
+		
 		/*forward = mergeForward;*/ 
 	}
 
@@ -267,7 +309,7 @@ public:
 	}
 
 
-	int getZSLevel(IZhongShu *startFrom, IZhongShu *endBy)
+	int getZSLevel(Class_ZhongShu *startFrom, Class_ZhongShu *endBy)
 	{
 
 		int baseXianDuanCount = endBy->getEnd() - startFrom->getStart() + 1;
@@ -290,7 +332,7 @@ public:
 		return -1;
 	}
 
-	bool canExtend(IZhongShu *former, IZhongShu* latter)
+	bool canExpand(Class_ZhongShu *former, Class_ZhongShu* latter)
 	{
 		assert(former->getGrade() == latter->getGrade());
 
@@ -305,7 +347,95 @@ public:
 			return false;
 	}
 
-	void merge(Itraits *TP1_2)
+
+	void ExpandZS(ElemOfView *from, ElemOfView* to, int newLevel)
+	{
+
+		// 建立一个ElemOfView
+		Class_ZhongShu *zs = createZhongShu(from->elem, to->elem, newLevel);
+		ElemOfView* newEov = new ElemOfView(zs);
+		
+		List_Entry *curr = &from->time_link;
+		List_Entry *end = to->time_link.next;
+		// 将 time link链表中， 位于from和to之间的各个项 都标记上
+		int cnt = 0;
+		while (curr != end)
+		{
+			ElemOfView *eov = list_entry(curr, ElemOfView, time_link);
+			eov->flags = 1;
+			curr = curr->next;
+			cnt++;
+		}
+		total -= (cnt - 1);
+
+		// 确定新建立的中枢，在newLevel级别队列中 将要插入的位置
+		List_Entry *insertAt = from->time_link.prev;
+		while (insertAt != &time_list)
+		{
+			ElemOfView *eov = list_entry(insertAt, ElemOfView, time_link);
+			if (eov->elem->getGrade() == newLevel)
+				break;
+			insertAt = insertAt->prev;
+		}
+
+		// 将 newEov 插入 newLevel队列
+		if (insertAt == &time_list)
+			insertAt = &level_list[newLevel];
+		else
+			insertAt = &list_entry(insertAt, ElemOfView, time_link)->level_link[newLevel];
+
+		newEov->level_link[newLevel].next = insertAt->next;
+		newEov->level_link[newLevel].prev = insertAt;
+		insertAt->next->prev = &newEov->level_link[newLevel];
+		insertAt->next = &newEov->level_link[newLevel];
+		levelTotal[newLevel]++;
+
+
+		// 遍历 level link，将打上标记的一段 从链表中移除
+		List_Entry *posToInsert;
+		for (int i = 0; i < newLevel; i++)
+		{
+			int cnt = 0;
+
+			curr = level_list[i].next;
+			while (curr != &level_list[i] && list_entry(curr, ElemOfView, level_link[i])->flags == 0)
+				curr = curr->next;
+
+			if (curr == &level_list[i]) continue;
+
+			posToInsert = curr;
+			while (curr != &level_list[i] && list_entry(curr, ElemOfView, level_link[i])->flags == 1)
+			{
+				curr = curr->next;
+				cnt++;
+			}
+
+			posToInsert->next = &newEov->level_link[i];
+			newEov->level_link[i].prev = posToInsert;
+			newEov->level_link[i].next = curr;
+			curr->prev = &newEov->level_link[i];
+			levelTotal[i] -= (cnt - 1);
+		}
+
+
+		// 将newEov插入 time list队列，并且，将time list队列中打上标记的项目 删除掉
+		insertAt = from->time_link.prev;
+		newEov->time_link.prev = insertAt;
+		newEov->time_link.next = to->time_link.next;
+		insertAt->next = &newEov->time_link;
+		to->time_link.next->prev = &newEov->time_link;
+
+		curr = &from->time_link;
+		while (curr != end)
+		{
+			List_Entry* next = curr->next;
+			ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+			delete elem;
+			curr = next;
+		}
+	}
+
+	void merge(Class_XianDuanBase *TP1_2)
 	{
 		bool changed;
 		do
@@ -318,25 +448,51 @@ public:
 
 				List_Entry *startFrom = locate_level_equal(level_list[level].next, level);
 				List_Entry *endAt = locate_level_higher(startFrom, level);
-
-				do 
-				{
-					List_Entry *latter = endAt->prev;
-
-					if (latter == startFrom) break;
-
-					List_Entry *former = latter->prev;
-
-					IZhongShu *latterZS = list_entry(latter, ElemOfView, level_link[baseLevel])->elem;
-					IZhongShu *formerZS = list_entry(former, ElemOfView, level_link[baseLevel])->elem;
-
-					if (canExtend(formerZS, latterZS))
+				List_Entry *latter = endAt->prev;
+				while (startFrom != &level_list[level])
+				{			
+					while (latter == startFrom && startFrom != &level_list[level])
 					{
-						//ExtendFromTo(former, latter, 
+						startFrom = locate_level_equal(endAt, level);
+						endAt = locate_level_higher(startFrom, level);
+						latter = endAt->prev;
 					}
+					if (startFrom == &level_list[level])
+						break;
+					
+					ElemOfView *eovl = list_entry(latter, ElemOfView, level_link[level]);
+					ValueRange range = eovl->elem->getCoreRange();
+
+					ElemOfView *eovf;
+					List_Entry *former = latter->prev;
+					while (former != startFrom->prev)
+					{
+						eovf = list_entry(former, ElemOfView, level_link[level]);
+						range && eovf->elem->getCoreRange();
+						if (range.isNulValueRange())
+							break;
+						former = former->prev;
+					}
+					former = former->next;
+
+					if (former == latter)
+					{
+						latter = former;
+						continue;
+					} 
+					else
+						latter = former->prev;
 
 
-				} while (endAt != &level_list[level]);
+					eovf = list_entry(former, ElemOfView, level_link[level]);
+
+					if (canExpand(eovf->elem, eovl->elem))
+					{
+						int newLevel = getZSLevel(eovf->elem, eovl->elem);
+						ExpandZS(eovf, eovl, newLevel);
+						changed = true;
+					}
+				} 
 			}
 
 		} while(changed);
@@ -527,26 +683,46 @@ void AnalyzeZhongShu_PostOrder<Class_XianDuan<1>>()
 template <class XianDuanClass>
 void handleLast(MultiLevelZhongShuView &view, XianDuanClass *last)
 {
+	typedef MultiLevelZhongShuView::ElemOfView ElemOfView;
+
+	List_Entry* curr = last->zsList;
+	while (curr != NULL)
+	{
+		ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+		view.Add_Elem(elem);
+		curr = curr->next;
+	}
 }
 
 
 template <class XianDuanClass>
 void handleTurningPoint(MultiLevelZhongShuView &view, XianDuanClass *TP1_1, XianDuanClass *TP1_2)
 {
-	if (!TP1_1->zsList && !TP1_2->zsList)
-	{
-		//assert(TP1_1->GRADE == 1);
-		IZhongShu *zs = createZhongShu(TP1_2);
-		view.Add_Elem(zs);
-	}
-	else
-	{
-		for (int i = 0; i < TP1_1->zsList->size(); i++)
-			view.Add_Elem(TP1_1->zsList->at(i));
-		for (int i = 0; i < TP1_2->zsList->size(); i++)
-			view.Add_Elem(TP1_2->zsList->at(i));
+	typedef MultiLevelZhongShuView::ElemOfView ElemOfView;
 
-		view.merge(TP1_2);
+	List_Entry *curr = TP1_1->zsList;
+	while (curr != NULL)
+	{
+		ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+		view.Add_Elem(elem);
+		curr = curr->next;
+	}
+
+	curr = TP1_2->zsList;
+	if (!curr)
+	{
+		assert(TP1_2->GRADE == 1);
+		Class_ZhongShu *zs = createZhongShu(TP1_2, 0);
+		view.Add_Elem(zs);
+
+	} else
+	{
+		while (curr != NULL)
+		{
+			ElemOfView *elem = list_entry(curr, ElemOfView, time_link);
+			view.Add_Elem(elem);
+			curr = curr->next;
+		}
 	}
 }
 
@@ -575,7 +751,7 @@ void doWork(XianDuanClass &item)
 		TP1_1 = TP1_1 + 2;
 		TP1_2 = TP1_2 + 2;
 	}
-	item.zsList = view.getResult();
+	item.zsList = view.exportResult();
 }
 
 template<>

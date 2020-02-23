@@ -244,6 +244,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\slist.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
