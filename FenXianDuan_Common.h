@@ -43,7 +43,7 @@
 		while (current < end - 2)
 		{
 			d = getDirection(lastBi, *(current + 2));
-			if (d == hints)
+			if (d == hints || (lastBi << *(current + 2)))
 			{
 				lastBi = *(current + 2);
 				current += 2;
