@@ -1,8 +1,33 @@
 #include "stdafx.h"
 #include "Class_Bi.h"
+#include "Class_env.h"
 
 Class_Bi<vector<Class_KXian> >::baseItem_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItem_Container*)NULL;
 Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
+
+
+void Class_Bi<vector<Class_KXian>>::FenBi()
+{
+	if (base_Container == NULL)
+	{
+	// 创建 K线 vector
+		Class_env *env = Class_env::getInstance();
+		int total = env->getTotal();
+		base_Container = new baseItem_Container(total);
+		for (int i = 0; i < total; i++)
+		{
+			((Class_KXian)(*base_Container)[i]) = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
+		}
+	}
+
+	if (base_Container && !container)
+	{
+		// 分笔
+		container = new ContainerType();
+	}
+}
+
+
 
 /*
 实现 笔

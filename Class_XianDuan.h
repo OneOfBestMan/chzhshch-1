@@ -89,6 +89,15 @@ template <int grade>
 Class_XianDuan<grade>::~Class_XianDuan(void)
 {
 }
+
+
+template<int grade>
+typename Class_XianDuan<grade>::baseItemType_Container* Class_XianDuan<grade>::baseItems = (typename Class_XianDuan<grade>::baseItemType_Container*)NULL;
+
+template<int grade>
+typename Class_XianDuan<grade>::ContainerType* Class_XianDuan<grade>::container = (typename Class_XianDuan<grade>::ContainerType*)NULL;
+
+
 /*
 template<>
 Class_XianDuan<1>::Class_XianDuan(void)

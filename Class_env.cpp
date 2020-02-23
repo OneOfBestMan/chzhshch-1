@@ -66,7 +66,7 @@ Class_env::Class_env(CALCINFO *p)
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 
-	Class_XianDuan<7> abc;
+	HuaFenXianDuan<Class_XianDuan<7>>();
 	
 	
 }

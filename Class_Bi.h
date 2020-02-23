@@ -65,7 +65,7 @@ public:
 	static baseItem_Container *base_Container;
 	static ContainerType *container;
 
-	static void FenBi() {}
+	static void FenBi();
 
 private:
 

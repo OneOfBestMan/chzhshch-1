@@ -54,16 +54,6 @@ public:
 	static bool rangeContain(float k1B, float k1T, float k2B, float k2T);
 	static void updateMergedRange(int direction, int bar, float &mergedBot, float &mergedTop);
 
-
-
-
-
-private:
-
-
-	Class_env(CALCINFO* p);
-	CALCINFO *handle;
-
     float *highParm;
     int firstHighParm;
 
@@ -77,6 +67,16 @@ private:
 	int firstEndParm;
 
 	int totalBar;
+
+
+
+private:
+
+
+	Class_env(CALCINFO* p);
+	CALCINFO *handle;
+
+
 };
 
 #endif
