@@ -2,6 +2,7 @@
 #define TRAITS_H
 
 #include <vector>
+#include <assert.h>
 using namespace std;
 
 
