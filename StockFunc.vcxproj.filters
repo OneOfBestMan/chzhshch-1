@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{142bd8b5-41ad-40fd-988c-1361e91834d2}</UniqueIdentifier>
+      <UniqueIdentifier>{60c851f7-0cc0-4392-aaa5-a8b526cc5e6c}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{2c16d6dd-c331-4a80-ab15-7a0ea038c8a4}</UniqueIdentifier>
+      <UniqueIdentifier>{ce05859c-9f39-4dde-a7d0-b0f826af871f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{be2b5c0f-353f-4ea6-a504-e9f7ef2ed188}</UniqueIdentifier>
+      <UniqueIdentifier>{5782350b-5a62-4bd8-8996-9d711b876654}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -75,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FenXianDuan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FenXianDuan_Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="normalize.h">

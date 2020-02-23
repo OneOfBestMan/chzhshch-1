@@ -59,12 +59,12 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		// 释放之前的分析结果
 		if (env)
 		{
-			FenXianDuan<Class_XianDuan<7>>(true);
+			FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(true);
 			delete env;
 		}
 
 		env = newEnv;
-		FenXianDuan<Class_XianDuan<7>>(false);
+		FenXianDuan_PostOrderTravel<Class_XianDuan<7>>(false);
 
 		static bool doOnce = false;
 		doOnce = true;

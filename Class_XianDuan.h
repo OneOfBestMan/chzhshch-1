@@ -28,6 +28,8 @@ public:
 	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
 
+	typedef typename baseItemType_Container::iterator baseItemIterator;
+
 	//static void printMe() {printf("This is %d\n", GRADE); Class_XianDuan<grade-1>::printMe();}
 
 	static const int GRADE = grade;
@@ -39,7 +41,9 @@ public:
 	Class_XianDuan(void);
 	~Class_XianDuan(void);
 
-	static ContainerType* HuaFenXianDuan() {return NULL;}
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
+
+
 
 	friend ostream& operator<<(ostream& file, Class_XianDuan& objXianDuan) 
 	{
@@ -74,15 +78,16 @@ public:
 	typedef DumpTemplateV2<Class_XianDuan> DumpClassV2;
 	typedef FenXianDuanTemplate<Class_XianDuan> FenXianDuanClass;
 
+	typedef baseItemType_Container::iterator baseItemIterator;
+
 	static const int GRADE = 1;
 
 
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
 
 
     static baseItemType_Container *baseItems;
     static ContainerType *container;
-
-	static ContainerType* HuaFenXianDuan() {return NULL;}
 
 	friend ostream& operator<<(ostream&, Class_XianDuan&);
 
@@ -101,6 +106,29 @@ template <int grade>
 Class_XianDuan<grade>::~Class_XianDuan(void)
 {
 }
+
+template <int grade>
+Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct)
+{
+	float high = (*biStart).getHigh();
+	float low = (*biStart).getLow();
+
+	while (biStart != biEnd + 1)
+	{
+		high = max(high, (*biStart).getHigh());
+		low = min(low, (*biStart).getLow());
+		biStart++;
+	}
+
+	this->High = high;
+	this->Low = low;
+
+	this->Start = &(*biStart);
+	this->End = &(*biEnd);
+	this->d = direct;
+
+}
+
 
 /*
 template<int grade>
@@ -131,6 +159,11 @@ template<>
 class FenXianDuanTemplate<typename Class_XianDuan<1> >
 {
 public:
+	typedef  Class_XianDuan<1>::baseItemType_Container::iterator baseItemIterator;
+	typedef  Class_XianDuan<1>::baseItemType baseItemType;
+	typedef Class_XianDuan<1>::ContainerType ContainerType;
+	typedef Class_XianDuan<1> XianDuanClass; // 这样定义，就可以使用FenXianDuan_Common.h中的函数了
+
 	static void doWork(bool release)
 	{
 		typedef Class_XianDuan<1> XianDuanClass;
@@ -139,13 +172,15 @@ public:
 			if (XianDuanClass::baseItems == NULL) 
 			{
 				//XianDuanClass::FenBi();
-				XianDuanClass::baseItemType::FenBi();
-				XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
+				baseItemType::FenBi();
+				XianDuanClass::baseItems = baseItemType::container;
 			}
 			if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
 			{
 				//下面就是划分线段的具体逻辑
-				XianDuanClass::container = XianDuanClass::HuaFenXianDuan();
+				baseItemIterator begin = XianDuanClass::baseItems->begin();
+				baseItemIterator end = XianDuanClass::baseItems->end();
+				XianDuanClass::container = startFenXianDuan(begin, end);
 			}
 		} else
 		{		
@@ -156,12 +191,14 @@ public:
 			XianDuanClass::baseItems = NULL;
 		}
 	}
+private:
+#include "FenXianDuan_Common.h"
 };
 
 
 
 template<>
-void FenXianDuan<typename Class_XianDuan<1>>(bool release);
+void FenXianDuan_PostOrderTravel<typename Class_XianDuan<1>>(bool release);
 
 
 

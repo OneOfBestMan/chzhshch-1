@@ -7,7 +7,7 @@ Class_XianDuan<1>::ContainerType* Class_XianDuan<1>::container = (Class_XianDuan
 
 
 template<>
-void FenXianDuan<typename Class_XianDuan<1>>(bool release)
+void FenXianDuan_PostOrderTravel<typename Class_XianDuan<1>>(bool release)
 {
 	Class_XianDuan<1>::FenXianDuanClass::doWork(release);
 }
@@ -27,4 +27,26 @@ ostream& operator<<(ostream& ostream, Class_XianDuan<1>& objXianDuan)
 	ostream.width(4);
 	ostream<< objXianDuan.getHigh() << ")";
 	return ostream;
+}
+
+
+
+Class_XianDuan<1>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct)
+{
+	float high = (*biStart).getHigh();
+	float low = (*biStart).getLow();
+
+	while (biStart != biEnd + 1)
+	{
+		high = max(high, (*biStart).getHigh());
+		low = min(low, (*biStart).getLow());
+		biStart++;
+	}
+
+	this->High = high;
+	this->Low = low;
+
+	this->Start = &(*biStart);
+	this->End = &(*biEnd);
+	this->d = direct;
 }

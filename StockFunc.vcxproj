@@ -168,6 +168,7 @@
     <ClInclude Include="Class_ZhongShu.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="FenXianDuan.h" />
+    <ClInclude Include="FenXianDuan_Common.h" />
     <ClInclude Include="normalize.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />

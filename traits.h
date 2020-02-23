@@ -24,6 +24,7 @@ public:
 	typedef baseItemType baseItemType;
 	typedef vector<baseItemType> baseItemType_Container;
 
+
 	float High, Low;
 	Direction d;
 	baseItemType *Start, *End;
