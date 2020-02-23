@@ -75,7 +75,7 @@ public:
                              \  /
                               \/
 
-  对于下列的线段，Juxtaposition是指： JP0/JP1/JP2/JP3/JP4/JP5
+  对于下列的线段(如果父亲线段方向是向上的)，Juxtaposition是指： JP0/JP1/JP2/JP3/JP4/JP5
    
                                  /\
                                 /  \
@@ -87,6 +87,20 @@ public:
   /      \  /        \    /              \
           \/          \  /                \
                        \/
+
+ 对于下列的线段(如果父亲线段方向是向下的)，Juxtaposition是指： JP0/JP1/JP2/JP3
+   
+                                 /\
+                                /  \
+                               /    \
+                /\            /      \
+     /\        /  \          /        \
+    /  \      /    \        /          \
+   /  JP0   JP1    JP2    JP3           \
+  /      \  /        \    /              \
+          \/          \  /                \
+                       \/
+
 */
 
 	}
