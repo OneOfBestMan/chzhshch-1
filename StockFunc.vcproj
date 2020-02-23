@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="StockFunc"
-	ProjectGUID="{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}"
+	ProjectGUID="{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="C:\Stock\KingTrader\FmlDll"
-			IntermediateDirectory="C:\Stock\KingTrader\FmlDll"
+			OutputDirectory=".\Debug"
+			IntermediateDirectory=".\Debug"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -77,11 +77,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Stock\KingTrader\FmlDll/StockFunc.dll"
+				OutputFile=".\Debug/StockFunc.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:\Stock\KingTrader\FmlDll/StockFunc.pdb"
+				ProgramDatabaseFile=".\Debug/StockFunc.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary=".\Debug/StockFunc.lib"

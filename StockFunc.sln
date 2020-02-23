@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StockFunc", "StockFunc.vcxproj", "{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StockFunc", "StockFunc.vcxproj", "{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +11,16 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}.Debug|Win32.Build.0 = Debug|Win32
-		{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}.Release|Win32.ActiveCfg = Release|Win32
-		{DF2A0B44-D790-4AB8-AA7B-EC281A1EE7F7}.Release|Win32.Build.0 = Release|Win32
+		{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}.Debug|Win32.Build.0 = Debug|Win32
+		{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}.Release|Win32.ActiveCfg = Release|Win32
+		{A428BB9A-A33C-4BFF-8DE4-A6DD0553DD74}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
