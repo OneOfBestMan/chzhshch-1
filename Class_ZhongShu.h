@@ -43,6 +43,9 @@ public:
 		case 4:
 			Start = content.c4.xianDuan->getBaseXianDuanStart();
 			break;
+		case 5:
+			Start = content.c5.former->getStart();
+			break;
 		default:
 			assert(0);
 		}
@@ -68,6 +71,9 @@ public:
 		case 4:
 			End = content.c4.xianDuan->getBaseXianDuanEnd();
 			break;
+		case 5:
+			End = content.c5.latter->getEnd();
+			break;
 		default:
 			assert(0);
 		}
@@ -82,7 +88,7 @@ private:
 
 	Class_ZhongShu(typename Class_XianDuan<grade+1> *xianDuan): traits_ZhongShu(xianDuan) {}
 	Class_ZhongShu(Class_ZhongShu<grade-1>* subZhongShu, Class_XianDuan<grade+1>* xianDuan): traits_ZhongShu(subZhongShu, xianDuan) {}
-
+	Class_ZhongShu(IZhongShu *former, IZhongShu *latter): traits_ZhongShu(former, latter) {}
 
 	/* 第三买、卖点： 次级别走势回拉（三卖）或回跌（三买），不触及中枢区间，则该次级别走势的终点是第三买卖点； 并且要求，该次级别的起点，应该高于中枢波动高点（三买）或低于中枢波动低点（三卖） */
 
@@ -93,6 +99,8 @@ private:
 
 	friend IZhongShu* createZhongShu<>(Class_XianDuan<grade+1> *xianDuan);
 	friend IZhongShu* createZhongShu<>(IZhongShu*, Class_XianDuan<grade+1>*);
+
+	friend IZhongShu* createZhongShu<>(IZhongShu*, IZhongShu*); // type = 5
 };
 
 
@@ -194,6 +202,12 @@ IZhongShu* createZhongShu(IZhongShu *zs, XianDuanType *xianDuan)
 #undef AS_ZhongShu
 }
 
+IZhongShu* createZhongShu(IZhongShu *former, IZhongShu *latter, int newGrade)
+{
+	assert(former->getGrade() == latter->getGrade());
+	IZhongShu *result = new Class_ZhongShu<newGrade>(former, latter);
+	return result;
+}
 
 
 #endif

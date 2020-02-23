@@ -93,6 +93,8 @@ class MultiLevelZhongShuView // 多级别中枢联立视图，用于中枢扩展的分析
 template <typename XianDuanClass> friend void handleTurningPoint(MultiLevelZhongShuView &, typename XianDuanClass*, typename XianDuanClass*);
 template <typename XianDuanClass> friend void handleLast(MultiLevelZhongShuView &, typename XianDuanClass*);
 
+typedef Class_XianDuan<1> veryBaseXianDuanType;
+
 private:
 	static const int MAX_LEVEL = 7; // 最大支持的中枢级别， 从中枢级别0 到 中枢级别max_level
 
@@ -111,8 +113,8 @@ private:
 	int total; // time_list队列所含的元素个数
 	int levelTotal[MAX_LEVEL]; // 个级别队列所含的元素个数
 
-	int max_level;
-	int min_level;
+	volatile int max_level; // 之所以，要将它们设成volatile，是因为，在merge的循环中，如果出现中枢扩张的情形，那么这两个变量可能会发生变化；这样可以避免编译器对循环变量进行优化
+	volatile int min_level; 
 	// int forward; // 增量式（随着添加中枢，随着merge）、还是待添加所有的中枢之后，再作merge。 如果是增量式，那么同级别中枢列表使用栈，否则，应该使用对列。
 
 	
@@ -222,10 +224,122 @@ public:
 		}
 	}
 
+	// 在baseLevel的链表中，从searchFrom开始，寻找与baseLevel级别一致的中枢，并返回；
+	List_Entry* locate_level_equal(List_Entry *searchFrom, int baseLevel)
+	{
+		List_Entry *endOfList = &level_list[baseLevel];
+		while (searchFrom != endOfList)
+		{
+			ElemOfView *item = list_entry(searchFrom, ElemOfView, level_link[baseLevel]);
+			int itemLevel = item->elem->getGrade();
+
+			if (itemLevel == baseLevel)
+				break;
+			else
+			{
+				assert(itemLevel > baseLevel);
+				searchFrom = searchFrom->next;
+			}
+		}
+
+		return searchFrom;
+	}
+
+	// 在baseLevel的链表中，从startFrom开始，寻找比baseLevel级别高的中枢，并返回；
+	List_Entry* locate_level_higher(List_Entry *searchFrom, int baseLevel)
+	{
+		List_Entry *endOfList = &level_list[baseLevel];
+		while (searchFrom != endOfList)
+		{
+			ElemOfView *item = list_entry(searchFrom, ElemOfView, level_link[baseLevel]);
+			int itemLevel = item->elem->getGrade();
+
+			if (itemLevel == baseLevel)
+				searchFrom = searchFrom->next;
+			else
+			{
+				assert(itemLevel > baseLevel);
+				break;
+			}
+		}
+
+		return searchFrom;
+	}
+
+
+	int getZSLevel(IZhongShu *startFrom, IZhongShu *endBy)
+	{
+
+		int baseXianDuanCount = endBy->getEnd() - startFrom->getStart() + 1;
+
+		if (baseXianDuanCount < 3) return 0;
+
+		if (baseXianDuanCount < 9) return 1;
+
+		if (baseXianDuanCount < 27) return 2;
+
+		if (baseXianDuanCount < 81) return 3;
+
+		if (baseXianDuanCount < 243) return 4;
+
+		if (baseXianDuanCount < 729) return 5;
+
+		if (baseXianDuanCount < 2187) return 6;
+
+		assert(0); // 中枢级别超过支持范围
+		return -1;
+	}
+
+	bool canExtend(IZhongShu *former, IZhongShu* latter)
+	{
+		assert(former->getGrade() == latter->getGrade());
+
+		int childGrade = former->getGrade();
+
+		if (former->intersect(*latter))
+		{
+			int newGrade = getZSLevel(former, latter);
+			return newGrade > childGrade;
+		}
+		else
+			return false;
+	}
 
 	void merge(Itraits *TP1_2)
 	{
+		bool changed;
+		do
+		{
+			changed = false;
 
+			for (int level = min_level; level < max_level; level++)
+			{
+				if (levelTotal[level] < 2) continue;
+
+				List_Entry *startFrom = locate_level_equal(level_list[level].next, level);
+				List_Entry *endAt = locate_level_higher(startFrom, level);
+
+				do 
+				{
+					List_Entry *latter = endAt->prev;
+
+					if (latter == startFrom) break;
+
+					List_Entry *former = latter->prev;
+
+					IZhongShu *latterZS = list_entry(latter, ElemOfView, level_link[baseLevel])->elem;
+					IZhongShu *formerZS = list_entry(former, ElemOfView, level_link[baseLevel])->elem;
+
+					if (canExtend(formerZS, latterZS))
+					{
+						//ExtendFromTo(former, latter, 
+					}
+
+
+				} while (endAt != &level_list[level]);
+			}
+
+		} while(changed);
 	}
 
 #if 0

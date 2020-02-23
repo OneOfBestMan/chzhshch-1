@@ -275,6 +275,12 @@ public:
 				// 处理，线段的低级别线段，未能构成该级别中枢的情形；此时，此线段就被当做该级别中枢；
 				XianDuanType *xianDuan;
 			}c4;
+			struct
+			{
+				// 两个相邻中枢， 发生扩展；通常，只发生在较低级别的中枢；高级别中枢拓展，都是3个同级别中枢相交，发生扩展；
+				subZhongShuType *former;
+				subZhongShuType *latter;
+			}c5;
 		};
 		int type;
 	} content;
@@ -287,6 +293,8 @@ public:
 	traits_ZhongShu(subXianDuanType *s, subXianDuanType *l) { assert(l-s >= 8); content.type = 3; content.c3.start =s; content.c3.last = l;}
 
 	traits_ZhongShu(XianDuanType *x) { assert(x->zsList == NULL); content.type = 4; content.c4.xianDuan = x;}
+
+	traits_ZhongShu(subZhongShuType *f, subZhongShuType *l) {content.type = 5; content.c5.former = f; content.c5.latter = l;}
 
 	traits_ZhongShu() {}
 
