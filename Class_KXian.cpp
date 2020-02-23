@@ -10,6 +10,21 @@ K线   用于刻画分型的顶点、线段的高低点、中枢的高低点、中枢的第三买卖点
 
 */
 
+Direction operator-(const Direction& d)
+{
+	switch (d)
+	{
+	case ASCENDING:
+		return DESCENDING;
+	case DESCENDING:
+		return ASCENDING;
+	default:
+		assert(0);
+	}
+	return d;
+}
+
+
 Class_KXian::ContainerType* Class_KXian::container = NULL;
 
 void Class_KXian::initialize()
@@ -17,7 +32,10 @@ void Class_KXian::initialize()
 	// 创建 K线 vector
 	Class_env *env = Class_env::getInstance();
 	int total = env->getTotal();
-	container = new ContainerType(total);
+	
+	if (total > 0)
+		container = new ContainerType(total);
+
 	for (int i = 0; i < total; i++)
 	{
 		(*container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);

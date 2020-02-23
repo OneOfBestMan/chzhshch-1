@@ -30,18 +30,41 @@ void Class_Bi<vector<Class_KXian>>::FenBi()
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
-	Direction d = ASCENDING;
+	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
 	ContainerType*  intermediate = new ContainerType();
 
 	Class_env *env = Class_env::getInstance();
 	int total = env->getTotal();
 
-	for (int i = 0; i < total; i++)
-	{
-		//(*base_Container)[i]
-	}
 
+	Class_KXian temp = (*base_Container)[0];
+
+	int i = 1;
+	do 
+	{
+		while (i<total && temp == (*base_Container)[i])
+		{
+			temp.merge((*base_Container)[i], d);
+			i++;
+		}
+	
+		if (i == total)
+		{
+			// TODO: 建立最后的一个  类-笔
+			break;
+		}
+		if (Class_KXian::getDirection(temp, (*base_Container)[i]) == d)
+		{
+			temp = (*base_Container)[i];
+			i++;
+		}
+		else
+		{
+			// 方向不再一致
+			d = -d;
+		}
+	} while (true);
 }
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
