@@ -65,6 +65,9 @@ public:
 
 private:
 
+	static void FenBi_Step1();
+	static void FenBi_Step2();
+
 	valueType bi;
 };
 
