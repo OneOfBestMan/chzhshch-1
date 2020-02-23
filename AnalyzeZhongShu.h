@@ -14,9 +14,6 @@ public:
 	typedef typename XianDuanClass::ContainerType ContainerType;
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 
-
-	static void handleTurningPoint(baseItemType *start, baseItemType *end)
-	{
 /*
   对于向上的线段说， TurningPoint(TP)是指 这样的点： TP1、TP2
 
@@ -41,17 +38,36 @@ TP1_1  TP1_2/
                   TP2         \
                                \
 */
-		baseItemType *TP1_1 = start;
-		baseItemType *TP1_2 = start + 1;
+
+	static void handleTurningPoint(ItemIterator &curr)
+	{
+		baseItemType* TP1_1 = (*curr).getStart();
+		baseItemType* TP1_2 = TP1_1 + 1;
+		baseItemType* end = (*curr).getEnd();
+
 		while (TP1_1 < end)
 		{
-			//if (TP1_1->
+			if (!TP1_1->zsList && !TP1_2->zsList)
+			{
+				//(*curr).addZhongShu(new Class_ZhongShu<0>
+			}
 		}
 
 	}
 
-	static void handleJuxtaposition(baseItemType *start, baseItemType *end)
+	static void handleTurningPoint(baseItemType *start, baseItemType *end)
 	{
+		baseItemType *TP1_1 = start;
+		baseItemType *TP1_2 = start + 1;
+		while (TP1_1 < end)
+		{
+			if (!TP1_1->zsList && !TP1_2->zsList)
+			{
+
+			}
+		}
+
+	}
 /*
   对于向上的线段说， Juxtaposition(JP)是指 这样的相邻（且有重合区域的）线段: JP0/JP1/JP2/JP3 、  JP2/JP3/JP4/JP5
 
@@ -107,6 +123,13 @@ TP1_1  TP1_2/
                        \/
 
 */
+	static void handleJuxtaposition(ItemIterator &curr)
+	{
+	}
+
+	static void handleJuxtaposition(baseItemType *start, baseItemType *end)
+	{
+
 
 	}
 
@@ -120,11 +143,8 @@ TP1_1  TP1_2/
 
 		while (curr < end)
 		{
-			baseItemType *first = (*curr).getStart();
-			baseItemType *last = (*curr).getEnd();
-
-			handleTurningPoint(first, last);
-			handleJuxtaposition(first, last);
+			handleTurningPoint(curr);
+			handleJuxtaposition(curr);
 
 			curr++;
 		}

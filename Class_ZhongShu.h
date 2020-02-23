@@ -12,7 +12,7 @@
 
 
 template <int grade>
-class Class_ZhongShu: protected traits_ZhongShu<typename Class_ZhongShu<grade-1>, typename Class_XianDuan<grade>, typename Class_ZhongShu<grade>>
+class Class_ZhongShu: protected traits_ZhongShu<typename Class_ZhongShu<grade-1>, typename Class_XianDuan<grade+1>, typename Class_ZhongShu<grade>>
 {
 public:
 
@@ -46,10 +46,12 @@ Class_ZhongShu<grade>::~Class_ZhongShu(void)
 {
 }
 
-
+/* 中枢0，对应着级别1线段中的 特征向量 */
 template<>
-class Class_ZhongShu<1>: public traits<typename Class_XianDuan<1>, typename Class_ZhongShu<1>>
+class Class_ZhongShu<0>: public traits_ZhongShu<void, typename Class_XianDuan<1>, typename Class_ZhongShu<0>>
 {
+public:
+	static const int GRADE = 0;
 };
 
 

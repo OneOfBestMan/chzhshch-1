@@ -20,6 +20,7 @@ Direction operator-(const Direction& d);
 
 class Class_KXian;
 template<int grade> class Class_XianDuan;
+class IZhongShu;
 
 template<class baseItemType, class Item>
 class traits
@@ -34,8 +35,9 @@ public:
 	baseItemType *Start, *End;
 
 
-	traits(baseItemType* start, baseItemType* end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir;}
-	traits() {Start = End = (baseItemType*)NULL; High = Low = 0; d = UNKNOWN;}
+	traits(baseItemType* start, baseItemType* end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir; zsList = NULL;}
+	traits() {Start = End = (baseItemType*)NULL; High = Low = 0; d = UNKNOWN; zsList = NULL;}
+	~traits() {delete zsList;}
 
 	float getHigh() const {return High;}
 	float getLow() const {return Low;}
@@ -49,6 +51,14 @@ public:
 	/* 这两个接口，是给中枢服务的，中枢最小的构成单位 */
 	Class_XianDuan<1>* getBaseXianDuanStart() {return getStart()->getBaseXianDuanStart();}
 	Class_XianDuan<1>* getBaseXianDuanEnd() {return getEnd()->getBaseXianDuanEnd();}
+
+	vector<IZhongShu*> *zsList; //该线段所包含的 中枢列表
+	bool addZhongShu(IZhongShu* zs)
+	{
+		if (!zsList)
+			zsList = new vector<IZhongShu*>;
+		zsList.push_back(zs);
+	}
 
 	bool operator<(const Item &latter) const
 	{
@@ -203,12 +213,23 @@ public:
 
 	float rangeHigh, rangeLow; // 中枢的区间； 
 	float High, Low;  // High和Low表示中枢波动的高低点
-	veryBaseXianDuanType *start;
-	veryBaseXianDuanType *end;
+	veryBaseXianDuanType *Start;
+	veryBaseXianDuanType *End;
 
 	//Direction d;
 
 
+	/*
+
+	关于中枢级别， 一点思考：
+
+	级别1线段 == 中枢级别0
+	级别2线段 == 中枢级别1
+	级别3线段 == 中枢级别2
+	以此类推
+
+	在处理级别3线段的时候，其子线段是级别2线段，处理这些级别2线段的TP/JP之后，得到的中枢列表，最小只看到中枢级别1、线段2，如果这个列表中依然存在中枢0，那么需要将它们忽略。
+	*/
 	struct {
 		union
 		{
@@ -228,6 +249,11 @@ public:
 				subXianDuanType *start;
 				subXianDuanType *last;
 			} c3;
+			struct
+			{
+				// 处理，线段的低级别线段，未能构成该级别中枢的情形；此时，此线段就被当做该级别中枢；
+				XianDuanType *xianDuan;
+			}c4;
 		};
 		int type;
 	} content;
@@ -239,7 +265,11 @@ public:
 
 	traits_ZhongShu(subXianDuanType *s, subXianDuanType *l) { assert(l-s >= 8); content.type = 3; content.c3.start =s; content.c3.last = l;}
 
+	traits_ZhongShu(XianDuanType *x) { assert(x->zsList == NULL); content.type = 4; content.c4.xianDuan = x;}
+
 	traits_ZhongShu() {}
+
+	int getGrade() {return ZhongShuType::GRADE ;}
 
 	float getHigh() const {return High;}
 	float getLow() const {return Low;}
@@ -291,7 +321,7 @@ public:
 	
 	/*Direction getDirection() const {return d;} */
 
-	Class_KXian* getStartRec() 
+	Class_KXian* getStartRec() const
 	{
 		if (getStart())
 			return Start->getStartRec();
@@ -299,7 +329,7 @@ public:
 			return NULL;
 	}
 
-	Class_KXian* getEndRec()
+	Class_KXian* getEndRec() const
 	{
 		if (getEnd())
 			return End->getEndRec();
@@ -308,23 +338,23 @@ public:
 	}
 
 
-	bool preceed(const IZhongShu &latter) const
+	bool preceed(const IZhongShu &latter)
 	{
 		return getEndRec() > latter.getStartRec();
 	}
 
-	bool follow(const IZhongShu &former) const 
+	bool follow(const IZhongShu &former) 
 	{
 		return latter.getEndRec() > getStartRec();
 	}
 
-	bool operator<(const IZhongShu &latter) const
+	bool operator<(const IZhongShu &latter)
 	{
 		/* 前者 与 后者 构成上升形态 */
 		return preceed(latter)  &&  getHigh() < latter.getLow();
 	}
 
-	bool operator>(const IZhongShu &latter) const
+	bool operator>(const IZhongShu &latter)
 	{
 		/* 前者 与 后者 构成下跌形态 */
 		return preceed(latter)  && getLow() > latter.getHigh();
@@ -342,19 +372,19 @@ public:
 			return OVERLAPPING;
 	}
 
-	bool operator>> (const IZhongShu &latter) const
+	bool operator>> (const IZhongShu &latter)
 	{
 		/* 前者 高于 后者，但是有重叠 */
 		return preceed(latter) && getHigh() > latter.getHigh()  && getLow() < latter.getHigh();
 	}
 
-	bool operator<< (const IZhongShu &latter) const
+	bool operator<< (const IZhongShu &latter)
 	{
 		/* 前者 低于 后者， 但是有重叠 */
 		return preceed(latter) && getHigh() > latter.getLow()  && getHigh() < latter.getHigh();
 	}
 	
-	bool operator==(const IZhongShu &latter) const
+	bool operator==(const IZhongShu &latter)
 	{
 		/* 包含 */
 		return  (*this >> latter) || (*this << latter);
