@@ -6,6 +6,10 @@
 #include <vector>
 using namespace std;
 
+
+typedef enum {ASCENDING =1, DESCENDING = 2, ENCLOSING = 3}  Direction;
+
+
 class Class_KXian
 {
 public:
@@ -26,10 +30,15 @@ public:
 	Class_KXian(float kStart, float kEnd, float kBot, float kHigh);
 	~Class_KXian(void);
 
-	float getStart();
-	float getEnd();
-	float getHigh();
-	float getLow();
+	float getStart() const;
+	float getEnd() const;
+	float getHigh() const;
+	float getLow() const;
+
+	static Direction getDirection(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
+	static bool isAscending(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
+	static bool isDecending(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
+	static bool isEnclosing(const Class_KXian& firstKXian, const Class_KXian &secondKXian);
 
 	static void initialize();
 private:

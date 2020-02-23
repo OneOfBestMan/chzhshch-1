@@ -30,9 +30,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi()
 
 void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
-	typedef enum {ascending =1, descending = 2, notclear = 3}  Direction;
-
-	Direction d = ascending;
+	Direction d = ASCENDING;
 
 	ContainerType*  intermediate = new ContainerType();
 
@@ -41,7 +39,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 	for (int i = 0; i < total; i++)
 	{
-		
+		//(*base_Container)[i]
 	}
 
 }

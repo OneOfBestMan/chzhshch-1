@@ -24,6 +24,34 @@ void Class_KXian::initialize()
 	}
 }
 
+bool Class_KXian::isAscending(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
+{
+	return (firstKXian.getHigh() < secondKXian.getHigh()  && firstKXian.getLow() < secondKXian.getLow());
+}
+
+bool Class_KXian::isDecending(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
+{
+	return (firstKXian.getHigh() > secondKXian.getHigh()  && firstKXian.getLow() > secondKXian.getLow());
+}
+
+bool Class_KXian::isEnclosing(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
+{
+	return (firstKXian.getHigh() >= secondKXian.getHigh()  && firstKXian.getLow() <= secondKXian.getLow()) ||
+		   (firstKXian.getHigh() <= secondKXian.getHigh()  && firstKXian.getLow() >= secondKXian.getLow());
+}
+
+Direction Class_KXian::getDirection(const Class_KXian& firstKXian, const Class_KXian &secondKXian)
+{
+	if (isAscending(firstKXian, secondKXian))
+		return ASCENDING;
+	else if (isDecending(firstKXian, secondKXian))
+		return DESCENDING;
+	else
+		return ENCLOSING;
+}
+
+
+
 Class_KXian::Class_KXian(float kStart, float kEnd, float kBot, float kHigh)
 {
 
@@ -38,22 +66,22 @@ Class_KXian::~Class_KXian(void)
 }
 
 
-float Class_KXian::getStart()
+float Class_KXian::getStart() const
 {
 	return bar.kStart;
 }
 
-float Class_KXian::getEnd()
+float Class_KXian::getEnd() const
 {
 	return bar.kEnd;
 }
 
-float Class_KXian::getHigh()
+float Class_KXian::getHigh() const
 {
 	return bar.kHigh;
 }
 
-float Class_KXian::getLow()
+float Class_KXian::getLow() const
 {
 	return bar.kBot;
 }
