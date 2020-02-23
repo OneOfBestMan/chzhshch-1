@@ -35,7 +35,7 @@ public:
 template<class XianDuan_or_Bi >
 void FenXianDuan(bool release )
 {
-	XianDuan_or_Bi::baseItemType::FenXianDuanClass::doWork(release);
+	FenXianDuan<XianDuan_or_Bi::baseItemType>(release);
 
 	XianDuan_or_Bi::FenXianDuanClass::doWork(release);
 }
