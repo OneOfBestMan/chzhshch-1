@@ -191,9 +191,9 @@ __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
 {
 	Class_env* env = Class_env::getInstance(pData);
 
-    /* 初始化 各个线段类型 */
-	AllocConsole();
-	freopen("CONOUT$", "w", stdout);
+	// 如果需要控制台输出的话，就把这两行打开
+	//AllocConsole();
+	//freopen("CONOUT$", "w", stdout);
 
-	return 0; //TODO: 这个返回值，不应该是0，而应该是result数组的个数
+	return 0; //这个返回值，返回的是结果数列中的第一个有效的值下标
 }
