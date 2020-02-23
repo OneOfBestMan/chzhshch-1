@@ -37,6 +37,7 @@ public:
 			XianDuanClass::baseItemType *xStart = item.getStart();
 			XianDuanClass::baseItemType *xEnd = item.getEnd();
 			
+#ifdef BiLiKuanDu //按比例宽度输出
 			int total = 0;
 			while (xStart != xEnd + 1)
 			{
@@ -49,6 +50,13 @@ public:
 
 			int content = strstream.str().length();
 			helperMap[&item] = dumpHelperMap::mapped_type(content, total);
+#else
+			stringstream strstream;
+			strstream << item;
+
+			int content = strstream.str().length();
+			helperMap[&item] = dumpHelperMap::mapped_type(content, content);
+#endif
 			p++;
 		}
 	}

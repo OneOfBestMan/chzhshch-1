@@ -148,9 +148,10 @@
 		while (end - biFormer > 2)
 		{
 			d = getDirection(*biFormer, *(biFormer + 2));
-			if (d == ENCLOSING)
+			Direction dXian = (*biFormer).getDirection();
+			if (d == ENCLOSING || d == -dXian) // d == -dXian  是为了规避normalize
 			{
-				biFormer += 2;
+				biFormer += 1;
 				continue;
 			}
 			else
@@ -159,8 +160,9 @@
 
 		if (end - biFormer <= 2) return resultSet;
 
-		if (d != (*biFormer).getDirection())
+		if (d == -(*biFormer).getDirection())
 		{
+			assert(0); // normalize 应该不会再被调用了，由于前面加了 d == -dXian条件
 			backupBeforeNormalize = new baseItemType_Container();
 			backupBeforeNormalize->assign(start,end);
 

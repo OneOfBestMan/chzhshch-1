@@ -85,8 +85,8 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 		filename<<"c:\\" << env->stockName << ".txt";
 
 		ofstream file(filename.str().c_str());
-		preDump<Class_XianDuan<1>>(map);
-		DumpV2<Class_XianDuan<1>>(map, file);
+		preDump<Class_XianDuan<2>>(map);
+		DumpV2<Class_XianDuan<2>>(map, file);
 #endif
 	}
 
