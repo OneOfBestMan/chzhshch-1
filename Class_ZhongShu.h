@@ -13,7 +13,6 @@ using namespace std;
 
 class ValueRange
 {
-friend class Class_ZhongShu;
 private:
 	float low, high;
 public:
@@ -22,6 +21,8 @@ public:
 
 	float getHigh() const {return high;}
 	float getLow() const {return low;}
+	void setHigh(float h) { high = h; }
+	void setLow(float l) { low = l; }
 
 	ValueRange& operator &&(const ValueRange &item)
 	{
@@ -354,13 +355,13 @@ public:
 		{
 			// 第三买卖点，在中枢上方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 低于 原来floatRange.low的部分
 			if (tmpRange.getLow() < floatRange.getLow())
-				floatRange.low = tmpRange.getLow();
+				floatRange.setLow(tmpRange.getLow());
 
 		} else if (thrdPoint->getFloatRange().getHigh() < getCoreRange().getLow())
 		{
 			// 第三买卖点，在中枢下方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 高于 原来floatRange.high的部分
 			if (tmpRange.getHigh() > floatRange.getHigh())
-				floatRange.high = tmpRange.getHigh();
+				floatRange.setHigh(tmpRange.getHigh());
 		}
 		else
 			assert(0);
