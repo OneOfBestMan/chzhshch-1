@@ -63,7 +63,7 @@
 		{
 			baseItemType &suspect = *(current + 2);
 			d = IComparable::getDirection(lastBi, suspect);
-			if (d == hints || (lastBi << suspect))
+			if (d == hints || (lastBi << suspect && !(*start << suspect)))
 			{
 				lastBi = suspect;
 				current += 2;
