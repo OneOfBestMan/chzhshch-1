@@ -59,7 +59,6 @@ class preDumpTemplate<typename Class_KXian>
 public:
 	static void doWork(dumpHelperMap &helperMap)
 	{
-		char tempSpace[50]; // 类似这样的串：(####.##, ####.##)
 		if (Class_KXian::container == NULL) return;
 
 		Class_KXian::ContainerType::iterator p = Class_KXian::container->begin();
@@ -67,7 +66,6 @@ public:
 		while (p != end)
 		{
 			Class_KXian::ContainerType::value_type &item = *p;
-			sprintf(tempSpace, "(%4.2f, %4.2f)", item.getLow(), item.getHigh());
 			
 			stringstream strstream;
 			strstream<< item;

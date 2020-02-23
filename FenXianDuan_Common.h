@@ -24,7 +24,7 @@
 	
 		/* 先合并（可能的）新线段开始处的包含（前包后）的几笔 */
 		baseItemType possiblePrevXianDuanChracVec = *current;
-		while (current + 2 < end)
+		while (end - current > 2)
 		{
 			if (possiblePrevXianDuanChracVec >> *(current + 2))
 			{
@@ -40,7 +40,7 @@
 
 		/* 找可能出现转折的位置 */
 		baseItemType lastBi = possiblePrevXianDuanChracVec;
-		while (current + 2 < end)
+		while (end - current > 2)
 		{
 			d = getDirection(lastBi, *(current + 2));
 			if (d == hints)
@@ -82,7 +82,7 @@
 		baseItemIterator biStart = start;
 		baseItemIterator biFormer = start;
 		Direction d = ENCLOSING;
-		while (biFormer + 2 < end)
+		while (end - biFormer > 2)
 		{
 			d = getDirection(*biFormer, *(biFormer + 2));
 			if (d == ENCLOSING)
@@ -94,20 +94,26 @@
 				break;
 		}
 
-		if (biFormer + 2 >= end) return resultSet;
+		if (end - biFormer <= 2) return resultSet;
 
 		analyzeStack CharacVecStack;
 
 		baseItemIterator biLatter = biFormer + 2;
 
+		int debugCnt = 0;
 		do 
 		{
 			/*在线段中，寻找可能出现转折的那一笔的位置； 包括，前包后、方向与原线段相反；不包括：后包前（因为有新高或新低）*/
-			while  (biFormer + 2 < end &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
+			while  (end - biFormer > 2 &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
 			{
-				CharacVecStack.push_back(CharacterVec(biFormer + 1, biFormer + 1));
+				CharacVecStack.push_back(CharacterVec(biFormer + 1, biLatter - 1));
 				biFormer = biLatter;
 				biLatter += 2;
+			}
+
+			if (end - biFormer <= 2)
+			{
+				break;
 			}
 
 			if (FXD_Case1(-d, biFormer + 1, end, CharacVecStack) == false)
@@ -115,6 +121,7 @@
 				/* 原线段延续*/
 				biFormer = CharacVecStack.back().start - 1;
 				biLatter = CharacVecStack.back().end + 1;
+				CharacVecStack.pop_back();
 				continue;
 			} else
 			{
@@ -124,8 +131,8 @@
 					resultSet = new ContainerType();
 				}
 				resultSet->push_back(XianDuanClass(biStart, biFormer, d));
-				
 
+				debugCnt++;
 
 				/* 新线段需要 翻转方向 */
 				d = -d;
@@ -136,7 +143,7 @@
 
 				/* 新的线段，开始的部分，有一组互相包含的线段，可以看成是之前线段的特征向量，可以应用包含关系。合并它们 */
 				baseItemType temp = *biFormer;
-				while (biFormer + 2 < end)
+				while (end - biFormer > 2)
 				{
 					if (temp >> *(biFormer + 2))
 					{
@@ -149,7 +156,7 @@
 				}
 				biLatter = biFormer + 2;
 			}
-		} while (biFormer + 2 < end);
+		} while (1);
 
 		return resultSet;
 	}

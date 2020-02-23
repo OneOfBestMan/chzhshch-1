@@ -56,7 +56,7 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	intermediate = new ContainerType();
+	container = intermediate = new ContainerType();
 
 	Class_env *env = Class_env::getInstance();
 
@@ -105,6 +105,12 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		}
 	}while (p != end);
 }
+
+void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
+{
+
+}
+
 
 
 #if 0
@@ -555,10 +561,6 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
 #endif
 
 
-void Class_Bi<vector<Class_KXian>>::FenBi_Step2()
-{
-
-}
 
 
 /*

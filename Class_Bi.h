@@ -69,7 +69,11 @@ public:
 		:traits(biStart, biEnd, high, low, direct) {KXianCnt = -1;}
 
 	static baseItemType_Container *base_Container;
-	static ContainerType *container;
+
+	/* 经过思考，觉得，从类笔到笔，需要经过2个步骤：先是用分线段的方式，确定大的线段； 然后在线段内部，寻找合适的顶分型、底分型，将线段划分成若干笔；
+	   目前的实现，打算先略去 从类笔 到 笔； 而是直接基于 类笔 划分线段。
+	*/
+	static ContainerType *container; 
 	static ContainerType *intermediate; // 用来保存 "类-笔"，是计算 “笔”的中间结果；
 
 	static void FenBi(bool release = false);
