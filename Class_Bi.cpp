@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Class_Bi.h"
-#include "Class_env.h"
+
+Class_Bi<vector<Class_KXian> >::baseItem_Container* Class_Bi<vector<Class_KXian> >::base_Container = (Class_Bi<vector<Class_KXian> >::baseItem_Container*)NULL;
+Class_Bi<vector<Class_KXian> >::ContainerType* Class_Bi<vector<Class_KXian> >::container = (Class_Bi<vector<Class_KXian> >::ContainerType*)NULL;
 
 /*
  µœ÷ ± 

@@ -6,6 +6,31 @@ using namespace std;
 
 #include "Class_XianDuan.h"
 
+
+
+
+template<>
+void HuaFenXianDuan<typename Class_XianDuan<1> >()
+{
+	typedef Class_XianDuan<1> XianDuanClass;
+
+	if (XianDuanClass::baseItems == NULL) 
+	{
+		//XianDuanClass::FenBi();
+		XianDuanClass::baseItemType::FenBi();
+		XianDuanClass::baseItems = XianDuanClass::baseItemType::container;
+	}
+
+	if (XianDuanClass::baseItems &&  XianDuanClass::container == NULL)
+	{
+		XianDuanClass::container = new XianDuanClass::ContainerType();
+		//下面就是划分线段的具体逻辑
+		XianDuanClass::HuaFenXianDuan();
+	}
+}
+
+
+
 Class_env* Class_env::env = NULL;
 
 

@@ -3,9 +3,9 @@
 #define CLASS_BI_H
 
 #include "Class_KXian.h"
-#include "Class_FenXing.h"
 
 #include <stack>
+#include <vector>
 
 using namespace std;
 
@@ -13,7 +13,8 @@ template <class baseItem_Container>
 class Class_Bi
 {
 public:
-
+	typedef stack<Class_Bi> ContainerType;
+	
 	typedef struct {
 		typename baseItem_Container::value_type *start;
 		typename baseItem_Container::value_type *end;
@@ -21,7 +22,7 @@ public:
 		float low;
 	} valueType;
 
-	typedef stack<Class_Bi> ContainerType;
+
 
 	Class_Bi(void) {}
 	~Class_Bi(void);
@@ -32,30 +33,44 @@ public:
 	static baseItem_Container *base_Container;
 	static ContainerType *container;
 
+	static void FenBi() {}
+
 private:
 
 	valueType bi;
-
-	/*typedef struct
-	{
-		int barIndex;
-		int cont; // 这个结构用于处理具有包含关系的k线； cont表示后面有几根k线，和barIndex开始的k线存在包含关系
-	} singleBar;
-
-	stack<singleBar*> contains;*/
-
-	/*stack<int> contains;
-
-	stack<int> contains;*/
-
-	/*Class_FenXing start;
-	Class_FenXing end;
-
-	float mergedBot;
-	float mergedTop;*/
-
-
-	
 };
+
+template<>
+class Class_Bi<vector<Class_KXian> >
+{
+public:
+	typedef stack<Class_Bi> ContainerType;
+	typedef vector<Class_KXian> baseItem_Container;
+
+	typedef struct {
+		baseItem_Container::value_type *start;
+		baseItem_Container::value_type *end;
+		float high;
+		float low;
+	} valueType;
+
+
+
+	Class_Bi(void) {}
+	~Class_Bi(void);
+    
+	void accept(int bar);
+
+
+	static baseItem_Container *base_Container;
+	static ContainerType *container;
+
+	static void FenBi() {}
+
+private:
+
+	valueType bi;
+};
+
 
 #endif

@@ -1,14 +1,5 @@
 #include "stdafx.h"
 #include "Class_XianDuan.h"
 
-/*
-template <int grade>
-Class_XianDuan<grade>::Class_XianDuan(void)
-{
-}
-
-template <int grade>
-Class_XianDuan<grade>::~Class_XianDuan(void)
-{
-}
-*/
+Class_XianDuan<1>::baseItemType_Container* Class_XianDuan<1>::baseItems = (Class_XianDuan<1>::baseItemType_Container*)NULL;
+Class_XianDuan<1>::ContainerType* Class_XianDuan<1>::container = (Class_XianDuan<1>::ContainerType*)NULL;

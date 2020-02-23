@@ -10,6 +10,8 @@ class Class_KXian
 {
 public:
 
+	typedef vector<Class_KXian> ContainerType;
+
 	typedef struct
 	{
 		float kStart;
@@ -17,8 +19,6 @@ public:
 		float kBot;
 		float kHigh;
 	} valueType;
-
-	typedef vector<Class_KXian> ContainerType;
 
 	static ContainerType *container;
 

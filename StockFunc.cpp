@@ -63,17 +63,6 @@ __declspec(dllexport) int WINAPI MYMACLOSE(CALCINFO* pData)
 	return -1;
 }
 
-/*
- 缠中说禅 分笔、分线段、确定中枢
- 调用方法:
-   "STOCKFUNC@CHZHSHCH(HIGH,LOW,START,END)
-*/
-__declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
-{
-	Class_env* env = Class_env::getInstance(pData);
-	return 0; //TODO: 这个返回值，不应该是0，而应该是result数组的个数
-}
-
 
 //计算均价,2个参数,参数1为待求均线的数据,参数2表示计算周期
 //调用方法:
@@ -193,3 +182,13 @@ __declspec(dllexport) int WINAPI MYBBI(CALCINFO* pData)
 	return -1;
 }
 
+/*
+ 缠中说禅 分笔、分线段、确定中枢
+ 调用方法:
+   "STOCKFUNC@CHZHSHCH(HIGH,LOW,START,END)
+*/
+__declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
+{
+	Class_env* env = Class_env::getInstance(pData);
+	return 0; //TODO: 这个返回值，不应该是0，而应该是result数组的个数
+}
