@@ -668,13 +668,13 @@ public:
 					if (startFrom == &level_list[level])
 						break;
 
-					/*if (startFrom->prev != &level_list[level])
+					if (endAt == &level_list[level] && startFrom->prev != &level_list[level])
 					{
 						ElemOfView *checkPrevEov = list_entry(startFrom->prev, ElemOfView, level_link[level]);
-						// 如果之前的那个中枢，级别是level+1，并且updateThirdPoint并没有成功设置该中枢的第三买卖点，后面的次级别中枢合并需要延迟，直至该level+1级别中枢第三买卖点被指定
+						// 在队尾，有一组连续的level级别中枢；如果之前的那个中枢，级别是level+1，并且updateThirdPoint并没有成功设置该中枢的第三买卖点，后面的次级别中枢合并需要延迟，直至该level+1级别中枢第三买卖点被指定
 						if (checkPrevEov->elem->getGrade() == level + 1 && checkPrevEov->elem->getThirdPoint() == NULL)
 							break;
-					}*/
+					}
 					
 					ElemOfView *eovf = list_entry(former, ElemOfView, level_link[level]); // eov latter
 

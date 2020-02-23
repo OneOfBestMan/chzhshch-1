@@ -350,13 +350,13 @@ public:
 	   前后两个级别1的中枢，他们的floatRange本来没有交集，但是画“<---”的地方，是高过第一个中枢1的floagRange低点的。下面的处理，可以把"ATT"作为第2个中枢1的次级别波动，合并到第2个中枢的floatRange中；这样，两个中枢1的
 	   floatRange就会产生交集，并且有可能会扩充成为更高级别的中枢；
 		*/
-		if (end->getStartRec()->getLow() > getCoreRange().getHigh())
+		if (thrdPoint->getFloatRange().getLow() > getCoreRange().getHigh())
 		{
 			// 第三买卖点，在中枢上方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 低于 原来floatRange.low的部分
 			if (tmpRange.getLow() < floatRange.getLow())
 				floatRange.low = tmpRange.getLow();
 
-		} else if (end->getStartRec()->getHigh() < getCoreRange().getLow())
+		} else if (thrdPoint->getFloatRange().getHigh() < getCoreRange().getLow())
 		{
 			// 第三买卖点，在中枢下方，扩展中枢floatRange，从中枢end到第三买卖点，使其包含 高于 原来floatRange.high的部分
 			if (tmpRange.getHigh() > floatRange.getHigh())
