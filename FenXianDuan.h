@@ -60,8 +60,7 @@ public:
 		baseItemType possiblePrevXianDuanChracVec = *current;
 		while (current + 2 < end)
 		{
-			d = getDirection(possiblePrevXianDuanChracVec, *(current + 2));
-			if (d == ENCLOSING)
+			if (possiblePrevXianDuanChracVec >> *(current + 2))
 			{
 				possiblePrevXianDuanChracVec.merge(*(current+2), -hints);
 				current += 2;
@@ -132,7 +131,7 @@ public:
 
 		do 
 		{
-			while  (biFormer + 2 < end &&  getDirection(*biFormer, *biLatter) == d)
+			while  (biFormer + 2 < end &&  (getDirection(*biFormer, *biLatter) == d || (*biFormer << *biLatter)) )
 			{
 				CharacVecStack.push_back(CharacterVec(biFormer + 1, biFormer + 1));
 				biFormer = biLatter;
@@ -154,7 +153,7 @@ public:
 				baseItemType temp = *biFormer;
 				while (biFormer + 2 < end)
 				{
-					if (getDirection(temp, *(biFormer + 2)) == ENCLOSING)
+					if (temp >> *(biFormer + 2))
 					{
 						temp.merge(*(biFormer + 2), -d);
 						biFormer += 2;
