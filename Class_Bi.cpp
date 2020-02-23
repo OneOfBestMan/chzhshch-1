@@ -67,6 +67,29 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 
 	int KXianCnt = 1; // 一笔内 无“包含关系”的K线的数量； 顶分型、底分型的K线，算在内； 一笔的KXianCnt，应该大于等于5
 	baseItemType_Container::iterator p = start;
+
+	
+	/*
+	注意: 一个笔的高、低价位，并不是简单地统计该笔所包含K线的最高值、最低值，必须考虑包含关系，譬如：
+          |
+          |___high
+      |   |
+      | | |
+        | |
+          |___low
+
+      这个笔的方向是向下的，里面包含3根k线， 笔的high、low，如图所示，不难发现，笔的high值并不是第3根k线的最高点，这是由于后2根k线，进行了包含关系处理
+	  再譬如：下面的笔方向向上，但笔的low并不是最后那根k线的最低值，这是由于后2根k线，进行了包含关系处理.
+           _____high
+          |
+        | |
+      | | |
+      |   |_____low
+          |
+	*/
+	float high = start->getHigh(); // 统计这个笔 的 high
+	float low = start->getLow();  // 统计 这个笔 的 low
+
 	do
 	{
 		while (p != end && temp == *p) // == 表示“包含：
@@ -74,12 +97,12 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 			temp.merge(*p, d);
 			p++;
 		}
+		high = max(high, temp.getHigh());
+		low = min(low, temp.getLow());
 
 		if (p == end)
 		{
 			// TODO: 建立最后的一个  类-笔
-			float high = max (start->getHigh(), (p-1)->getHigh());
-			float low = min (start->getLow(), (p-1)->getLow());
 			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
@@ -95,13 +118,14 @@ void Class_Bi<vector<Class_KXian>>::FenBi_Step1()
 		else
 		{
 			// 方向不再一致, 建立一个 类-笔
-			float high = max(start->getHigh(), (p-1)->getHigh());
-			float low = min(start->getLow(), (p-1)->getLow());
 			intermediate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			d = -d;
 			KXianCnt = 1;
+
+			high = start->getHigh();
+			low = start->getEnd();
 		}
 	}while (p != end);
 }
