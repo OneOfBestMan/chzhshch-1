@@ -84,7 +84,7 @@
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>C:\Stock\FoxTrader\FmlDll/StockFunc.dll</OutputFile>
+      <OutputFile>D:\Stock\JIAOYISHI\FmlDll\StockFunc.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/StockFunc.pdb</ProgramDatabaseFile>
@@ -180,6 +180,7 @@
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />
     <ClInclude Include="traits.h" />
+    <ClInclude Include="XRXD.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

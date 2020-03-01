@@ -58,6 +58,9 @@ public:
 	float *endParm;
 	int firstEndParm;
 
+	SPLITDATA*  XR_XD; // 除权、除息
+	int num_XR_XD; // 除权、除息 次数
+
 	int totalBar;
 	char* stockName;
 	DATA_TYPE barKind; // K线图的时间类型

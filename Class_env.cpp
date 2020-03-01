@@ -46,6 +46,10 @@ Class_env::Class_env(CALCINFO *p)
 
 	totalBar = p->m_nNumData;
 
+	XR_XD = p->m_pSplitData;
+	num_XR_XD = p->m_nNumSplitData;
+
+
 	grade = static_cast<gradeSelect>((int)(p->m_pCalcParam[4].m_fParam));
 	func =  static_cast<funcSelect>((int)(p->m_pCalcParam[5].m_fParam));
 	ZSorXD =  static_cast<ZsXdSelect>((int)(p->m_pCalcParam[6].m_fParam));
