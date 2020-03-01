@@ -45,15 +45,16 @@ public:
 	static Class_env* env;
 
 	int   getTotal() const {return totalBar;}
-
 	const STKDATA*	KXian;
+	int totalBar;
+	DATA_TYPE barKind; // K线图的时间类型
 
 	SPLITDATA*  XR_XD; // 除权、除息
 	int num_XR_XD; // 除权、除息 次数
 
-	int totalBar;
+	
 	char* stockName;
-	DATA_TYPE barKind; // K线图的时间类型
+	
 
 
 	// ouput 相关
