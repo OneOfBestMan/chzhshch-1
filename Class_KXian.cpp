@@ -62,7 +62,8 @@ void Class_KXian::initialize(bool release)
 		
 		for (int i = 0; i < total; i++)
 		{
-			(*container)[i] = Class_KXian(env->startParm[i], env->endParm[i], env->lowParm[i], env->highParm[i]);
+			const STKDATA& KXianInfo = env->KXian[i];
+			(*container)[i] = Class_KXian(KXianInfo.m_fOpen, KXianInfo.m_fClose, KXianInfo.m_fLow, KXianInfo.m_fHigh);
 		}
 	} else 
 	{

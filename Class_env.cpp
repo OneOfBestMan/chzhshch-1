@@ -20,30 +20,7 @@ Class_env::Class_env(CALCINFO *p)
 {
 	handle = p;
 
-    if (p->m_nNumParam != 7) 
-		throw invalid_argument("输入 参数个数不正确");
-
-	if (p->m_pCalcParam[0].m_nParamStart < 0  || 
-		p->m_pCalcParam[1].m_nParamStart < 0  ||
-		p->m_pCalcParam[2].m_nParamStart < 0  || 
-		p->m_pCalcParam[3].m_nParamStart < 0  ||
-		p->m_pCalcParam[4].m_nParamStart > 0  ||
-		p->m_pCalcParam[5].m_nParamStart > 0  || 
-		p->m_pCalcParam[6].m_nParamStart > 0 )
-		throw invalid_argument("输入 数组参数不正确");
-
-	startParm = const_cast<float*>(p->m_pCalcParam[0].m_pfParam);
-	firstStartParm = p->m_pCalcParam[0].m_nParamStart;
-
-    endParm = const_cast<float*>(p->m_pCalcParam[1].m_pfParam);
-	firstEndParm = p->m_pCalcParam[1].m_nParamStart;
-
-	lowParm = const_cast<float*>(p->m_pCalcParam[2].m_pfParam);
-	firstLowParm =  p->m_pCalcParam[2].m_nParamStart;
-
-	highParm = const_cast<float*>(p->m_pCalcParam[3].m_pfParam);
-	firstHighParm = p->m_pCalcParam[3].m_nParamStart;
-
+	KXian = p->m_pData;
 	totalBar = p->m_nNumData;
 
 	XR_XD = p->m_pSplitData;

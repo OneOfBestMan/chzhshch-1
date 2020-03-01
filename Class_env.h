@@ -46,17 +46,7 @@ public:
 
 	int   getTotal() const {return totalBar;}
 
-    float *highParm;
-    int firstHighParm;
-
-	float *lowParm;
-	int firstLowParm;
-
-	float *startParm;
-	int firstStartParm;
-
-	float *endParm;
-	int firstEndParm;
+	const STKDATA*	KXian;
 
 	SPLITDATA*  XR_XD; // 除权、除息
 	int num_XR_XD; // 除权、除息 次数
