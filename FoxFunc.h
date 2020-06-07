@@ -248,6 +248,7 @@ __declspec(dllexport) int WINAPI MYMACLOSE(CALCINFO* pData);
 __declspec(dllexport) int WINAPI MYMAVAR(CALCINFO* pData);
 __declspec(dllexport) int WINAPI MYBBI(CALCINFO* pData);
 __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData);
+__declspec(dllexport) int WINAPI VALUE_ADJUST(CALCINFO* pData);
 #ifdef __cplusplus
 }
 #endif //__cplusplus

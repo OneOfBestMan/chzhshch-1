@@ -220,7 +220,7 @@ typedef struct tagCALCINFO
 	DWORD			    m_dwBarpos;				//若为逐K线模式调用，此参数为逐K线调用传递过来的基于0序号的K线序号
 
 	const int			m_nNumParam;			// 调用参数数量
-	const CALCPARAM*	m_pCalcParam;			// 调用参数数组
+	const CALCPARAM* 	m_pCalcParam;			// 调用参数数组
 
 	//2.55版增加,当日分笔数据
 	SUBSECTION_REPORT * m_pSubData;		//当日分笔成交数据(仅DATA_TYPE != TICK_DATA时有效)
@@ -280,6 +280,8 @@ __declspec(dllexport) int WINAPI MYMAVAR(CALCINFO* pData);
 __declspec(dllexport) int WINAPI MYBBI(CALCINFO* pData);
 
 __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData);
+__declspec(dllexport) int WINAPI TOPRANGE_PERCENT(CALCINFO* pData);
+__declspec(dllexport) int WINAPI LOWRANGE_PERCENT(CALCINFO* pData);
 
 #ifdef __cplusplus
 }

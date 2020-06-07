@@ -51,6 +51,9 @@
     <ClCompile Include="traits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnalyzeZhongShu.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XRXD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

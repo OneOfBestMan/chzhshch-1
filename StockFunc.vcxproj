@@ -150,6 +150,7 @@
     <ClCompile Include="Class_KXian.cpp" />
     <ClCompile Include="Class_XianDuan.cpp" />
     <ClCompile Include="Class_ZhongShu.cpp" />
+    <ClCompile Include="MA.cpp" />
     <ClCompile Include="slist.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -176,6 +177,7 @@
     <ClInclude Include="IComparable.h" />
     <ClInclude Include="IDisplayable.h" />
     <ClInclude Include="include_api.h" />
+    <ClInclude Include="MA.h" />
     <ClInclude Include="slist.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StockFunc.h" />

@@ -105,9 +105,10 @@ Class_env* Class_env::getInstance(CALCINFO *p)
 
 Class_env* Class_env::getInstance()
 {
-	if (env) 
+	if (env)
 		return env;
 	else
+		//return NULL;
 		throw invalid_argument("env是NULL，请先调用getInstance(CALCINFO *p)对env进行构造");
 }
 

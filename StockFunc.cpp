@@ -209,3 +209,74 @@ __declspec(dllexport) int WINAPI CHZHSHCH(CALCINFO* pData)
 
 	return 0; //这个返回值，返回的是结果数列中的第一个有效的值下标
 }
+
+
+/*
+传入参数：
+ （1）HIGH
+ （2）百分比
+传出参数：
+  最后一个值是调整过的，其它值都一样
+调用方法:
+"STOCKFUNC@TOPRANGE_PERCENT(HIGH, PERCENTAGE)
+*/
+__declspec(dllexport) int WINAPI TOPRANGE_PERCENT(CALCINFO* pData)
+{
+	if (pData->m_pfParam1 && pData->m_pfParam2 && 	//参数1,2有效
+		pData->m_pfParam3 == NULL)					//有2个参数
+	{
+		const float*  pValue = pData->m_pCalcParam[0].m_pfParam;	//参数1
+		int nFirst = pData->m_pCalcParam[0].m_nParamStart;		//有效值起始位
+		int percent = *pData->m_pfParam2;			//参数2
+		int totalBar = pData->m_nNumData;
+
+		memset(pData->m_pResultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
+
+		for (int i = totalBar-1; i >= nFirst; i--)
+		{
+			float val = pValue[i] * (1 + (float)percent/100);
+			int idx = i - 1;
+			while (idx >= nFirst && val > pValue[idx])
+				idx--;
+			pData->m_pResultBuf[i] = i - idx -1;
+		}
+		return nFirst;
+	}
+	return -1;
+}
+
+
+
+/*
+传入参数：
+（1）LOW
+（2）百分比
+传出参数：
+最后一个值是调整过的，其它值都一样
+调用方法:
+"STOCKFUNC@LOWRANGE_PERCENT(LOW, PERCENTAGE)
+*/
+__declspec(dllexport) int WINAPI LOWRANGE_PERCENT(CALCINFO* pData)
+{
+	if (pData->m_pfParam1 && pData->m_pfParam2 && 	//参数1,2有效
+		pData->m_pfParam3 == NULL)					//有2个参数
+	{
+		const float*  pValue = pData->m_pCalcParam[0].m_pfParam;	//参数1
+		int nFirst = pData->m_pCalcParam[0].m_nParamStart;		//有效值起始位
+		int percent = *pData->m_pfParam2;			//参数2
+		int totalBar = pData->m_nNumData;
+
+		memset(pData->m_pResultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
+
+		for (int i = totalBar - 1; i >= nFirst; i--)
+		{
+			float val = pValue[i] * (1 + (float)percent / 100);
+			int idx = i - 1;
+			while (idx >= nFirst && val < pValue[idx])
+				idx--;
+			pData->m_pResultBuf[i] = i - idx - 1;
+		}
+		return nFirst;
+	}
+	return -1;
+}
