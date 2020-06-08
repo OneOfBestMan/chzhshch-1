@@ -100,103 +100,235 @@ void Class_LeiBi::FenBi(bool release)
 	}
 }
 
+/*
+旧实现与v2的对比
 
+（旧实现）
+
+向上的笔，里面包含3根k线，头两根k线需要处理包含关系（high、low都取低值），与第3根k线不具有包含关系，最终，笔的high、low如下：
+
+|
+|___high
+|   |
+| | |
+| |
+|___low
+
+不难发现，笔的high值并不是这3根k线中的最高点，这是由于对前2根k线进行了包含关系处理。
+
+向下的笔，里面包含3根k线， 头两根k线需要处理包含关系（high、low都取高值），与第3根k线不具有包含关系，最终，笔的high、low，如图所示
+_____high
+|
+| |
+| | |
+|   |_____low
+|
+
+笔的low并不是这3根k线的最低值，这是由于对前2根k线进行了包含关系处理。
+
+（新实现）
+
+向上的笔，这3根k线中的后2根，都包含在第1根k线中。 所以，只记住第1根k线的low和high，后2根k线都可以忽略，方向是UNSURE。
+
+|
+|
+|   |
+| | |
+| |
+|
+
+对于第4根k线分类：
+
+（1） 如果，依然被第1根k线包含，则方向UNSURE；继续看下一根k线
+
+|
+|     |
+|   | |
+| | | |
+| |   |
+|     |
+|
+（2） 如果，包含第1根k线， 则更新low、high为第4根k线的low、high，方向是UNSURE；继续看下一根k线
+
+      |
+|     |
+|   | |
+| | | |
+| |   |
+|     |
+      |
+
+（3） 如果，第4根k线的low、high都小于第1根k线的low、high，则方向是SEARCHING_BOTTOM，第1根k线构成向上笔的结束、向下笔的开始
+
+|
+|     |
+|   | |
+| | | |
+| |   |
+|     |
+      |
+
+（4） 如果，第4根k线的low、high都大于第1根k线的low、high，则方向是SEARCHING_TOP，第1根k线构成向下笔的结束、向上笔的开始
+
+      |
+|     |
+|   | |
+| | | |
+| |   |
+|
+
+新算法，相对于旧算法，优点在于：可以更精准的识别出笔的最高点、最低点所在的k线，并且，每1笔的最高点、最低点，一定是k线中的最高、最低点；
+                                旧算法在处理包含关系的时候，会导致笔的最高、最低点数值不准确。
+
+*/
 void Class_LeiBi::FenBi_Step1()
 {
-	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
-
 	container = new ContainerType();
 	baseItemType_Container::iterator start = base_Container->begin();
 	baseItemType_Container::iterator end = base_Container->end();
 
-	Class_KXian temp = *start;
 
-	int KXianCnt = 1; // 一笔内 无“包含关系”的K线的数量； 顶分型、底分型的K线，算在内； 一笔的KXianCnt，应该大于等于5
-	baseItemType_Container::iterator p = start;
+	float possibleBot((*start).getLow()), possibleTop((*start).getHigh());
+	baseItemType_Container::iterator posBotBars(start), posTopBars(start);  // pos : possible
+	baseItemType_Container::iterator curBotBars(start), curTopBars(start); // cur : current
 
-	
-	/*
-	注意: 一个笔的高、低价位，并不是简单地统计该笔所包含K线的最高值、最低值，必须考虑包含关系，譬如：
-          |
-          |___high
-      |   |
-      | | |
-        | |
-          |___low
+	enum { UNSURE, SEARCHING_TOP, SEARCHING_BOT } goal = UNSURE;
+	typedef enum {
+		// 拐点性质
+		INIT = 0, //算法开始时未知状态
+		NON_PEAK_BOT = 0, // 峰 和 谷 之间的K线
+		IS_PEAK = 1, //峰
+		IS_TROUGH = -1  //谷
+	} INFLECTION_POINT;
+	INFLECTION_POINT  lastStatus = INIT, firstBarIs = INIT;
 
-      这个笔的方向是向下的，里面包含3根k线， 笔的high、low，如图所示，不难发现，笔的high值并不是第3根k线的最高点，这是由于后2根k线，进行了包含关系处理
-	  再譬如：下面的笔方向向上，但笔的low并不是最后那根k线的最低值，这是由于后2根k线，进行了包含关系处理.
-           _____high
-          |
-        | |
-      | | |
-      |   |_____low
-          |
-	*/
-	float high = start->getHigh(); // 统计这个笔 的 high
-	float low = start->getLow();  // 统计 这个笔 的 low
-
-	do
+	baseItemType_Container::iterator current;
+	for (current = start + 1; current < end; current++)
 	{
-		while (p != end && temp == *p) // == 表示“包含：
-		{
-			temp.merge(*p, d);
-			p++;
-		}
-		high = max(high, temp.getHigh());
-		low = min(low, temp.getLow());
+		float curLow = (*current).getLow();
+		float curHigh = (*current).getHigh();
 
-		if (p == end)
+		if (goal == UNSURE)
 		{
-			// TODO: 建立最后的一个  类-笔
-			container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
-
-			start = p-1;
-			break;
-		}
-
-		if (Class_KXian::getDirection(temp, *p) == d)
-		{
-			temp = *p;
-			p++;
-			KXianCnt++;
-		}
-		else if (Class_KXian::getDirection(temp, *p) == -d)
-		{
-			
-			if (KXianCnt == 1)
+			if (curLow <= possibleBot)
 			{
-				/* KXianCnt 是1，只可能发生在最开始 几根K线，存在包含关系。 例如：
+				if (curHigh < possibleTop)
+				{
+					if (lastStatus != IS_PEAK) 
+					{
+						// 情形1： INIT 时的 UNSURE状态
+						// 情形2： SEARCHING_TOP过程中，遇到包含之后的UNSURE状态
 
-                     |
-                   | |   |
-                   | | | |
-                   | | | |
-                     | |
-                     |
-
-				  由于，我假定，初始的方向是acscending，所以，在处理了第1、第2 k线包含关系后，发现第3根k线 与之 方向相反，此时，KXianCnt是1；所以把ascending变为descending，
-				  再来一次，但是，在处理了第1、2、3k线的包含关系后，第4根k线又与包含关系k线相反，此时KXianCnt依然是1；所以，开始处的这几根包含关系k线，既不能说是向上、也不能说是向下；
-				  所以，这种情况，打破了我对“类笔”至少由 2根 没有包含关系的K线构成的认识。 处理的方式是： 假设第1根k线，之前有一个虚无的k线，构成一个类笔。
-			   */
-				assert(start == base_Container->begin());
-				KXianCnt = 2;
+						// 找到了顶拐点， 顶拐点左侧的向上一笔确认了
+						if (posTopBars > curBotBars) // 如果lastStatus != INIT
+							container->push_back(ContainerType::value_type(&(*curBotBars), &(*(posTopBars)), possibleTop, (*curBotBars).getLow(), ASCENDING, posTopBars - curBotBars));
+					
+						curTopBars = posTopBars;
+						posTopBars = start - 1;
+						lastStatus = IS_PEAK;
+						if (firstBarIs == INIT)
+							firstBarIs = IS_PEAK;
+					}
+					// 情形3： SEARCHING_BOTTOM过程中，遇到包含之后的UNSURE状态
+					posBotBars = current;
+					possibleBot = curLow;
+					possibleTop = curHigh;
+					goal = SEARCHING_BOT;
+				}
+				else
+				{
+					possibleBot = curLow;
+					possibleTop = curHigh;
+					posTopBars = posBotBars = current;
+				}
 			}
+			else if (curHigh > possibleTop)
+			{
+				if (lastStatus != IS_TROUGH)
+				{
+					// 情形1： INIT 时的 UNSURE状态
+					// 情形2： SEARCHING_BOTTOM过程中，遇到包含之后的UNSURE状态
 
-			container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
-
-			start = p-1;
-			d = -d;
-			KXianCnt = 1;
-
-			high = start->getHigh();
-			low = start->getLow();
+					// 找到了底拐点， 底拐点左侧的向下的一笔确认了
+					if (posBotBars > curTopBars) // 如果lastStatus != INIT
+						container->push_back(ContainerType::value_type(&(*curTopBars), &(*(posBotBars)), (*curTopBars).getHigh(), possibleBot, DESCENDING, posBotBars - curTopBars));
+				
+					curBotBars = posBotBars;
+					posBotBars = start - 1;
+					lastStatus = IS_TROUGH;
+					if (firstBarIs == INIT)
+						firstBarIs = IS_TROUGH;
+				}
+				// 情形3: SEARCHING_TOP的过程中，遇到包含之后的UNSURE状态
+				posTopBars = current;
+				possibleBot = curLow;
+				possibleTop = curHigh;
+				goal = SEARCHING_TOP;
+			}
+			else
+				continue;
 		}
-	}while (p != end);
-	// 将剩余的K线做成1个类笔
-	if (start != end -  1)
-		container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+		else if (goal == SEARCHING_TOP)
+		{
+			if (curHigh > possibleTop)
+			{
+				possibleBot = curLow;
+				possibleTop = curHigh;
+				posTopBars = current;
+			}
+			else if (curLow < possibleBot)
+			{
+				// 找到了顶拐点， 顶拐点左侧的向上的一笔确认了
+				container->push_back(ContainerType::value_type(&(*curBotBars), &(*(posTopBars)), possibleTop, (*curBotBars).getLow(), ASCENDING, posTopBars - curBotBars));
+			
+				curTopBars = posTopBars;
+				posBotBars = current;
+				posTopBars = start - 1;
+				possibleBot = curLow;
+				possibleTop = curHigh;
+				goal = SEARCHING_BOT;
+				lastStatus = IS_PEAK;
+			}
+			else
+				goal = UNSURE;
+		}
+		else // SEARCHING_BOTTOM
+		{
+			if (curLow <= possibleBot)
+			{
+				possibleBot = curLow;
+				possibleTop = curHigh;
+				posBotBars = current;
+			}
+			else if (curHigh > possibleTop)
+			{
+				// 找到了底拐点， 底拐点左侧的向下的一笔确认了
+				container->push_back(ContainerType::value_type(&(*curTopBars), &(*(posBotBars)), (*curTopBars).getHigh(), possibleBot, DESCENDING, posBotBars - curTopBars));
+			
+				curBotBars = posBotBars;
+				posBotBars = start - 1;
+				posTopBars = current;
+				possibleTop = curHigh;
+				possibleBot = curLow;
+				goal = SEARCHING_TOP;
+				lastStatus = IS_TROUGH;
+			}
+			else
+				goal = UNSURE;
+
+		}
+	}
+	// 将剩余的k线新建一笔
+	if (lastStatus == IS_PEAK)
+	{
+		container->push_back(ContainerType::value_type(&(*curTopBars), &(*(posBotBars)), (*curTopBars).getHigh()	, possibleBot, DESCENDING, posBotBars - curTopBars));
+	}
+	else if (lastStatus == IS_TROUGH) 
+	{
+		container->push_back(ContainerType::value_type(&(*curBotBars), &(*(posTopBars)), possibleTop, (*curBotBars).getLow(), ASCENDING, posTopBars - curBotBars));
+	}
 }
+
 
 
 void Class_Bi::FenBi(bool release)
