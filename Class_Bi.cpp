@@ -105,8 +105,7 @@ void Class_LeiBi::FenBi_Step1()
 {
 	Direction d = ASCENDING; // 从最开始的第1、2根k线，我们假设之前的方向是ascending的，这样方便处理包含关系。
 
-	ContainerType* intermidiate = new ContainerType();
-
+	container = new ContainerType();
 	baseItemType_Container::iterator start = base_Container->begin();
 	baseItemType_Container::iterator end = base_Container->end();
 
@@ -150,7 +149,7 @@ void Class_LeiBi::FenBi_Step1()
 		if (p == end)
 		{
 			// TODO: 建立最后的一个  类-笔
-			intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+			container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			break;
@@ -184,7 +183,7 @@ void Class_LeiBi::FenBi_Step1()
 				KXianCnt = 2;
 			}
 
-			intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
+			container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 
 			start = p-1;
 			d = -d;
@@ -196,88 +195,7 @@ void Class_LeiBi::FenBi_Step1()
 	}while (p != end);
 	// 将剩余的K线做成1个类笔
 	if (start != end -  1)
-		intermidiate->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
-
-
-	/* 对intermidiate中的各个类笔，做处理，检查下列情形：即 这3个类笔，各自KXianCnt都是2， 并且 第1、第3 类笔 同向或包含， 将这3个类笔，合并成为1个类笔，总笔数是4
-
-      。 
-            。
-          。   
-                 。
-       
-    */
-	container = new ContainerType();
-	ContainerType::iterator former = intermidiate->begin();
-	ContainerType::iterator endl = intermidiate->end();
-
-	while (former < endl - 2)
-	{
-		ContainerType::iterator latter = former + 2;
-
-		int fKXianCnt = (*former).getKXianCnt();
-		int mKXianCnt = (*(former + 1)).getKXianCnt();
-		int lKXianCnt = (*latter).getKXianCnt();
-
-		if (lKXianCnt != 2)
-		{
-			container->push_back(*former);
-			container->push_back(*(former + 1));
-			container->push_back(*latter);
-			former = latter + 1;
-			continue;
-		} else if (mKXianCnt != 2)
-		{
-			container->push_back(*former);
-			container->push_back(*(former + 1));
-			former = latter;
-			continue;
-		} else if (fKXianCnt != 2)
-		{
-			container->push_back(*former);
-			former++;
-			continue;
-		}
-		
-		Direction df = (*former).getDirection();
-		
-		if (df == IComparable::getDirection(*former, *latter))
-		{
-			float high = max((*former).getHigh(), (*latter).getHigh());
-			float low = min((*former).getLow(), (*latter).getLow());
-
-			container->push_back(ContainerType::value_type((*former).getStart(), (*latter).getEnd(), high, low, df, 4));
-			former = latter + 1;
-		}
-		else if (*former >> *latter)
-		{
-			/*
-			这两个线段，前包后，merge之后，应该是按照df取 former方向相反的方式来merge
-                 /\     _ high
-                /  \  / 
-             former \/
-              /         
-                        - low
-			*/
-			ContainerType::value_type merg = (*former);
-			merg.merge(*latter, -df);
-			container->push_back(ContainerType::value_type((*former).getStart(), (*latter).getEnd(), merg.getHigh(), merg.getLow(), df, 4));
-
-			former = latter + 1;
-		}
-		else
-		{
-			container->push_back(*former);
-			++former;
-		}
-	}
-	// 拷贝剩余的类笔
-	while (former != endl)
-	{
-		container->push_back(*former);
-		former++;
-	}
-	delete intermidiate;
+		container->push_back(ContainerType::value_type(&(*start), &(*(p-1)), high, low, d, KXianCnt));
 }
 
 
