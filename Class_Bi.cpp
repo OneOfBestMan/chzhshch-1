@@ -428,108 +428,153 @@ void Class_Bi::checkValid()
 
 void Class_Bi::FenBi_Step2()
 {
+	float ZIG_PERCENT = 5;
 	container = new ContainerType();
+
+	baseItemType_Container::iterator start = base_Container->begin();
+	baseItemType_Container::iterator end = base_Container->end();
+
+	float possibleBot((*start).getDirection() == ASCENDING ? (*start).getLow() : -1);
+	float possibleTop((*start).getDirection() == DESCENDING ? (*start).getHigh() : -1);
+
+
+	/* 
 	
-	baseItemType_Container::iterator current = base_Container->begin();
-	while (current < base_Container->end() - 2)
+	SEARCHING_TOP 过程中 用到：curBotBars、posTopBars,这两个的方向都是向上的； possibleTop 仅当 向下的一笔低点跌幅超过ZIG_PERCENT才被确认
+
+								   (possibleTop)
+									   /\
+						/\            /  \
+					   /  \          / (ZIG_PERCENT)
+					  /    \  posTopBars   \
+   					 /      \      /        \  /
+				curBotBars   \    /          \/
+				   /          \  /        (curLow) 相对于possibleTop跌幅超过ZIG_PERCENT，则possibleTop被确认为 顶拐点
+				  /            \/             
+				 /
+(上一个已确认的底拐点)
+
+	 SEARCHING_BOTTOM 过程中 用到：curTopBars、posBotBars,这两个的方向都是向下的； possibleBot 仅当 向上的一笔高点涨幅超过ZIG_PERCENT才被确认
+
+ (上一个已确认的顶拐点) 
+				  \
+				   \            /\            (curHigh)相对于possibleBot涨幅超过ZIG_PERCENT，则possibleBot被确认为 底拐点
+				curTopBars     /  \            /\
+					 \        /    \          /  \
+					  \      /      \        /
+					   \    / posBotBars    /
+						\  /          \  (ZIG_PERCENT)
+						 \/            \  /
+										\/
+									(possibleBot)
+ 
+		*/ 
+	baseItemType_Container::iterator posBotBars((*start).getDirection() == ASCENDING ? start-1 : start); // pos: possible
+	baseItemType_Container::iterator posTopBars((*start).getDirection() == DESCENDING ? start-1 : start); // pos: possible
+	baseItemType_Container::iterator curBotBars(end), curTopBars(end); // cur: current
+
+
+	enum { INIT, SEARCHING_TOP, SEARCHING_BOT } goal = INIT;
+	baseItemType_Container::iterator current; 
+	for (current = start; current < end; current++)
 	{
-		Class_LeiBi obj = *current;
-		if ((*current).getKXianCnt() >= 5)
-		{
-			container->push_back(ContainerType::value_type(&(*current)));
-			current++;
-		}
-		else
-		{
-		
-		/*
-		case 1：第1类笔、第3类笔 同向， 则 “类笔1、类笔2、类笔3”构成  1笔
-        。
-          。      。
-            。  。  。
-              。      。
-                        。
+		float curHigh = (*current).getHigh();
+		float curLow = (*current).getLow();
+		Direction d = (*current).getDirection();
 
-		case 2：第1类笔、第3类笔 后包前， 则考察（1）类笔1 是否和 前两类笔 构成1笔（2）类笔1、类笔2 是否可以和前一类笔 构成1笔。考察方法是：
-		逆向 扫描， 如果反向包含 或 反向时， 停止； 如果同向，那么就算找到了 1笔；如果包含，向前继续扫描。
-                       。
-         。          。  。
-           。      。      。
-             。  。          。
-               。              。
-                                 。
-		case 3：第1类笔、第3类笔 前包后：向前扫描， 如果 后包前 或 反向， 停止；  如果前包后 或者 同向， 向前扫描。
-         。
-           。          。
-             。      。  。
-               。  。      。
-                 。
-		case 4：第1类笔、第3类笔 反向，则考察： 第1、第2类笔 逆向扫描；  第1类笔 逆向扫描。
-                      。
-        。          。  。
-          。      。      。
-            。  。
-              。
-
-		*/
-			Direction d = (*current).getDirection();
-			Direction dBi = IComparable::getDirection(*current, *(current + 2));
-			if (d == dBi)
+		if (goal == INIT)
+		{
+			if (d == ASCENDING)
 			{
-				container->push_back(ContainerType::value_type(&(*current), &(*(current+2))));
-				current = current + 3;
+				if (possibleBot*(1 + ZIG_PERCENT / 100) <= curHigh)
+				{
+					curBotBars = posBotBars + 1;
+					posBotBars = end;
+					possibleTop = curHigh;
+					posTopBars = current;
+					goal = SEARCHING_TOP;
+
+					assert((*curBotBars).getDirection() == (*posTopBars).getDirection() && (*curBotBars).getDirection() == ASCENDING);
+				}
+				else if (curHigh > possibleTop)
+				{
+					posTopBars = current;
+					possibleTop = curHigh;
+				}
 			}
-			else if (-d == dBi  ||  *current << *(current + 2) )
-			{
-				if (container->size())
+			else {
+				// DESCENDING
+				if (curLow*  (1 + ZIG_PERCENT / 100) <= possibleTop)  // (curLow) 相对于possibleTop跌幅超过ZIG_PERCENT
 				{
-					Class_Bi temp(&(*(current + 1)));
-					container->push_back(temp);
-					if (bckwdSearch(container->rbegin() + 1, &(*(current + 1)), -d))
-					{
-						current += 2;
-						continue;
-					}
-				}
+					curTopBars = posTopBars + 1;
+					posTopBars = end;
+					possibleBot = curLow;
+					posBotBars = current;
+					goal = SEARCHING_BOT;
 
-				if (container->size() > 1)
-				{
-					Class_Bi temp(&(*current));
-					container->push_back(temp);
-					if (bckwdSearch(container->rbegin() + 2,  &(*current), d))
-					{
-						current++;
-						continue;
-					}
+					assert((*curTopBars).getDirection() == (*posBotBars).getDirection() && (*curTopBars).getDirection() == DESCENDING);
 
 				}
-				
+				else if (curLow < possibleBot)
 				{
-					container->push_back(ContainerType::value_type(&(*current)));
-					container->push_back(ContainerType::value_type(&(*(current+1))));
-					current = current + 2;
+					posBotBars = current;
+					possibleBot = curLow;
 				}
-			}else
+			}
+		}
+		else if (goal == SEARCHING_TOP)  // 寻找顶拐点： 找到一个向下的类笔，类笔的低点对于当前高点转折超过  ZIG_PERCENT
+		{
+			if (d == ASCENDING) 
 			{
-				if (container->size() > 1)
+				if (curHigh > possibleTop)
 				{
-					Class_Bi temp(&(*current));
-					container->push_back(temp);
-					if (bckwdSearch(container->rbegin() + 2,  &(*current), d))
-					{
-						current++;
-						continue;
-					}
+					possibleTop = curHigh;
+					posTopBars = current;
 				}
-				
+			}
+			else 
+			{
+				if (curLow * (1 + ZIG_PERCENT / 100) <= possibleTop)
 				{
-					container->push_back(ContainerType::value_type(&(*current), &(*(current+2))));
-					current = current + 3;
+					// 找到 顶拐点， 顶拐点左侧的向上笔 被确认
+					container->push_back(ContainerType::value_type(&(*curBotBars), &(*posTopBars)));
+					assert((*curBotBars).getDirection() == (*posTopBars).getDirection() && (*curBotBars).getDirection() == ASCENDING);
+
+					curTopBars = posTopBars + 1;
+					posTopBars = start -1;
+					posBotBars = current;
+					possibleBot = curLow;
+					goal = SEARCHING_BOT;
+				}
+			}
+		}
+		else // SEARCHING_BOT
+		{
+			if (d == DESCENDING)
+			{
+				if (curLow < possibleBot)
+				{
+					possibleBot = curLow;
+					posBotBars = current;
+				}
+			}
+			else 
+			{
+				if (possibleBot*(1 + ZIG_PERCENT / 100) <= curHigh) // (curHigh)相对于possibleBot涨幅超过ZIG_PERCENT
+				{
+					// 找到 底拐点， 底拐点左侧的向下笔 被确认
+					container->push_back(ContainerType::value_type(&(*curTopBars), &(*posBotBars)));
+					assert((*curTopBars).getDirection() == (*posBotBars).getDirection() && (*curTopBars).getDirection() == DESCENDING);
+
+					curBotBars = posBotBars + 1;
+					posBotBars = start-1;
+					posTopBars = current;
+					possibleTop = curHigh;
+					goal = SEARCHING_TOP;
 				}
 			}
 		}
 	}
-
 
 }
 
