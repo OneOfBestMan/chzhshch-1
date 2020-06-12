@@ -539,7 +539,7 @@ void Class_Bi::FenBi_Step2()
 				}
 			}
 		}
-		else if (goal == SEARCHING_TOP)  // 寻找顶拐点： 找到一个向下的类笔，类笔的低点对于当前高点转折超过  ZIG_PERCENT
+		else if (goal == SEARCHING_TOP)  // 寻找顶拐点的确认点： 找到一个向下的类笔，类笔的低点对于当前高点（possibleTop）转折超过  ZIG_PERCENT
 		{
 			if (d == ASCENDING) 
 			{
@@ -566,7 +566,7 @@ void Class_Bi::FenBi_Step2()
 				}
 			}
 		}
-		else // SEARCHING_BOT
+		else // SEARCHING_BOT  寻找底拐点的确认点： 找到一个向上的类笔，类笔的高点对于当前低点（possibleBot）转折超过  ZIG_PERCENT
 		{
 			if (d == DESCENDING)
 			{
