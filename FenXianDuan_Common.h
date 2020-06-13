@@ -537,19 +537,17 @@ class CharacterVec: public IComparable
 
 		ContainerType* bigPicture = ZIG_PEAK_TROUGH<XianDuanClass>(30);
 
-		itemIterator start = bigPicture->begin();
-		itemIterator end = bigPicture->end();
-		itemIterator current;
+		itemIterator firstXianDuan = bigPicture->begin();
+		itemIterator lastXianDuan = bigPicture->end();
+		itemIterator curXianDuan;
 
-		for (current = start; current < end; current++)
+		for (curXianDuan = firstXianDuan; curXianDuan < lastXianDuan; curXianDuan++)
 		{
-			itemType *item = &(*current);
-			//baseItemType_Container::iterator bi_Start = item->
-
-
+			baseItemIterator biStart = (*curXianDuan).getStart();
+			baseItemIterator biEnd = (*curXianDuan).getEnd();
+			
+			CHZHSHCH_PEAK(biStart, biEnd);
 		}
-
-
 
 		delete bigPicture;
 

@@ -24,42 +24,42 @@ typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH(float ZIG_PERCENT=5)
 	float possibleBot((*start).getDirection() == ASCENDING ? (*start).getLow() : -1);
 	float possibleTop((*start).getDirection() == DESCENDING ? (*start).getHigh() : -1);
 
-
-	/*
-
-	SEARCHING_TOP 过程中 用到：curBotBars(已确认底拐点右侧的第1笔)、posTopBars（待确认顶拐点左侧的第1笔），方向都是向上的；
+	/* 
+	
+	SEARCHING_TOP 过程中 用到：curBotBars(已确认底拐点右侧的第1笔)、posTopBars（待确认顶拐点左侧的第1笔），方向都是向上的； 
 	possibleTop 仅当 向下的一笔低点(curLow)跌幅超过ZIG_PERCENT时才被确认
 
 
-	(possibleTop：待确认的顶拐点)
-	/\
-	/\            /  \
-	/  \          / (ZIG_PERCENT)
-	/    \  posTopBars   \
-	/      \      /        \  /
-	curBotBars   \    /          \/
-	/          \  /        (curLow) 相对于possibleTop跌幅超过ZIG_PERCENT，则possibleTop才被确认为 顶拐点
-	/            \/
-	/
-	(已确认的底拐点)
+                                                                (possibleTop：待确认的顶拐点)
+                                                                               /\
+                                                     /\                     /    \
+                                                   /    \                 /   (ZIG_PERCENT)
+                                                 /        \   posTopBars    \
+                                               /            \          /               \    /
+                                       curBotBars     \        /                  \/
+                                            /                  \    /              (curLow) 相对于possibleTop跌幅超过ZIG_PERCENT，则possibleTop才被确认为 顶拐点
+                                          /                      \/             
+                                        /
+                                (已确认的底拐点)
 
-	SEARCHING_BOTTOM 过程中 用到：curTopBars(已确认顶拐点的右侧第1笔)、posBotBars（待确认底拐点的左侧第1笔）,方向都是向下的；
-	possibleBot 仅当 向上的一笔高点（curHigh）涨幅超过ZIG_PERCENT时才被确认
+	 SEARCHING_BOTTOM 过程中 用到：curTopBars(已确认顶拐点的右侧第1笔)、posBotBars（待确认底拐点的左侧第1笔）,方向都是向下的； 
+	 possibleBot 仅当 向上的一笔高点（curHigh）涨幅超过ZIG_PERCENT时才被确认
 
 
-	(已确认的顶拐点)
-	\
-	\            /\            (curHigh)相对于possibleBot涨幅超过ZIG_PERCENT，则possibleBot才被确认为 底拐点
-	curTopBars     /  \            /\
-	\        /    \          /  \
-	\      /      \        /
-	\    / posBotBars    /
-	\  /          \  (ZIG_PERCENT)
-	\/            \  /
-	\/
-	(possibleBot：待确认的底拐点)
+                                           (已确认的顶拐点) 
+                                                  \
+                                                    \                  /\            (curHigh)相对于possibleBot涨幅超过ZIG_PERCENT，则possibleBot才被确认为 底拐点
+                                              curTopBars      /    \                       /\
+                                                       \            /       \                    /   \
+                                                         \        /           \                /
+                                                           \    /  posBotBars         /
+                                                             \/                    \     (ZIG_PERCENT)
+                                                                                      \    /
+                                                                                        \/
+                                                                                (possibleBot：待确认的底拐点)
+ 
+		*/ 
 
-	*/
 
 	/*
 	初始的时候，如果 第1笔 向上， 则 第1笔的起点 被假定是一个 已确认的底拐点， 该底拐点 左侧的一笔（posBotBars = start-1）方向向下（虽然这1笔不存在）;
