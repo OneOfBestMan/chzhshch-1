@@ -1,4 +1,6 @@
-  class CharacterVec: public IComparable
+
+
+class CharacterVec: public IComparable
 	{
 	public:
 		// 特征向量； 如果，特征向量只有1笔，那么start和end指向同一个笔，否则，分别指向第一、最后一笔；
@@ -461,7 +463,8 @@
 		return resultSet;
 	}
 
-	static ContainerType* startFenXianDuan_v2(baseItemIterator start, baseItemIterator end)
+
+	static ContainerType* startFenXianDuan_v2()
 	{
 		/*
 		拐点的特征向量：每一个拐点右侧1笔，是该拐点的特征向量，如下图中的①②③、④⑤⑥分别是对应的拐点1、2、3、4、5、6的特征向量。
@@ -530,6 +533,24 @@
 
 		   一个可以适用的方式是： 先按照zig（30%）来划分出大的走势区间（这样能够识别出一些大画面的顶、底），然后再在各个走势区间内部 进行线段划分。 这样的好处是：每个走势区间的头、尾对应的顶、底分型是确定的，只需要找出其内部的各个顶、底分型就可以了。
 
-		   
 		 */
+
+		ContainerType* bigPicture = ZIG_PEAK_TROUGH<XianDuanClass>(30);
+
+		itemIterator start = bigPicture->begin();
+		itemIterator end = bigPicture->end();
+		itemIterator current;
+
+		for (current = start; current < end; current++)
+		{
+			itemType *item = &(*current);
+			//baseItemType_Container::iterator bi_Start = item->
+
+
+		}
+
+
+
+		delete bigPicture;
+
 	}

@@ -3,6 +3,7 @@
 #ifndef FENXIANDUAN_H
 #define FENXIANDUAN_H
 
+#include "Zig_Common.h"
 
 template<class XianDuanClass >
 class FenXianDuanTemplate
@@ -13,6 +14,8 @@ public:
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType ContainerType;
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
+	typedef typename ContainerType::iterator itemIterator;
+	typedef XianDuanClass itemType;
 
 	static void doWork(bool release)
 	{

@@ -1076,12 +1076,15 @@ template <class XianDuanClass>
 void doWork(MultiLevelZhongShuView &view, XianDuanClass &item)
 {
 	typedef typename XianDuanClass::baseItemType baseItemType;
+	typedef typename XianDuanClass::baseItemIterator baseItemIterator;
+
+
 	// debugCounter++;
 	// MultiLevelZhongShuView view;
 	
-	baseItemType* TP1_1 = item.getStart();
-	baseItemType* TP1_2 = TP1_1 + 1;
-	baseItemType* end = item.getEnd();
+	baseItemIterator TP1_1 = item.getStart();
+	baseItemIterator TP1_2 = TP1_1 + 1;
+	baseItemIterator end = item.getEnd();
 
 	while (TP1_1 <= end)
 	{
@@ -1090,7 +1093,7 @@ void doWork(MultiLevelZhongShuView &view, XianDuanClass &item)
 		{
 			doWork(view, *TP1_2);
 			// handleTurningPoint(view, TP1_1, TP1_2);
-			view.merge(TP1_2);
+			view.merge(&(*TP1_2));
 
 		}
 		//else
@@ -1106,18 +1109,19 @@ template<>
 void doWork(MultiLevelZhongShuView &view, Class_XianDuan<2>  &item)
 {
 	typedef Class_XianDuan<1> baseItemType;
+	typedef Class_XianDuan<2>::baseItemIterator baseItemIterator;
 
 	// MultiLevelZhongShuView view;
 	
-	baseItemType* TP1_1 = item.getStart();
-	baseItemType* TP1_2 = TP1_1 + 1;
-	baseItemType* end = item.getEnd();
+	baseItemIterator TP1_1 = item.getStart();
+	baseItemIterator TP1_2 = TP1_1 + 1;
+	baseItemIterator end = item.getEnd();
 
 	while (TP1_1 <= end)
 	{
 		if (TP1_2 <= end)
 		{
-			Class_ZhongShu *zs = createZhongShu(TP1_2, 0);
+			Class_ZhongShu *zs = createZhongShu(&(*TP1_2), 0);
 			view.Add_Elem(zs);
 		}
 		TP1_1 = TP1_1 + 2;
@@ -1130,6 +1134,7 @@ void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView 
 {
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
+	typedef typename XianDuanClass::baseItemIterator baseItemIterator;
 
 
 	if (startFrom)
@@ -1156,8 +1161,8 @@ void AnalyzeZhongShu_Remaining(XianDuanClass *startFrom, MultiLevelZhongShuView 
 				startFrom++;
 			}
 		}
-		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
-		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
+		baseItemIterator remaining = (*(end - 1)).getEnd() + 1;
+		AnalyzeZhongShu_Remaining<baseItemType>(&(*remaining), view);
 		
 		//printf("break me here");
 	}
@@ -1174,7 +1179,8 @@ void AnalyzeZhongShu_PostOrder_V2()
 {
 	typedef typename XianDuanClass::baseItemType baseItemType;
 	typedef typename XianDuanClass::ContainerType::iterator ItemIterator;
-
+	typedef typename XianDuanClass::baseItemType baseItemType;
+	typedef typename XianDuanClass::baseItemIterator baseItemIterator;
 
 	if (XianDuanClass::container)
 	{
@@ -1206,14 +1212,14 @@ void AnalyzeZhongShu_PostOrder_V2()
 		}
 
 		// 会有一些低级别线段， 它们还没有被归纳到 高级别线段，因此需要处理这些线段
-		baseItemType *remaining = (*(end - 1)).getEnd() + 1;
+		baseItemIterator remaining = (*(end - 1)).getEnd() + 1;
 
 		// 通常，未能归纳成为高级别线段，都意味着很大的转折产生了；比如，从1900涨到6100，然后从6100跌倒4000点，后一段走势，可能还没有被归纳成为高级别线段；
 		// 我更希望能够单独考察后一段下跌段，而不是把它们中的中枢，与之前的上涨段中的中枢去扩展。因此，建立一个单独的view，来分析这个转折之后的线段。
 		// 如果，上涨、下跌已经都走出来了，那么，就要分开考察后面的走势； 如果，还看不清楚是否是走势的转折，那么就要统一考察；
 		// MultiLevelZhongShuView afterBigTurningPoint;
 		// AnalyzeZhongShu_Remaining<baseItemType>(remaining, afterBigTurningPoint);
-		AnalyzeZhongShu_Remaining<baseItemType>(remaining, view);
+		AnalyzeZhongShu_Remaining<baseItemType>(&(*remaining), view);
 	}
 	else
 	{

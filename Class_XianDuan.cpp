@@ -33,8 +33,8 @@ ostream& operator<<(ostream& ostream, Class_XianDuan<1>& objXianDuan)
 
 Class_XianDuan<1>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct)
 {
-	this->Start = &(*biStart);
-	this->End = &(*biEnd);
+	this->Start =biStart;
+	this->End = biEnd;
 	this->d = direct;
 
 	float high = (*biStart).getHigh();
@@ -51,4 +51,14 @@ Class_XianDuan<1>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biE
 	this->Low = low;
 
 
+}
+
+Class_XianDuan<1>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd)
+{
+	baseItemType& start = *biStart;
+	baseItemType& end = *biEnd;
+
+	assert(start.getDirection() == end.getDirection() && IComparable::getDirection(start, end) == start.getDirection());
+
+	Class_XianDuan(biStart, biEnd, start.getDirection());
 }

@@ -14,6 +14,8 @@
 
 #include "Display.h"
 
+#include "Zig_Common.h"
+
 using namespace std;
 
 
@@ -28,13 +30,14 @@ public:
 
 
 	typedef ContainerType::value_type leiBi; // 类笔
-	typedef ContainerType::iterator leiBiIter, BiIter;
+	typedef ContainerType::iterator leiBiIter;
+	typedef baseItemIterator KXianIter;
 
 
 	Class_LeiBi(void) {}
 	~Class_LeiBi(void){}
 	/* 类笔 的构造函数*/
-	Class_LeiBi(baseItemType_Container::value_type* biStart, baseItemType_Container::value_type* biEnd, float high, float low, Direction direct, int Cnt)
+	Class_LeiBi(KXianIter biStart, KXianIter biEnd, float high, float low, Direction direct, int Cnt)
 		:traits(biStart, biEnd, high, low, direct) {KXianCnt = Cnt;}
 
 	static baseItemType_Container *base_Container;
@@ -81,6 +84,7 @@ private:
 };
 
 
+
 class Class_Bi: public traits<Class_LeiBi, Class_Bi>
 {
 public:
@@ -91,16 +95,17 @@ public:
 	typedef DisplayTemplate<Class_Bi> DisplayClass;
 
 	typedef baseItemType_Container::value_type leiBi;
+	typedef baseItemIterator leiBiIter;
 
 
 	Class_Bi(void) {}
 	~Class_Bi(void){}
 	/* 笔 的构造函数*/
-	Class_Bi(leiBi* biStart, leiBi* biEnd);
+	Class_Bi(leiBiIter biStart, leiBiIter biEnd);
 
-	Class_Bi(leiBi* biStart);
+	Class_Bi(leiBiIter biStart);
 
-	static baseItemType_Container *base_Container;
+	static baseItemType_Container *baseItems;
 
 	/* 经过思考，觉得，从类笔到笔，需要经过2个步骤：先是用分线段的方式，确定大的线段； 然后在线段内部，寻找合适的顶分型、底分型，将线段划分成若干笔；
 	   目前的实现，打算先略去 从类笔 到 笔； 而是直接基于 类笔 划分线段。
@@ -117,6 +122,8 @@ public:
 	Class_XianDuan<1>* getBaseXianDuanEnd() {return NULL;}
 
 	int getKXianCnt() {return KXianCnt;}
+
+
 private:
 
 		/*
@@ -140,10 +147,12 @@ private:
 	/* 之前的实现，在调试的时候，发现是不对的。 目前看，分笔的实现，本质上还是划分线段，特征向量就是“类笔”中，那些非常小的类笔； */
 	static void FenBi_Step2();
 
-	static bool bckwdSearch(ContainerType::reverse_iterator, Class_LeiBi *, Direction);
+	static bool bckwdSearch(ContainerType::reverse_iterator, leiBiIter, Direction);
 	//static bool bckwdSearch(int, Class_LeiBi *, Direction);
 
 	static void checkValid();
+
+
 };
 
 #endif

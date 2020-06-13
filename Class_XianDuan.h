@@ -15,6 +15,7 @@ using namespace std;
 #include "FenXianDuan.h"
 #include "traits.h"
 #include "Display.h"
+#include "Zig_Common.h"
 
 /*
 template<int grade> class Class_XianDuan;
@@ -44,7 +45,9 @@ public:
 	Class_XianDuan(void);
 	~Class_XianDuan(void);
 
-	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd); // v2分线段算法
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct); // v1分线段算法
+
 
 	/* 这两个接口，是给中枢服务的，中枢最小的构成单位 */
 	Class_XianDuan<1>* getBaseXianDuanStart() {return getStart()->getBaseXianDuanStart();}
@@ -67,6 +70,7 @@ public:
 		return file;
 	}
 
+
 private:
 
 };
@@ -87,10 +91,12 @@ public:
 
 	typedef baseItemType_Container::iterator baseItemIterator;
 
+
 	static const int GRADE = 1;
 
 
-	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct);
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd); // v2分线段算法
+	Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct); // v1分线段 算法
 
     static baseItemType_Container *baseItems;
     static ContainerType *container;
@@ -99,8 +105,11 @@ public:
 
 	Class_XianDuan<1>* getBaseXianDuanStart() {return this;}
 	Class_XianDuan<1>* getBaseXianDuanEnd() {return this;}
+
+	
 private:
 
+	
 
 };
 
@@ -118,8 +127,8 @@ Class_XianDuan<grade>::~Class_XianDuan(void)
 template <int grade>
 Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd, Direction direct)
 {
-	this->Start = &(*biStart);
-	this->End = &(*biEnd);
+	this->Start = biStart;
+	this->End = biEnd;
 	this->d = direct;
 
 	float high = (*biStart).getHigh();
@@ -138,6 +147,16 @@ Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator
 
 }
 
+template <int grade>
+Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator biEnd)
+{
+	baseItemType& start = *biStart;
+	baseItemType& end = *biEnd;
+	
+	assert(start.getDirection() == end.getDirection() && IComparable::getDirection(start,end) == start.getDirection());
+
+	Class_XianDuan(biStart, biEnd, start.getDirection());
+}
 
 template<int grade>
 typename Class_XianDuan<grade>::baseItemType_Container* Class_XianDuan<grade>::baseItems = (typename Class_XianDuan<grade>::baseItemType_Container*)NULL;
@@ -155,6 +174,8 @@ public:
 	typedef Class_XianDuan<1>::ContainerType ContainerType;
 	typedef Class_XianDuan<1> XianDuanClass; // 这样定义，就可以使用FenXianDuan_Common.h中的函数了
 	typedef Class_XianDuan<1>::baseItemType_Container baseItemType_Container;
+	typedef typename ContainerType::iterator itemIterator;
+	typedef Class_XianDuan<1> itemType;
 
 	static void doWork(bool release)
 	{

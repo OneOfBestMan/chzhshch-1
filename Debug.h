@@ -34,8 +34,8 @@ public:
 		while (p != end)
 		{
 			XianDuanClass::ContainerType::value_type &item = *p;
-			XianDuanClass::baseItemType *xStart = item.getStart();
-			XianDuanClass::baseItemType *xEnd = item.getEnd();
+			XianDuanClass::baseItemIterator xStart = item.getStart();
+			XianDuanClass::baseItemIterator xEnd = item.getEnd();
 			
 #ifdef BiLiKuanDu //按比例宽度输出
 			int total = 0;
@@ -132,14 +132,14 @@ class DumpTemplateV2
 {
 public:
 
-	static void printChildren(typename XianDuanClass::baseItemType *start, typename XianDuanClass::baseItemType *end, ostream &stream, dumpHelperMap &helperMap)
+	static void printChildren(typename XianDuanClass::baseItemIterator start, typename XianDuanClass::baseItemIterator end, ostream &stream, dumpHelperMap &helperMap)
 	{
-		XianDuanClass::baseItemType *p = start;
-		while (p != end + 1)
+		XianDuanClass::baseItemIterator p = start;
+		while (p <= end)
 		{
-			XianDuanClass::baseItemType item = *p;
+			XianDuanClass::baseItemType& item = *p;
 
-			int total = helperMap[p].total;
+			int total = helperMap[&(*p)].total;
 
 			stringstream strstream;
 			strstream << item;

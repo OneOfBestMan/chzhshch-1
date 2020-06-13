@@ -44,15 +44,19 @@ class traits : public Class_XianDuanBase, public IComparable, public IDisplayabl
 { 
 public:
 	typedef vector<Item> ContainerType;
+	typedef typename ContainerType::iterator itemIterator;
+
 	typedef baseItemType baseItemType;
 	typedef vector<baseItemType> baseItemType_Container;
+	typedef typename baseItemType_Container::iterator baseItemIterator;
+	typedef Item itemType;
 
 	float High, Low;
 	Direction d;
-	baseItemType *Start, *End;
+	baseItemIterator Start, End;
 
-	traits(baseItemType* start, baseItemType* end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir; zsList = NULL;}
-	traits() {Start = End = (baseItemType*)NULL; High = Low = 0; d = UNKNOWN; zsList = NULL;}
+	traits(baseItemIterator start, baseItemIterator end, float h, float l, Direction dir = UNKNOWN) {Start = start; End = end; High =h; Low = l; d = dir; zsList = NULL;}
+	traits() {/*Start = End = (baseItemType*)NULL;*/ High = Low = 0; d = UNKNOWN; zsList = NULL;}
 	~traits() {delete zsList;}
 
 	float getHigh() const {return High;}
@@ -60,11 +64,11 @@ public:
 	void setHigh(float h) {High = h;}
 	void setLow(float l) {Low = l;}
 
-	baseItemType*  getStart() const{return Start;}
-	baseItemType*  getEnd() const {return End;}
+	baseItemIterator  getStart() const{return Start;}
+	baseItemIterator  getEnd() const {return End;}
 
-	Class_KXian* getStartRec() { return getStart()->getStartRec(); }
-	Class_KXian* getEndRec() { return getEnd()->getEndRec(); }
+	Class_KXian* getStartRec() { return (*getStart()).getStartRec(); }
+	Class_KXian* getEndRec() { return (*getEnd()).getEndRec(); }
 
 	Direction getDirection() const {return d;}
 
