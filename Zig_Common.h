@@ -31,7 +31,7 @@ typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH(float ZIG_PERCENT=5)
         遇到向下1笔，若低点低于possibleBot则更新possibleBot；遇到向上1笔，若高点高于possibleTop则更新possibleTop；
         不断比较possibleBot、possibleTop之间的幅度，若大于ZIG_PERCENT，若当前位置是possibleTop，则确认的是possibleBot，设置好curBotBars为posBotBars，进入SEARCHING_TOP；
         若当前位置是possibleBot，则确认的是possibleTop，设置好curTopBars为posTopBars，进入SEARCHING_BOT
-	舍弃 从开始第1根k线 到 第一个被确认的顶或者底，因为：这一段的幅度肯定不足ZIG_PERCENT，并且，也不一定满足“顶开始于向下1笔，底满足于向上1笔”，譬如：
+	舍弃 从开始第1根k线 到 第一个被确认的顶或者底，因为：这一段的幅度肯定不足ZIG_PERCENT，并且，也不一定满足“顶开始于向下1笔，底开始于向上1笔，并且高低点都出现在首尾”，譬如：
 
 	    （假设 zig 设置成为30%）
                                         拐点3
@@ -46,7 +46,7 @@ typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH(float ZIG_PERCENT=5)
                          \/
 				   拐点2
 
-    算法会舍弃从开始点 到拐点2这一部分； 首先，这一段的zig肯定不足30%；第二，虽然开始点 相对于拐点2，应该是顶（因为拐点2是底，并且开始点不可能低于拐点2），但是其到拐点1之前的1笔却是向上的，并不满足“顶开始于向下1笔，底满足于向上1笔”，所以非常别扭。。。。
+    算法会舍弃从开始点 到拐点2这一部分； 首先，这一段的zig肯定不足30%；第二，虽然开始点 相对于拐点2，应该是顶（因为拐点2是底，并且开始点不可能低于拐点2），但是其到拐点1之前的1笔却是向上的，并不满足“顶开始于向下1笔，底开始于向上1笔，并且高低点都出现在首尾”，所以非常别扭。。。。
 	因此，从开始点 到 拐点2这一段，会被舍弃。
 
 	SEARCHING_TOP 过程中 用到：curBotBars(已确认底拐点右侧的第1笔)、posTopBars（待确认顶拐点左侧的第1笔），方向都是向上的； 
@@ -83,6 +83,8 @@ typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH(float ZIG_PERCENT=5)
                                                                                         \/
                                                                                 (possibleBot：待确认的底拐点)
  
+       算法结束之前，会将 curTopBars到posBotBars （或者 curBotBars到posTopBars)建立1个线段，不过，posTopBars、posBotBars 不一定是最后1笔。  虽然这个线段的幅度不会满足ZIG，但是，这段区间却一定满足“顶开始于向下1笔，底开始于向上1笔，并且高低点都出现在首尾”。
+	   
 		*/ 
 
 

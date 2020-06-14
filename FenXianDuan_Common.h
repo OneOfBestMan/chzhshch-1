@@ -11,7 +11,7 @@ class CharacterVec: public IComparable
 		void setHigh(float h) {High = h;}
 		void setLow(float l) {Low = l;}
 
-		CharacterVec(baseItemIterator &s, baseItemIterator &e) 
+		CharacterVec(baseItemIterator s, baseItemIterator e) 
 		{
 			assert((*s).getDirection() == (*e).getDirection());
 			start = s; 
@@ -21,6 +21,26 @@ class CharacterVec: public IComparable
 			High = (*s).getHigh();
 			Low = (*s).getLow();
 
+			while (s != e)
+			{
+				s += 2;
+				merge(*s, -d);
+			}
+		}
+
+		CharacterVec(baseItemIterator e) : CharacterVec(e, e) 
+		{
+		}
+
+		void updateEnd(baseItemIterator e)
+		{
+			assert((*start).getDirection() == (*e).getDirection());
+
+			High = (*start).getHigh();
+			Low = (*start).getLow();
+			end = e;
+
+			baseItemIterator s = start;
 			while (s != e)
 			{
 				s += 2;
@@ -463,6 +483,133 @@ class CharacterVec: public IComparable
 		return resultSet;
 	}
 
+	typedef enum { IS_TROUGH = -1, NON = 0, IS_PEAK = 1 }  InflectionPoint;
+
+	static void findFenXing(InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end, bool findPeak)
+	{
+		/* 在start到end之间，寻找分型拐点，并且更新map。 各个拐点对应到map的下标，通过与veryStart求差值，来计算。
+		   ZIG算法保证:  start、end必然对应着顶或者底，并且start、end方向相同；若start是向上1笔，则start开始于底，否则start开始于顶；若end是向上1笔，则结束于顶，否则结束于底。
+
+		   假设：最开始点到拐点1、拐点1到拐点2的幅度均不满足ZIG；拐点2到拐点5幅度，超过ZIG；拐点5到拐点8的跌幅也超过ZIG。
+                                               拐点5   		
+                              拐点3          /\          拐点7
+        拐点1                  /\      end   \        /\
+              /\                /    \    /         \    /    \
+            /    \            /        \/             \/        \
+  veryStart   \      start   拐点4      拐点6         \
+        /            \    /                                           \
+ 最开始点         \/                                            拐点8
+                   拐点2                      
+      |--不考虑---|--- ZIG区间1 ---|--  ZIG区间2 --|
+		*/
+		assert((*start).getDirection() == (*end).getDirection());
+		map[start - veryStart] = ((*start).getDirection() == ASCENDING ? IS_TROUGH : IS_PEAK);
+		map[end - veryStart + 1] = ((*end).getDirection() == ASCENDING ? IS_PEAK : IS_TROUGH);
+
+		baseItemIterator current;
+		/*
+		假定 寻找底分型， start方向向下。  left、mid、right分别代表左、中、右 3个独立的特征向量
+      拐点1
+          \                                         拐点6
+            \        拐点3      拐点4        /\
+        start        /\             /\    right  \
+                \  left  \         /    \    /        \
+                  \/        \   mid     \/            \
+              拐点2         \/          拐点5       end
+                               拐点4                       \ 
+                          （ 底分型拐点）               \
+                                                               拐点7
+		*/
+
+		if (findPeak)
+		{
+			current = (*start).getDirection() == ASCENDING ? start + 1 : start;
+		}
+		else
+		{
+			current = (*start).getDirection() == ASCENDING ? start : start + 1;
+		}
+		while (current < end)
+		{
+			CharacterVec  leftCharacterVec(current);   // 分型的左特征向量
+
+			//分型左侧的特征向量，适用“前包后”合并
+			while ((current + 2) < end &&  leftCharacterVec >> *(current + 2))
+			{
+				leftCharacterVec.updateEnd(current + 2);
+				current += 2;
+			}
+
+			current += 2;
+			if (current > end) 
+				break;
+
+			CharacterVec midCharacterVec(current);
+
+			if (findPeak)
+			{
+				if (leftCharacterVec > midCharacterVec || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				{
+					current = midCharacterVec.start;
+					continue;
+				}
+			}
+			else
+			{
+				if (leftCharacterVec < midCharacterVec || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				{
+					current = midCharacterVec.start;
+					continue;
+				}
+
+			}
+			assert(findPeak ? (leftCharacterVec.getHigh() < midCharacterVec.getHigh()) : (leftCharacterVec.getLow() > midCharacterVec.getLow()));
+
+			//分型右侧特征向量，适用“前包后"合并
+			while ((current + 2) < end && midCharacterVec >> *(current + 2))
+			{
+				midCharacterVec.updateEnd(current + 2);
+				current += 2;
+			}
+
+			current += 2;
+			if (current > end)
+				break;
+
+			CharacterVec rightCharacterVec(current);
+			if (findPeak)
+			{
+				if (midCharacterVec > rightCharacterVec)
+				{
+					// 找到 顶分型
+					map[midCharacterVec.start - veryStart] = IS_PEAK;
+				}
+				else // if (midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec)
+				{
+					assert(midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec);
+					current = midCharacterVec.start;
+				}
+			}
+			else
+			{
+				if (midCharacterVec < rightCharacterVec)
+				{
+					// 找到 底分型
+					map[midCharacterVec.start - veryStart] = IS_TROUGH;
+				}
+				else // if ( midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec)
+				{
+					assert(midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec);
+					current = midCharacterVec.start;
+				}
+			}
+		}
+	}
+
+	static void handleConflict(InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end)
+	{
+
+	}
 
 	static ContainerType* startFenXianDuan_v2()
 	{
@@ -535,20 +682,33 @@ class CharacterVec: public IComparable
 
 		 */
 
-		ContainerType* bigPicture = ZIG_PEAK_TROUGH<XianDuanClass>(30);
+		ContainerType* bigPicture = ZIG_PEAK_TROUGH<XianDuanClass>(30); // 先按照zig 做个宏观的线段划分
 
 		itemIterator firstXianDuan = bigPicture->begin();
 		itemIterator lastXianDuan = bigPicture->end();
 		itemIterator curXianDuan;
 
-		for (curXianDuan = firstXianDuan; curXianDuan < lastXianDuan; curXianDuan++)
+		
+
+	    // 每个拐点，对应1个状态位。算上开头、结尾，一共有XianDuanClass::baseItems->size()+1个点
+		
+		InflectionPoint* map = new InflectionPoint[XianDuanClass::baseItems->size()+1];
+		for (int i = 0; i < XianDuanClass::baseItems->size() + 1; i++)
+			map[i] = NON;
+
+		baseItemIterator veryStart = XianDuanClass::baseItems->begin(); // 最开始点
+
+		for (curXianDuan = firstXianDuan; curXianDuan < lastXianDuan; curXianDuan++)  //对于每个大的线段划分
 		{
-			baseItemIterator biStart = (*curXianDuan).getStart();
-			baseItemIterator biEnd = (*curXianDuan).getEnd();
+			baseItemIterator biStart = (*curXianDuan).getStart(); //线段的开始点
+			baseItemIterator biEnd = (*curXianDuan).getEnd();   //线段的结束点
 			
-			CHZHSHCH_PEAK(biStart, biEnd);
+			findFenXing(map, veryStart, biStart, biEnd, true); // 寻找 顶分型
+			findFenXing(map, veryStart, biStart, biEnd, false); // 寻找 底分型
+
+			handleConflict(map, veryStart, biStart, biEnd);  // 处理 顶顶、底底相邻，以及 顶、底之间没有3笔的情况
 		}
 
 		delete bigPicture;
-
+		delete[] map;
 	}
