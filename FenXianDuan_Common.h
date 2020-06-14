@@ -716,7 +716,7 @@ class CharacterVec: public IComparable
 							}
 							else
 							{
-								cancelPoint(map, last); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2
+								cancelPoint(map, last); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2。 last肯定不会是start,因为ZIG算法保证最高、最低点都出现在首尾，底1高于底2，所以底1不是最低点，也就不会是start。
 								changed = true;
 								last = current1;
 								current1 = current2;
