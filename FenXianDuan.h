@@ -28,7 +28,8 @@ public:
 				//下面就是划分线段的具体逻辑
 				baseItemIterator begin = XianDuanClass::baseItems->begin();
 				baseItemIterator end = XianDuanClass::baseItems->end();
-				XianDuanClass::container = startFenXianDuan(begin, end);
+				//XianDuanClass::container = startFenXianDuan(begin, end);
+				XianDuanClass::container = startFenXianDuan_v2();
 			}
 		}
 		else

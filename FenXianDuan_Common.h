@@ -483,7 +483,7 @@ class CharacterVec: public IComparable
 		return resultSet;
 	}
 
-	typedef enum { IS_TROUGH = -1, NON = 0, IS_PEAK = 1 }  InflectionPoint;
+	typedef enum {IS_CANCELED_TROUGH=-2,  IS_TROUGH = -1, NON = 0, IS_PEAK = 1 , IS_CANCELED_PEAK=2}  InflectionPoint;
 
 	static void findFenXing(InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end, bool findPeak)
 	{
@@ -548,7 +548,7 @@ class CharacterVec: public IComparable
 
 			if (findPeak)
 			{
-				if (leftCharacterVec > midCharacterVec || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				if (leftCharacterVec > midCharacterVec)// || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
 					current = midCharacterVec.start;
 					continue;
@@ -556,14 +556,14 @@ class CharacterVec: public IComparable
 			}
 			else
 			{
-				if (leftCharacterVec < midCharacterVec || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				if (leftCharacterVec < midCharacterVec)// || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
 					current = midCharacterVec.start;
 					continue;
 				}
 
 			}
-			assert(findPeak ? (leftCharacterVec.getHigh() < midCharacterVec.getHigh()) : (leftCharacterVec.getLow() > midCharacterVec.getLow()));
+			assert(findPeak ? (leftCharacterVec.getHigh() <= midCharacterVec.getHigh()) : (leftCharacterVec.getLow() >= midCharacterVec.getLow()));
 
 			//分型右侧特征向量，适用“前包后"合并
 			while ((current + 2) < end && midCharacterVec >> *(current + 2))
@@ -584,7 +584,7 @@ class CharacterVec: public IComparable
 					// 找到 顶分型
 					map[midCharacterVec.start - veryStart] = IS_PEAK;
 				}
-				else // if (midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec)
+				else
 				{
 					assert(midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec);
 					current = midCharacterVec.start;
@@ -597,18 +597,241 @@ class CharacterVec: public IComparable
 					// 找到 底分型
 					map[midCharacterVec.start - veryStart] = IS_TROUGH;
 				}
-				else // if ( midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec)
+				else
 				{
-					assert(midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec);
+					assert(midCharacterVec << rightCharacterVec || midCharacterVec > rightCharacterVec);
 					current = midCharacterVec.start;
 				}
 			}
 		}
 	}
 
+	static bool getPrevPoint(InflectionPoint  *map, int start, int &last) {
+		if (last <= start)
+			return false;
+
+		do {
+			last--;
+			if (map[last] == IS_PEAK || map[last] == IS_TROUGH)
+				return true;
+		} while (last > start);
+
+		return false;
+	}
+
+	static bool getNextPoint(InflectionPoint  *map, int end, int &next) {
+		/*
+		返回下一个有效的拐点。
+		如果超过end，则返回假*/
+		if (next >= end)
+			return false;
+
+		do {
+			next++;
+			if (map[next] == IS_PEAK || map[next] == IS_TROUGH)
+				return true;
+		} while (next < end);
+
+		return false;
+	}
+
+	static void cancelPoint(InflectionPoint  *map, int idx)
+	{
+		assert(map[idx] == IS_PEAK || map[idx] == IS_TROUGH);
+		map[idx] == IS_PEAK ? map[idx] = IS_CANCELED_PEAK : map[idx] = IS_CANCELED_TROUGH;
+	}
+
 	static void handleConflict(InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end)
 	{
+		/*
+		冲突1：
+		两个顶（或底）相连：
 
+		                      顶                             顶
+                                 /\                           /\
+                               /    \        /\            /    \
+              /\            /        \    /    \        /        \    /\
+            /    \        /            \/        \    /            \/    \
+          /        \    /                           \/                       \
+        /            \/                                                         \ 
+      /
+		冲突2：
+		相邻顶、底之间不足3笔：
+		                                顶
+                                          /\
+                                        /    \                   /\
+                   /\                /        \        /\    /    \
+        \        /    \            /            \    /   \/         \ 
+          \    /        \        /                \/                   \
+            \/            \    /                                          \
+                             \/ 
+                           底
+		*/
+
+
+		int s = start - veryStart;
+		int e = end + 1 - veryStart;
+
+
+		bool changed; 
+		do
+		{
+			changed = false;
+
+			int last = s, current1 = s, current2; // 3个节点的工作窗口， current1和current2 是当前存在问题的节点
+
+			if (!getNextPoint(map, e, current1))
+				return;
+
+			current2 = current1;
+			if (!getNextPoint(map, e, current2))
+				return;
+
+			if (current1 - s < 3 || map[s] == map[current1])
+			{
+				cancelPoint(map, current1);
+				changed = true;
+				continue;
+			}
+
+		
+			while (current2 <= e)
+			{
+				if (current2 - current1 < 3) // 相邻顶、底之间不足3笔
+				{
+					int next = current2;
+					if (getNextPoint(map, e, next))
+					{
+						
+						if (map[last] == map[current1])
+						{
+							// 如果current1 与 last同类型，并且 current1 没有比last更极端（底则需更低、顶则需更高），则将current1禁用; 否则 将last禁用
+							if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + last)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + last)).getHigh())
+							{
+								cancelPoint(map, current1);   // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 低于 底2
+								changed = true;
+								current1 = current2;
+								if (!getNextPoint(map, e, current2))
+									return;
+							}
+							else
+							{
+								cancelPoint(map, last); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2
+								changed = true;
+								last = current1;
+								current1 = current2;
+								if (!getNextPoint(map, e, current2))
+									return;
+							}
+						}
+						else if (map[current2] == map[next])
+						{
+							if (map[current2] == IS_TROUGH ? (*(veryStart + current2)).getLow() >= (*(veryStart + next)).getLow() : (*(veryStart + current2)).getHigh() <= (*(veryStart + next)).getHigh())
+							{
+								cancelPoint(map, current2);  // 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
+								changed = true;
+								last = current1;
+								current1 = current2;
+								if (!getNextPoint(map, e, current2))
+									return;
+							}
+							else
+							{
+								/* 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 底于 顶2。 需要注意的是：start肯定不是顶1，因为ZIG算法保证高低点都集中在首尾，
+								     所以start最次也是个底(相对于顶2)，即便start是顶，那么start也不会低于顶2，而顶1低于顶2，所以顶1肯定不会是start，
+									 因此，last可以被安全的cancel掉。
+                                                                              顶2
+                                                                               /\                           顶3
+                                                                             /    \                           /\
+                                                   顶1                   /        \           /\         /    \            /\
+                                                   /\                   /             \       /    \    /        \        /     \
+                                      /\        /    \    /\        /                 \    /       \/            \    /         \
+                                    /    \    /        \/    \    /                     \/                          \/             \
+                                  /        \/                   \/                                                                     \
+                                /                              底1
+								*/
+								// 取消 顶1、底1
+								cancelPoint(map, last);
+								cancelPoint(map, current1);
+								changed = true;
+								getPrevPoint(map, s, last);
+								current1 = current2;
+								if (!getNextPoint(map, e, current2))
+									return;
+							}
+						}
+						else {
+							// 譬如： 顶1- 底1 -顶2- 底2
+							
+							if (
+								(map[last] == IS_TROUGH ? (*(veryStart + last)).getLow() <= (*(veryStart + current2)).getLow() : (*(veryStart + last)).getHigh() >= (*(veryStart + current2)).getHigh())
+								&&
+								(map[next] == IS_TROUGH ? (*(veryStart + next)).getLow() <= (*(veryStart + current1)).getLow() : (*(veryStart + next)).getHigh() >= (*(veryStart + current1)).getHigh())
+								)
+							{
+								// 如果 顶1 高于 顶2 ，并且 底2 低于 底1
+								cancelPoint(map, current1);
+								cancelPoint(map, current2);
+								changed = true;
+								current2 = current1 = next;
+								if (!getNextPoint(map, e, current2))
+									return;
+							}
+							else
+								// 我还没有画出这样的图形。头痛。。。。。
+								assert(0);
+						}
+					}
+					else
+					{
+						// current2 就是 end，因此，current2必须保留；last也有可能是start，因此也需要保留；所以，只取消current1
+						cancelPoint(map, current1);
+						changed = true;
+						break;
+					}
+					
+				}
+				else if (map[current1] == map[current2])  // 两个顶（或底）相连
+				{
+					if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + current2)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + current2)).getHigh())
+					{
+						cancelPoint(map, current1);
+						changed = true;
+						current1 = current2;
+						if (!getNextPoint(map, e, current2))
+							break;
+					}
+					else {
+						cancelPoint(map, current2);
+						changed = true;
+						if (!getNextPoint(map, e, current2))
+							break;
+					}
+				}
+				else 
+				{
+					// 无异常
+					last = current1;
+					current1 = current2;
+					if (!getNextPoint(map, e, current2))
+						break;
+				}
+			}
+
+		} while (changed);
+	}
+
+	static void createResult(ContainerType* container, InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end)
+	{
+		int last = start - veryStart;
+		int e = end - veryStart + 1;
+		int cur = last;
+		while (cur < e)
+		{
+			getNextPoint(map, e, cur);
+			container->push_back(XianDuanClass(veryStart+last, veryStart+cur-1));
+			last = cur;
+		}
 	}
 
 	static ContainerType* startFenXianDuan_v2()
@@ -681,6 +904,7 @@ class CharacterVec: public IComparable
 		   一个可以适用的方式是： 先按照zig（30%）来划分出大的走势区间（这样能够识别出一些大画面的顶、底），然后再在各个走势区间内部 进行线段划分。 这样的好处是：每个走势区间的头、尾对应的顶、底分型是确定的，只需要找出其内部的各个顶、底分型就可以了。
 
 		 */
+		ContainerType* resultSet = (ContainerType*)NULL;
 
 		ContainerType* bigPicture = ZIG_PEAK_TROUGH<XianDuanClass>(30); // 先按照zig 做个宏观的线段划分
 
@@ -707,8 +931,16 @@ class CharacterVec: public IComparable
 			findFenXing(map, veryStart, biStart, biEnd, false); // 寻找 底分型
 
 			handleConflict(map, veryStart, biStart, biEnd);  // 处理 顶顶、底底相邻，以及 顶、底之间没有3笔的情况
+
+			if (!resultSet)
+			{
+				resultSet = new ContainerType();
+			}
+			createResult(resultSet, map, veryStart, biStart, biEnd);
 		}
 
 		delete bigPicture;
 		delete[] map;
+
+		return resultSet;
 	}

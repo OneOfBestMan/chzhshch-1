@@ -153,9 +153,26 @@ Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator
 	baseItemType& start = *biStart;
 	baseItemType& end = *biEnd;
 	
-	assert(start.getDirection() == end.getDirection() && IComparable::getDirection(start,end) == start.getDirection());
+	// assert(start.getDirection() == end.getDirection() && IComparable::getDirection(start,end) == start.getDirection()); 此处会触发错误：当只有1笔30%涨幅的时候，线段则只包含1笔；IComparable的判断失效
+	assert(start.getDirection() == end.getDirection());
 
-	Class_XianDuan(biStart, biEnd, start.getDirection());
+
+	this->Start = biStart;
+	this->End = biEnd;
+	this->d = start.getDirection();
+
+	float high = (*biStart).getHigh();
+	float low = (*biStart).getLow();
+
+	while (biStart != biEnd + 1)
+	{
+		high = max(high, (*biStart).getHigh());
+		low = min(low, (*biStart).getLow());
+		biStart++;
+	}
+
+	this->High = high;
+	this->Low = low;
 }
 
 template<int grade>
@@ -208,7 +225,8 @@ public:
 					//下面就是划分线段的具体逻辑
 					baseItemIterator begin = XianDuanClass::baseItems->begin();
 					baseItemIterator end = XianDuanClass::baseItems->end();
-					XianDuanClass::container = startFenXianDuan(begin, end);
+					//XianDuanClass::container = startFenXianDuan(begin, end);
+					XianDuanClass::container = startFenXianDuan_v2();
 				}
 			}
 		} else
