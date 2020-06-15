@@ -4,12 +4,26 @@
 ZIG算法
 */
 
-template<class XianDuan_or_Bi>
-typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH(float ZIG_PERCENT=5)
+static float gradedTrend[] =
+{
+	0,   // NOT USED,  类笔不采用ZIG算法来处理
+	5,  //   笔的幅度 （类笔构成的趋势的幅度）
+	5 * 5, // 笔中枢构成的趋势的幅度， 线段级别1的幅度
+	5 * 5 * 5,  // 线段级别1 构成的趋势（其 内部的中枢是由 线段级别1 构成）的幅度
+	5 * 5 * 5 * 5,
+	5 * 5 * 5 * 5 * 5,
+	5 * 5 * 5 * 5 * 5 * 5,
+	5 * 5 * 5 * 5 * 5 * 5 * 5
+};
+
+
+template<class XianDuan_or_Bi, int grade>
+typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH()
 {
 	/*
 	根据输入的zig_percent，对base_Container中的元素寻找拐点。 
 	*/
+	float ZIG_PERCENT = gradedTrend[grade];
 
 	typedef typename XianDuan_or_Bi::ContainerType ContainerType;
 	typedef typename XianDuan_or_Bi::baseItemType_Container baseItemType_Container;

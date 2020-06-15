@@ -431,7 +431,7 @@ void Class_Bi::checkValid()
 
 void Class_Bi::FenBi_Step2()
 {
-	container = ZIG_PEAK_TROUGH<Class_Bi>();
+	container = ZIG_PEAK_TROUGH<Class_Bi, 1>();
 }
 
 

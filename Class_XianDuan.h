@@ -164,6 +164,13 @@ Class_XianDuan<grade>::Class_XianDuan(baseItemIterator biStart, baseItemIterator
 	float high = (*biStart).getHigh();
 	float low = (*biStart).getLow();
 
+	/* 本来一直觉得，ZIG算法之后，大区间内，找顶分型、底分型，划分线段，应该可以保证线段高低点在首尾底分型出现，但是实际上也为尽然
+	问题出在哪里？  问题出在，在handle confilict的时候，会对 顶顶、底底、顶底不足3笔进行处理，这就导致一些顶、底分型被删除了，所以，剩下的
+	顶底分形 所形成的线段，就不一定满足  高、低点，一定出现在首尾了。
+
+	此处，可以写一个assert，来检查这样的情况是否严重。 原则上来说，应该尽量避免出现高低点不出现在首尾的情况。 
+	可以把这样的情况，当成bug去修。
+	*/
 	while (biStart != biEnd + 1)
 	{
 		high = max(high, (*biStart).getHigh());
