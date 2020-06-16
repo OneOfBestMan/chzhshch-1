@@ -531,6 +531,8 @@ class CharacterVec: public IComparable
 		}
 		while (current < end)
 		{
+			baseItemIterator nextTry = current + 2;
+
 			CharacterVec  leftCharacterVec(current);   // 分型的左特征向量
 
 			//分型左侧的特征向量，适用“前包后”合并
@@ -550,7 +552,8 @@ class CharacterVec: public IComparable
 			{
 				if (leftCharacterVec > midCharacterVec)// || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
-					current = midCharacterVec.start;
+					// current = midCharacterVec.start;
+					current = nextTry;
 					continue;
 				}
 			}
@@ -558,7 +561,8 @@ class CharacterVec: public IComparable
 			{
 				if (leftCharacterVec < midCharacterVec)// || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
-					current = midCharacterVec.start;
+					// current = midCharacterVec.start;
+					current = nextTry;
 					continue;
 				}
 
@@ -583,11 +587,13 @@ class CharacterVec: public IComparable
 				{
 					// 找到 顶分型
 					map[midCharacterVec.start - veryStart] = IS_PEAK;
+					current = nextTry;
 				}
 				else
 				{
 					assert(midCharacterVec << rightCharacterVec || midCharacterVec < rightCharacterVec);
-					current = midCharacterVec.start;
+					// current = midCharacterVec.start;
+					current = nextTry; 
 				}
 			}
 			else
@@ -596,11 +602,13 @@ class CharacterVec: public IComparable
 				{
 					// 找到 底分型
 					map[midCharacterVec.start - veryStart] = IS_TROUGH;
+					current = nextTry;
 				}
 				else
 				{
 					assert(midCharacterVec << rightCharacterVec || midCharacterVec > rightCharacterVec);
-					current = midCharacterVec.start;
+					// current = midCharacterVec.start;
+					current = nextTry;
 				}
 			}
 		}
@@ -635,9 +643,9 @@ class CharacterVec: public IComparable
 		return false;
 	}
 
-	static void cancelPoint(InflectionPoint  *map, int idx)
+	static void cancelPoint(InflectionPoint  *map, int idx, int start, int end)
 	{
-		assert(map[idx] == IS_PEAK || map[idx] == IS_TROUGH);
+		assert((map[idx] == IS_PEAK || map[idx] == IS_TROUGH) && idx < end && idx > start);
 		map[idx] == IS_PEAK ? map[idx] = IS_CANCELED_PEAK : map[idx] = IS_CANCELED_TROUGH;
 	}
 
@@ -671,7 +679,7 @@ class CharacterVec: public IComparable
 
 		int s = start - veryStart;
 		int e = end + 1 - veryStart;
-
+		Direction d = (*start).getDirection();
 
 		bool changed; 
 		do
@@ -689,7 +697,7 @@ class CharacterVec: public IComparable
 
 			if (current1 - s < 3 || map[s] == map[current1])
 			{
-				cancelPoint(map, current1);
+				cancelPoint(map, current1, s, e);
 				changed = true;
 				continue;
 			}
@@ -708,7 +716,7 @@ class CharacterVec: public IComparable
 							// 如果current1 与 last同类型，并且 current1 没有比last更极端（底则需更低、顶则需更高），则将current1禁用; 否则 将last禁用
 							if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + last)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + last)).getHigh())
 							{
-								cancelPoint(map, current1);   // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 低于 底2
+								cancelPoint(map, current1, s, e);   // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 低于 底2
 								changed = true;
 								current1 = current2;
 								if (!getNextPoint(map, e, current2))
@@ -716,7 +724,7 @@ class CharacterVec: public IComparable
 							}
 							else
 							{
-								cancelPoint(map, last); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2。 last肯定不会是start,因为ZIG算法保证最高、最低点都出现在首尾，底1高于底2，所以底1不是最低点，也就不会是start。
+								cancelPoint(map, last, s,e); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2。 last肯定不会是start,因为ZIG算法保证最高、最低点都出现在首尾，底1高于底2，所以底1不是最低点，也就不会是start。
 								changed = true;
 								last = current1;
 								current1 = current2;
@@ -728,7 +736,7 @@ class CharacterVec: public IComparable
 						{
 							if (map[current2] == IS_TROUGH ? (*(veryStart + current2)).getLow() >= (*(veryStart + next)).getLow() : (*(veryStart + current2)).getHigh() <= (*(veryStart + next)).getHigh())
 							{
-								cancelPoint(map, current2);  // 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
+								cancelPoint(map, current2, s,e);  // 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
 								changed = true;
 								last = current1;
 								current1 = current2;
@@ -751,8 +759,8 @@ class CharacterVec: public IComparable
                                 /                              底1
 								*/
 								// 取消 顶1、底1
-								cancelPoint(map, last);
-								cancelPoint(map, current1);
+								cancelPoint(map, last, s,e);
+								cancelPoint(map, current1,s,e);
 								changed = true;
 								getPrevPoint(map, s, last);
 								current1 = current2;
@@ -770,22 +778,71 @@ class CharacterVec: public IComparable
 								)
 							{
 								// 如果 顶1 高于 顶2 ，并且 底2 低于 底1
-								cancelPoint(map, current1);
-								cancelPoint(map, current2);
+								cancelPoint(map, current1, s,e);
+								cancelPoint(map, current2,s,e);
 								changed = true;
 								current2 = current1 = next;
 								if (!getNextPoint(map, e, current2))
 									return;
 							}
 							else
+							{
 								// 我还没有画出这样的图形。头痛。。。。。
-								assert(0);
+								if (d == ASCENDING)
+								{  // 如果线段上升，则取消peak，因为，后面肯定还有更高的峰，峰不值钱。。。。。晕菜。
+									if (map[current2] == IS_PEAK)
+									{
+										cancelPoint(map, current2,s,e);
+										changed = true;
+										if (!getNextPoint(map, e, current2))
+											return;
+									}
+									else
+									{
+										cancelPoint(map, current1,s,e);
+										changed = true;
+										current1 = current2;
+										if (!getNextPoint(map, e, current2))
+											return;
+									}
+
+									/*if (map[current2] == IS_PEAK)
+									{
+										cancelPoint(map, last);
+										cancelPoint(map, current1);
+										changed = true;
+										if (!getPrevPoint(map, s, last))
+											assert(0);
+										current1 = current2;
+										if (!getNextPoint(map, e, current2))
+											return;
+									}*/
+								} 
+								else
+								{
+									if (map[current2] == IS_TROUGH)
+									{
+										cancelPoint(map, current2,s,e);
+										changed = true;
+										if (!getNextPoint(map, e, current2))
+											return;
+									}
+									else
+									{
+										cancelPoint(map, current1,s,e);
+										changed = true;
+										current1 = current2;
+										if (!getNextPoint(map, e, current2))
+											return;
+									}
+								}
+							}
 						}
 					}
 					else
 					{
 						// current2 就是 end，因此，current2必须保留；last也有可能是start，因此也需要保留；所以，只取消current1
-						cancelPoint(map, current1);
+						cancelPoint(map, current1,s,e);
 						changed = true;
 						break;
 					}
@@ -795,14 +852,14 @@ class CharacterVec: public IComparable
 				{
 					if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + current2)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + current2)).getHigh())
 					{
-						cancelPoint(map, current1);
+						cancelPoint(map, current1,s,e);
 						changed = true;
 						current1 = current2;
 						if (!getNextPoint(map, e, current2))
 							break;
 					}
 					else {
-						cancelPoint(map, current2);
+						cancelPoint(map, current2,s,e);
 						changed = true;
 						if (!getNextPoint(map, e, current2))
 							break;
@@ -832,6 +889,12 @@ class CharacterVec: public IComparable
 			container->push_back(XianDuanClass(veryStart+last, veryStart+cur-1));
 			last = cur;
 		}
+	}
+
+	static void debugMap(InflectionPoint *src, int *dest, int size)
+	{
+		for (int i = 0; i < size; i++)
+			dest[i] = (int)src[i];
 	}
 
 	static ContainerType* startFenXianDuan_v2()
@@ -937,9 +1000,14 @@ class CharacterVec: public IComparable
 			if (!resultSet)
 			{
 				resultSet = new ContainerType();
+				XianDuanClass::debugInfPnt = new int[XianDuanClass::baseItems->size()+1];
 			}
+
 			createResult(resultSet, map, veryStart, biStart, biEnd);
 		}
+
+		if (resultSet)
+			debugMap(map, XianDuanClass::debugInfPnt, XianDuanClass::baseItems->size() + 1);
 
 		delete bigPicture;
 		delete[] map;

@@ -41,6 +41,8 @@ public:
 
 	static baseItemType_Container *baseItems;
 	static ContainerType *container;
+
+	static int *debugInfPnt; // InfPnt = Inflection Point ¹Õµã
 	
 	Class_XianDuan(void);
 	~Class_XianDuan(void);
@@ -100,6 +102,8 @@ public:
 
     static baseItemType_Container *baseItems;
     static ContainerType *container;
+
+	static int *debugInfPnt; // InfPnt = Inflection Point ¹Õµã
 
 	friend ostream& operator<<(ostream&, Class_XianDuan&);
 
@@ -188,6 +192,8 @@ typename Class_XianDuan<grade>::baseItemType_Container* Class_XianDuan<grade>::b
 template<int grade>
 typename Class_XianDuan<grade>::ContainerType* Class_XianDuan<grade>::container = (typename Class_XianDuan<grade>::ContainerType*)NULL;
 
+template<int grade>
+int* Class_XianDuan<grade>::debugInfPnt = (int*)NULL;
 
 template<>
 class FenXianDuanTemplate<typename Class_XianDuan<1> >

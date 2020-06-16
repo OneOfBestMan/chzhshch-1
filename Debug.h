@@ -131,6 +131,8 @@ template<class XianDuanClass >
 class DumpTemplateV2
 {
 public:
+	typedef typename XianDuanClass::baseItemIterator baseItemIterator;
+	typedef typename XianDuanClass::baseItemType baseItemType;
 
 	static void printChildren(typename XianDuanClass::baseItemIterator start, typename XianDuanClass::baseItemIterator end, ostream &stream, dumpHelperMap &helperMap)
 	{
@@ -158,20 +160,19 @@ public:
 		stream << '$' << "\n\n";
 	}
 
-
 	static void doWork(dumpHelperMap &helperMap, ostream &stream)
 	{
 		if (XianDuanClass::container == NULL) return;
 
 		XianDuanClass::ContainerType::iterator p = XianDuanClass::container->begin();
-		XianDuanClass::ContainerType::iterator end   = XianDuanClass::container->end();
-		
+		XianDuanClass::ContainerType::iterator end = XianDuanClass::container->end();
+
 		while (p != end)
 		{
 			XianDuanClass::ContainerType::value_type &item = *p;
 
 			int total = helperMap[&item].total;
-			
+
 			stringstream strstream;
 			strstream << item;
 
@@ -191,6 +192,40 @@ public:
 		}
 		stream << "####" << '\n';
 	}
+
+	static void displayInfPnt(float *resultBuf)  //InfPnt = Inflection Point ¹Õµã
+	{
+		if (!XianDuanClass::baseItems) return;
+
+		baseItemIterator start = XianDuanClass::baseItems->begin();
+		baseItemIterator end = XianDuanClass::baseItems->end();
+		baseItemIterator curr = start;
+
+		baseItemType item = *curr;
+
+		Class_KXian *veryStart = item.getStartRec();
+		Class_KXian *lastEnd = veryStart;
+
+		while (curr != end)
+		{
+			item = *curr;
+
+			Class_KXian *currStart = item.getStartRec();
+
+			assert(currStart == lastEnd);
+
+			if (XianDuanClass::debugInfPnt[curr - start])
+				resultBuf[currStart - veryStart] = XianDuanClass::debugInfPnt[curr - start];
+
+			lastEnd = item.getEndRec();
+
+			curr++;
+		}
+
+		if (XianDuanClass::debugInfPnt[curr - start])
+			resultBuf[item.getEndRec() - veryStart] = XianDuanClass::debugInfPnt[curr - start];
+	}
+
 };
 
 

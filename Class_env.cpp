@@ -122,7 +122,7 @@ void Class_env::outputResult()
 {
 	if (ZSorXD == XIANDUAN)
 	{
-		assert(grade >= LEI_BI && grade <= XIANDUAN_7 && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
+		assert(grade >= LEI_BI && grade <= DEBUG_GUAIDIAN && func >= OUTPUT_TIME && func <= OUTPUT_PRICE);
 
 		if (grade == BI)
 		{
@@ -158,7 +158,9 @@ void Class_env::outputResult()
 				Class_XianDuan<XIANDUAN_7>::DisplayClass::doWork(func, resultBuf);
 				break;
 			default:
-				assert(0);
+				Class_XianDuan<XIANDUAN_2>::DumpClassV2::displayInfPnt(resultBuf);
+				break;
+				//assert(0);
 			}
 		}
 	} else

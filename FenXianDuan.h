@@ -15,7 +15,7 @@ public:
 	typedef typename XianDuanClass::ContainerType ContainerType;
 	typedef typename XianDuanClass::baseItemType_Container baseItemType_Container;
 	typedef typename ContainerType::iterator itemIterator;
-	typedef XianDuanClass itemType;
+	typedef typename XianDuanClass XianDuanClass;
 
 	static void doWork(bool release)
 	{
@@ -37,6 +37,12 @@ public:
 			delete XianDuanClass::container;
 			XianDuanClass::container = NULL;
 			XianDuanClass::baseItems = NULL;
+
+			if (XianDuanClass::debugInfPnt)
+			{
+				delete[] XianDuanClass::debugInfPnt;
+				XianDuanClass::debugInfPnt = NULL;
+			}
 		}
 	}
 
