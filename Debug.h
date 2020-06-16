@@ -7,6 +7,8 @@
 #include <map>
 #include <ostream>
 #include <sstream> // to use istringstream
+
+#include "Class_env.h"
 using namespace std;
 
 typedef struct mappedInfo{

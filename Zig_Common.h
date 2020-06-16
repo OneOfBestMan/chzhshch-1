@@ -18,7 +18,7 @@ static float gradedTrend[] =
 
 
 template<class XianDuan_or_Bi, int grade>
-typename XianDuan_or_Bi::ContainerType* ZIG_PEAK_TROUGH()
+typename XianDuan_or_Bi::ContainerType*     ZIG_PEAK_TROUGH()
 {
 	/*
 	根据输入的zig_percent，对base_Container中的元素寻找拐点。 

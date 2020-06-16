@@ -14,7 +14,7 @@ using namespace std;
 #include "AnalyzeZhongShu.h"
 
 Class_env* Class_env::env = NULL;
-
+ofstream* Class_env::log = NULL;
 
 Class_env::Class_env(CALCINFO *p)
 {
@@ -40,6 +40,8 @@ Class_env::Class_env(CALCINFO *p)
 	barKind = (DATA_TYPE)(int)p->m_dataType;
 
 	memset(resultBuf, 0, totalBar * sizeof(float)); // 飞狐交易师 并不初始化resultBuf为0，所以需要自己初始化
+
+	getDebugLog() << "==== Handling " << stockName << " ====\n";
 }
 
 Class_env* Class_env::getInstance(CALCINFO *p)
@@ -115,6 +117,7 @@ Class_env* Class_env::getInstance()
 Class_env::~Class_env(void)
 {
 	delete stockName;
+	
 }
 
 

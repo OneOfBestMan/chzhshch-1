@@ -550,7 +550,7 @@ class CharacterVec: public IComparable
 
 			if (findPeak)
 			{
-				if (leftCharacterVec > midCharacterVec)// || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				if (leftCharacterVec > midCharacterVec || leftCharacterVec << midCharacterVec)   // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
 					// current = midCharacterVec.start;
 					current = nextTry;
@@ -559,7 +559,7 @@ class CharacterVec: public IComparable
 			}
 			else
 			{
-				if (leftCharacterVec < midCharacterVec)// || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
+				if (leftCharacterVec < midCharacterVec || leftCharacterVec << midCharacterVec) // 参考缠论第81讲的那个例子，启用了更严格的要求： 后包前 不算。
 				{
 					// current = midCharacterVec.start;
 					current = nextTry;
@@ -681,6 +681,8 @@ class CharacterVec: public IComparable
 		int e = end + 1 - veryStart;
 		Direction d = (*start).getDirection();
 
+		Class_env::getDebugLog() << "handleConflict " << s << " to " << e << "\n";
+
 		bool changed; 
 		do
 		{
@@ -697,6 +699,8 @@ class CharacterVec: public IComparable
 
 			if (current1 - s < 3 || map[s] == map[current1])
 			{
+				Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 				cancelPoint(map, current1, s, e);
 				changed = true;
 				continue;
@@ -716,6 +720,8 @@ class CharacterVec: public IComparable
 							// 如果current1 与 last同类型，并且 current1 没有比last更极端（底则需更低、顶则需更高），则将current1禁用; 否则 将last禁用
 							if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + last)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + last)).getHigh())
 							{
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 								cancelPoint(map, current1, s, e);   // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 低于 底2
 								changed = true;
 								current1 = current2;
@@ -724,6 +730,8 @@ class CharacterVec: public IComparable
 							}
 							else
 							{
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << last << "\n";
+
 								cancelPoint(map, last, s,e); // 譬如： 底1(last) -底2(current1) - 顶(current2)，且底1 高于 底2。 last肯定不会是start,因为ZIG算法保证最高、最低点都出现在首尾，底1高于底2，所以底1不是最低点，也就不会是start。
 								changed = true;
 								last = current1;
@@ -736,16 +744,20 @@ class CharacterVec: public IComparable
 						{
 							if (map[current2] == IS_TROUGH ? (*(veryStart + current2)).getLow() >= (*(veryStart + next)).getLow() : (*(veryStart + current2)).getHigh() <= (*(veryStart + next)).getHigh())
 							{
-								cancelPoint(map, current2, s,e);  // 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
+								// 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
+								
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2 << "\n";
+
+								cancelPoint(map, current2, s,e);  
 								changed = true;
 								last = current1;
 								current1 = current2;
 								if (!getNextPoint(map, e, current2))
 									return;
 							}
-							else
+							else	if (map[current2] == IS_TROUGH ? (*(veryStart + last)).getLow() > (*(veryStart + current2)).getLow() : (*(veryStart + last)).getHigh() < (*(veryStart + current2)).getHigh())
 							{
-								/* 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 底于 顶2。 需要注意的是：start肯定不是顶1，因为ZIG算法保证高低点都集中在首尾，
+								/* 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 底于 顶2、顶1低于顶2。 需要注意的是：start肯定不是顶1，因为ZIG算法保证高低点都集中在首尾，
 								     所以start最次也是个底(相对于顶2)，即便start是顶，那么start也不会低于顶2，而顶1低于顶2，所以顶1肯定不会是start，
 									 因此，last可以被安全的cancel掉。
                                                                               顶2
@@ -759,6 +771,9 @@ class CharacterVec: public IComparable
                                 /                              底1
 								*/
 								// 取消 顶1、底1
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << last << "\n";
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 								cancelPoint(map, last, s,e);
 								cancelPoint(map, current1,s,e);
 								changed = true;
@@ -766,6 +781,16 @@ class CharacterVec: public IComparable
 								current1 = current2;
 								if (!getNextPoint(map, e, current2))
 									return;
+							} else
+							{
+								// 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且 顶3低于顶2，顶1 高于 顶2，
+
+								// 会造成 线段最高点、最低点，不出现在线段开始、结尾的情形！！
+								assert(0);
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2 << "\n";
+								cancelPoint(map, current2, s, e);
+								changed = true;
+								current2 = next;
 							}
 						}
 						else {
@@ -778,6 +803,9 @@ class CharacterVec: public IComparable
 								)
 							{
 								// 如果 顶1 高于 顶2 ，并且 底2 低于 底1
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+								Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2 << "\n";
+
 								cancelPoint(map, current1, s,e);
 								cancelPoint(map, current2,s,e);
 								changed = true;
@@ -792,6 +820,8 @@ class CharacterVec: public IComparable
 								{  // 如果线段上升，则取消peak，因为，后面肯定还有更高的峰，峰不值钱。。。。。晕菜。
 									if (map[current2] == IS_PEAK)
 									{
+										Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2 << "\n";
+
 										cancelPoint(map, current2,s,e);
 										changed = true;
 										if (!getNextPoint(map, e, current2))
@@ -799,6 +829,8 @@ class CharacterVec: public IComparable
 									}
 									else
 									{
+										Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 										cancelPoint(map, current1,s,e);
 										changed = true;
 										current1 = current2;
@@ -822,6 +854,8 @@ class CharacterVec: public IComparable
 								{
 									if (map[current2] == IS_TROUGH)
 									{
+										Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2<< "\n";
+
 										cancelPoint(map, current2,s,e);
 										changed = true;
 										if (!getNextPoint(map, e, current2))
@@ -829,6 +863,8 @@ class CharacterVec: public IComparable
 									}
 									else
 									{
+										Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 										cancelPoint(map, current1,s,e);
 										changed = true;
 										current1 = current2;
@@ -842,6 +878,8 @@ class CharacterVec: public IComparable
 					else
 					{
 						// current2 就是 end，因此，current2必须保留；last也有可能是start，因此也需要保留；所以，只取消current1
+						Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 						cancelPoint(map, current1,s,e);
 						changed = true;
 						break;
@@ -852,6 +890,8 @@ class CharacterVec: public IComparable
 				{
 					if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + current2)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + current2)).getHigh())
 					{
+						Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
+
 						cancelPoint(map, current1,s,e);
 						changed = true;
 						current1 = current2;
@@ -859,6 +899,8 @@ class CharacterVec: public IComparable
 							break;
 					}
 					else {
+						Class_env::getDebugLog() << __LINE__ << ": Cancel " << current2<< "\n";
+
 						cancelPoint(map, current2,s,e);
 						changed = true;
 						if (!getNextPoint(map, e, current2))
@@ -894,7 +936,14 @@ class CharacterVec: public IComparable
 	static void debugMap(InflectionPoint *src, int *dest, int size)
 	{
 		for (int i = 0; i < size; i++)
-			dest[i] = (int)src[i];
+		{
+			if (src[i] == IS_TROUGH || src[i] == IS_CANCELED_TROUGH)
+				dest[i] = -(i<< 2 | (-src[i] ));
+			else if (src[i] == IS_PEAK || src[i] == IS_CANCELED_PEAK)
+				dest[i] = (i << 2 | (src[i] ));
+			else
+				dest[i] = NON;
+		}
 	}
 
 	static ContainerType* startFenXianDuan_v2()

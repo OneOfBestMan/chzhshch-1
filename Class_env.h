@@ -6,7 +6,7 @@
 
 #include "include_api.h"
 #include <map>
-
+#include <fstream>
 
 using namespace std;
 
@@ -75,10 +75,24 @@ public:
 			totalBar  == secondEnv.totalBar  && barKind == secondEnv.barKind);
 	}
 
+
+	static ofstream& getDebugLog()
+	{
+		if (!log)
+		{
+			log = new ofstream("c:\\交易师.log", ios_base::app); // 追加写入
+		}
+		log->flush();
+		return *log;
+	}
+
 private:
 
 	Class_env(CALCINFO* p);
 	CALCINFO *handle;
+
+	static ofstream *log;
+
 
 
 };
