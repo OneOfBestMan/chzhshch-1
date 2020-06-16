@@ -205,8 +205,8 @@ public:
 
 		baseItemType item = *curr;
 
-		Class_KXian *veryStart = item.getStartRec();
-		Class_KXian *lastEnd = veryStart;
+		Class_KXian *veryStart = &(*(Class_KXian::container->begin()));
+		Class_KXian *lastEnd = item.getStartRec();
 
 		while (curr != end)
 		{

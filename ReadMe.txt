@@ -15,8 +15,10 @@
 	
 	XIANDUAN_2_GuaiDian_Raw:="STOCKFUNC@CHZHSHCH"(Open, Close, Low, High, 8, 0, 0);	XIANDUAN_2_GuaiDian:= mod(XIANDUAN_2_GuaiDian_Raw,4);	XIANDUAN_2_GuaiDian_Pos:=floor(abs(XIANDUAN_2_GuaiDian_Raw)/4);	DRAWICON(XIANDUAN_2_GuaiDian==-2, LOW, '取消的底分型.ico'); 
 	DRAWICON(XIANDUAN_2_GuaiDian==-1, LOW, '底分型.ico');  
+	DRAWICON(XIANDUAN_2_GuaiDian==-3, LOW, 'ZIG底分型.ico'); 
 	DRAWICON(XIANDUAN_2_GuaiDian==2, HIGH, '取消的顶分型.ico'); 
-	DRAWICON(XIANDUAN_2_GuaiDian==1, HIGH, '顶分型.ico');  	DRAWTEXT(XIANDUAN_2_GuaiDian<0, LOW*0.9, XIANDUAN_2_GuaiDian_Pos),COLORFFFFFF;
+	DRAWICON(XIANDUAN_2_GuaiDian==1, HIGH, '顶分型.ico');
+	DRAWICON(XIANDUAN_2_GuaiDian==3, HIGH, 'ZIG顶分型.ico'); 	DRAWTEXT(XIANDUAN_2_GuaiDian<0, LOW*0.9, XIANDUAN_2_GuaiDian_Pos),COLORFFFFFF;
 	DRAWTEXT(XIANDUAN_2_GuaiDian>0, HIGH*1.1, XIANDUAN_2_GuaiDian_Pos),COLORFFFFFF;
 
 	XIANDUAN_3_TIME:="STOCKFUNC@CHZHSHCH"(Open, Close, Low, High, 3, 0, 0);

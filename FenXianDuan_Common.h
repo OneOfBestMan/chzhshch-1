@@ -483,7 +483,7 @@ class CharacterVec: public IComparable
 		return resultSet;
 	}
 
-	typedef enum {IS_CANCELED_TROUGH=-2,  IS_TROUGH = -1, NON = 0, IS_PEAK = 1 , IS_CANCELED_PEAK=2}  InflectionPoint;
+	typedef enum { IS_ZIG_TROUGH = -3, IS_CANCELED_TROUGH = -2, IS_TROUGH = -1, NON = 0, IS_PEAK = 1, IS_CANCELED_PEAK = 2, IS_ZIG_PEAK = 3 }  InflectionPoint;
 
 	static void findFenXing(InflectionPoint  *map, baseItemIterator veryStart, baseItemIterator start, baseItemIterator end, bool findPeak)
 	{
@@ -742,7 +742,10 @@ class CharacterVec: public IComparable
 						}
 						else if (map[current2] == map[next])
 						{
-							if (map[current2] == IS_TROUGH ? (*(veryStart + current2)).getLow() >= (*(veryStart + next)).getLow() : (*(veryStart + current2)).getHigh() <= (*(veryStart + next)).getHigh())
+							float next_High = (next == e ? (*(veryStart + next - 1)).getHigh() : (*(veryStart + next)).getHigh());
+							float next_Low = (next == e ? (*(veryStart + next - 1)).getLow() : (*(veryStart + next)).getLow());
+
+							if (map[current2] == IS_TROUGH ? (*(veryStart + current2)).getLow() >= next_Low : (*(veryStart + current2)).getHigh() <= next_High)
 							{
 								// 譬如： 顶1(last) - 底1(current1) - 顶2(current2) - 顶3，且顶3 高于顶2
 								
@@ -888,7 +891,10 @@ class CharacterVec: public IComparable
 				}
 				else if (map[current1] == map[current2])  // 两个顶（或底）相连
 				{
-					if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= (*(veryStart + current2)).getLow() : (*(veryStart + current1)).getHigh() <= (*(veryStart + current2)).getHigh())
+					float current2_High = (current2 == e ? (*(veryStart + current2 - 1)).getHigh() : (*(veryStart + current2)).getHigh());
+					float current2_Low = (current2 == e ? (*(veryStart + current2 - 1)).getLow() : (*(veryStart + current2)).getLow());
+
+					if (map[current1] == IS_TROUGH ? (*(veryStart + current1)).getLow() >= current2_Low : (*(veryStart + current1)).getHigh() <= current2_High)
 					{
 						Class_env::getDebugLog() << __LINE__ << ": Cancel " << current1 << "\n";
 
@@ -933,13 +939,13 @@ class CharacterVec: public IComparable
 		}
 	}
 
-	static void debugMap(InflectionPoint *src, int *dest, int size)
+	static void saveInfPntMap(InflectionPoint *src, int *dest, int size)
 	{
 		for (int i = 0; i < size; i++)
 		{
-			if (src[i] == IS_TROUGH || src[i] == IS_CANCELED_TROUGH)
+			if (src[i] == IS_TROUGH || src[i] == IS_CANCELED_TROUGH || src[i] == IS_ZIG_TROUGH)
 				dest[i] = -(i<< 2 | (-src[i] ));
-			else if (src[i] == IS_PEAK || src[i] == IS_CANCELED_PEAK)
+			else if (src[i] == IS_PEAK || src[i] == IS_CANCELED_PEAK || src[i] == IS_ZIG_PEAK)
 				dest[i] = (i << 2 | (src[i] ));
 			else
 				dest[i] = NON;
@@ -1056,7 +1062,17 @@ class CharacterVec: public IComparable
 		}
 
 		if (resultSet)
-			debugMap(map, XianDuanClass::debugInfPnt, XianDuanClass::baseItems->size() + 1);
+		{
+			for (curXianDuan = firstXianDuan; curXianDuan < lastXianDuan; curXianDuan++)
+			{
+				baseItemIterator biStart = (*curXianDuan).getStart(); //线段的开始点
+				baseItemIterator biEnd = (*curXianDuan).getEnd();   //线段的结束点
+
+				map[biStart - veryStart] = ((*biStart).getDirection() == ASCENDING ? IS_ZIG_TROUGH : IS_ZIG_PEAK);
+				map[biEnd - veryStart + 1] = ((*biEnd).getDirection() == ASCENDING ? IS_ZIG_PEAK : IS_ZIG_TROUGH);
+			}
+			saveInfPntMap(map, XianDuanClass::debugInfPnt, XianDuanClass::baseItems->size() + 1);  // InfPnt = inflection point 拐点
+		}
 
 		delete bigPicture;
 		delete[] map;
